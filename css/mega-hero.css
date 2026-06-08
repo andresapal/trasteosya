@@ -98,20 +98,34 @@
 @media (max-width: 767px) {
   .mega-hero {
     height: auto !important;
-    min-height: 420px !important;
+    min-height: 0 !important;
     max-height: none !important;
   }
   .mega-hero__content {
-    padding: 24px var(--space-md) 36px !important;
+    padding: 18px 16px 24px !important;
     justify-content: flex-start !important;
+    min-height: 0 !important;
+    height: auto !important;
   }
-  /* Forzar visibilidad del slide activo y su contenido en mobile (sin esperar JS) */
-  .mega-hero__slide:first-child { opacity: 1 !important; pointer-events: auto !important; z-index: 2 !important; }
-  .mega-hero__slide:first-child .mega-hero__slide-content { opacity: 1 !important; transform: none !important; }
+  /* Forzar TODOS los slides visibles (el primero como activo, los demas invisibles pero
+     el contenido no usa display:none asi que el "ancho" se calcula bien) */
+  .mega-hero__slides { position: relative !important; z-index: 1; }
+  .mega-hero__slide { position: absolute; }
+  .mega-hero__slide:first-child {
+    position: relative !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: 2 !important;
+  }
+  .mega-hero__slide:not(:first-child) { display: none !important; }
+  .mega-hero__slide:first-child .mega-hero__slide-content,
   .mega-hero__slide-content { opacity: 1 !important; transform: none !important; }
-  /* Reducir tamaño del titulo en mobile */
-  .mega-hero__title { font-size: clamp(26px, 7vw, 36px) !important; line-height: 1.12 !important; }
-  .mega-hero__lead { font-size: 15px !important; line-height: 1.4 !important; }
+  .mega-hero__slide:first-child .mega-hero__bg { transform: none !important; }
+  /* Titulo y lead mas pequenos */
+  .mega-hero__title { font-size: clamp(24px, 6.5vw, 32px) !important; line-height: 1.12 !important; margin-bottom: 8px !important; }
+  .mega-hero__lead { font-size: 14px !important; line-height: 1.4 !important; margin-bottom: 14px !important; }
+  .mega-hero__tag { font-size: 11px !important; padding: 5px 10px !important; }
+  .mega-hero__ctas .btn { padding: 12px 20px !important; font-size: 14px !important; }
 }
 
 .mega-hero__slide-content { max-width: 880px; }
