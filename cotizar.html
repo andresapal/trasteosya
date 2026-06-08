@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cotiza tu mudanza de hogar en 15 minutos · Trasteos Ya</title>
+  <meta name="description" content="Mudanza de hogar puerta a puerta en Bogotá y toda Colombia. Cotización por WhatsApp en menos de 15 minutos. 15 años, 5.000+ trasteos, equipo propio uniformado.">
+  <meta name="theme-color" content="#0A1845">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Cotiza tu mudanza de hogar en 15 minutos · Trasteos Ya">
+  <meta property="og:description" content="15 años moviendo Bogotá. Mudanzas de hogar con equipo propio, empaque profesional, transporte e instalación incluidos. Sin sorpresas.">
+  <meta property="og:image" content="assets/img/Hogar%201.png">
+  <meta name="robots" content="index,follow">
+
+  <link rel="icon" type="image/png" href="assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="image" href="assets/img/Hogar%201.png" fetchpriority="high">
+
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/effects.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "serviceType": "Mudanza de hogar",
+    "provider": {
+      "@type": "MovingCompany",
+      "name": "Trasteos Ya",
+      "telephone": "+57 314 309 5194",
+      "address": { "@type": "PostalAddress", "addressLocality": "Bogotá", "addressCountry": "CO" }
+    },
+    "areaServed": ["Bogotá", "Colombia"],
+    "description": "Mudanza residencial puerta a puerta con empaque profesional y armado de muebles."
+  }
+  </script>
+
+  <style>
+    /* ============================================
+       LANDING /cotizar — estilos locales
+       ============================================ */
+
+    /* Navbar minimal para landing (override del navbar global) */
+    .lp-nav { padding: 14px 0; }
+    .lp-nav__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: var(--container-wide);
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+      position: relative;
+      z-index: 2;
+    }
+    .lp-nav__logo img { height: 44px; width: auto; display: block; }
+    @media (min-width: 768px) {
+      .lp-nav__logo img { height: 52px; }
+    }
+
+    /* ---------- HERO ---------- */
+    .lp-hero {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      background: linear-gradient(135deg, #001236 0%, #0A1845 35%, #1E3A8A 50%, #0A1845 65%, #001236 100%);
+      color: white;
+      padding: 24px 0 60px;
+    }
+    .lp-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(45deg, rgba(93,168,255,0.10) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(93,168,255,0.10) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(93,168,255,0.10) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(93,168,255,0.10) 75%);
+      background-size: 28px 28px;
+      background-position: 0 0, 0 14px, 14px -14px, -14px 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.85;
+    }
+    .lp-hero::after {
+      content: '';
+      position: absolute;
+      top: -20%;
+      right: -10%;
+      width: 60%;
+      height: 80%;
+      background: radial-gradient(circle at 60% 50%, rgba(227,6,19,0.28) 0%, transparent 60%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      animation: lp-glow 9s ease-in-out infinite;
+    }
+    @keyframes lp-glow {
+      0%, 100% { opacity: 0.55; transform: scale(1); }
+      50%      { opacity: 0.95; transform: scale(1.12); }
+    }
+    .lp-hero__grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 36px;
+      max-width: var(--container-wide);
+      margin: 0 auto;
+      padding: 30px var(--space-md) 0;
+      align-items: center;
+    }
+    @media (min-width: 980px) {
+      .lp-hero { padding: 32px 0 80px; }
+      .lp-hero__grid {
+        grid-template-columns: 1.05fr 1fr;
+        gap: 60px;
+        padding: 50px var(--space-lg) 20px;
+      }
+    }
+
+    /* Left column */
+    .lp-hero__eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px 7px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(93,168,255,0.30);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.92);
+      margin-bottom: 18px;
+    }
+    .lp-hero__eyebrow .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #FF2638;
+      box-shadow: 0 0 12px #FF2638;
+      animation: lp-pulse 2s ease-in-out infinite;
+    }
+    @keyframes lp-pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%      { transform: scale(1.25); opacity: 0.75; }
+    }
+    .lp-hero__title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: clamp(34px, 5.5vw, 64px);
+      line-height: 1.04;
+      letter-spacing: -0.025em;
+      margin-bottom: 18px;
+      color: white;
+    }
+    .lp-hero__title strong {
+      font-weight: 800;
+      background: linear-gradient(180deg, #FF4B5C 0%, #E30613 55%, #8E0410 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 8px rgba(227,6,19,0.30));
+    }
+    .lp-hero__lead {
+      font-size: clamp(15px, 1.6vw, 18px);
+      line-height: 1.55;
+      color: rgba(255,255,255,0.80);
+      max-width: 540px;
+      margin-bottom: 28px;
+    }
+    .lp-hero__bullets {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 32px;
+      display: grid;
+      gap: 12px;
+    }
+    .lp-hero__bullets li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 15px;
+      color: rgba(255,255,255,0.92);
+    }
+    .lp-hero__bullets li svg {
+      flex-shrink: 0;
+      color: #5DA8FF;
+      margin-top: 2px;
+    }
+
+    /* Stats inline en el hero */
+    .lp-hero__stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      max-width: 520px;
+    }
+    .lp-hero__stat { text-align: left; padding-right: 18px; }
+    .lp-hero__stat:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.10); padding-right: 18px; }
+    .lp-hero__stat:not(:first-child) { padding-left: 18px; }
+    .lp-hero__stat-num {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: clamp(22px, 2.6vw, 30px);
+      line-height: 1;
+      background: linear-gradient(180deg, #E8F4FF 0%, #7BB8FF 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+    .lp-hero__stat-lbl {
+      display: block;
+      margin-top: 4px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.25;
+    }
+
+    /* Right column: foto + form card */
+    .lp-hero__right {
+      position: relative;
+    }
+    .lp-hero__photo {
+      position: relative;
+      border-radius: 22px;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+      transform: translateZ(0);
+    }
+    .lp-hero__photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      animation: lp-kenburns 14s ease-in-out infinite alternate;
+    }
+    @keyframes lp-kenburns {
+      from { transform: scale(1.04); }
+      to   { transform: scale(1.14); }
+    }
+    .lp-hero__photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 30%, rgba(5,14,45,0.40) 75%, rgba(5,14,45,0.85) 100%);
+      pointer-events: none;
+    }
+    .lp-hero__photo-tag {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px 6px 10px;
+      background: rgba(5,14,45,0.55);
+      border: 1px solid rgba(93,168,255,0.35);
+      border-radius: 999px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: white;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      z-index: 2;
+    }
+    .lp-hero__photo-tag .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #FF2638;
+      box-shadow: 0 0 10px #FF2638;
+    }
+
+    /* FORM CARD */
+    .lp-form {
+      position: relative;
+      margin-top: 22px;
+      padding: 22px 20px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+      border: 1px solid rgba(255,255,255,0.20);
+      border-radius: 20px;
+      box-shadow:
+        0 32px 64px rgba(0,0,0,0.40),
+        0 12px 24px rgba(0,0,0,0.20),
+        inset 0 1px 0 rgba(255,255,255,0.40);
+      color: var(--text);
+      box-sizing: border-box;
+      max-width: 100%;
+    }
+    @media (min-width: 768px) {
+      .lp-form { padding: 26px 24px; margin-top: 28px; }
+    }
+    .lp-form__header { margin-bottom: 18px; }
+    .lp-form__title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+      color: var(--brand-navy);
+      margin-bottom: 6px;
+    }
+    .lp-form__sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .lp-form .field { margin-bottom: 14px; }
+    .lp-form .field-row { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    @media (min-width: 640px) {
+      .lp-form .field-row { grid-template-columns: 1fr 1fr; }
+    }
+    .lp-form .label {
+      display: block;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .lp-form .input, .lp-form .select, .lp-form .textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      color: var(--text);
+      background: white;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      box-sizing: border-box;
+    }
+    .lp-form .input:focus, .lp-form .select:focus, .lp-form .textarea:focus {
+      outline: none;
+      border-color: var(--brand-navy);
+      box-shadow: 0 0 0 4px rgba(10,24,69,0.10);
+    }
+    .lp-form .textarea { resize: vertical; min-height: 70px; }
+    .lp-form__submit {
+      width: 100%;
+      padding: 15px 24px;
+      background: linear-gradient(180deg, #FF2638 0%, #E30613 50%, #B0050F 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.25),
+        0 8px 24px rgba(227,6,19,0.42);
+      margin-top: 4px;
+    }
+    .lp-form__submit:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.30),
+        0 14px 32px rgba(227,6,19,0.55);
+    }
+    .lp-form__submit:active { transform: translateY(0); }
+    .lp-form__note {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .lp-form__note strong { color: var(--text); }
+
+    /* ---------- SECCION TRUST (3 cards) ---------- */
+    .lp-trust { padding: 64px 0 56px; background: #FFFFFF; }
+    .lp-trust__head { text-align: center; max-width: 720px; margin: 0 auto 40px; padding: 0 var(--space-md); }
+    .lp-trust__eyebrow {
+      display: inline-block;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--brand-red);
+      margin-bottom: 10px;
+    }
+    .lp-trust__title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: clamp(26px, 3.6vw, 40px);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      color: var(--brand-navy);
+      margin-bottom: 12px;
+    }
+    .lp-trust__sub {
+      font-size: 16px;
+      line-height: 1.55;
+      color: var(--text-muted);
+      max-width: 580px;
+      margin: 0 auto;
+    }
+    .lp-trust__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      max-width: var(--container-wide);
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+    }
+    @media (min-width: 720px)  { .lp-trust__grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
+    .lp-trust__card {
+      position: relative;
+      padding: 28px 22px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .lp-trust__card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 32px rgba(10,24,69,0.10);
+      border-color: rgba(10,24,69,0.20);
+    }
+    .lp-trust__icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(227,6,19,0.16) 0%, rgba(227,6,19,0.05) 100%);
+      border: 1px solid rgba(227,6,19,0.30);
+      color: var(--brand-red);
+      margin-bottom: 14px;
+    }
+    .lp-trust__card--blue .lp-trust__icon {
+      background: linear-gradient(135deg, rgba(59,130,246,0.18) 0%, rgba(10,24,69,0.06) 100%);
+      border-color: rgba(10,24,69,0.30);
+      color: var(--brand-navy);
+    }
+    .lp-trust__card h3 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.01em;
+      color: var(--brand-navy);
+      margin-bottom: 8px;
+    }
+    .lp-trust__card p {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-muted);
+    }
+
+    /* ---------- TESTIMONIALS ---------- */
+    .lp-testimonials {
+      background:
+        linear-gradient(45deg, rgba(93,168,255,0.10) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(93,168,255,0.10) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(93,168,255,0.10) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(93,168,255,0.10) 75%),
+        linear-gradient(135deg, #001236 0%, #0A1845 50%, #001236 100%);
+      background-size: 28px 28px, 28px 28px, 28px 28px, 28px 28px, 100% 100%;
+      background-position: 0 0, 0 14px, 14px -14px, -14px 0, 0 0;
+      color: white;
+      padding: 64px 0;
+      position: relative;
+    }
+    .lp-testimonials__head { text-align: center; max-width: 600px; margin: 0 auto 40px; padding: 0 var(--space-md); }
+    .lp-testimonials__head .lp-trust__eyebrow { color: #FF7F8B; }
+    .lp-testimonials__head h2 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: clamp(26px, 3.6vw, 40px);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      color: white;
+    }
+    .lp-testimonials__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      max-width: var(--container-wide);
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+    }
+    @media (min-width: 820px) { .lp-testimonials__grid { grid-template-columns: repeat(3, 1fr); gap: 22px; } }
+    .lp-testimonial {
+      position: relative;
+      padding: 26px 22px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 18px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .lp-testimonial__quote-mark {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 38px;
+      line-height: 1;
+      color: #FF2638;
+      margin-bottom: 6px;
+      font-weight: 800;
+    }
+    .lp-testimonial__text {
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.92);
+      margin-bottom: 18px;
+    }
+    .lp-testimonial__author { display: flex; align-items: center; gap: 12px; }
+    .lp-testimonial__avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FF4B5C 0%, #B0050F 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+    }
+    .lp-testimonial__name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: white;
+    }
+    .lp-testimonial__loc {
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+    }
+
+    /* ---------- FAQ ---------- */
+    .lp-faq { background: #FFFFFF; padding: 64px 0; }
+    .lp-faq__head { text-align: center; max-width: 620px; margin: 0 auto 36px; padding: 0 var(--space-md); }
+    .lp-faq__head h2 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: clamp(26px, 3.6vw, 40px);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      color: var(--brand-navy);
+      margin-bottom: 10px;
+    }
+    .lp-faq__list {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .lp-faq__item {
+      background: #F8FAFC;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .lp-faq__item[aria-expanded="true"] {
+      border-color: rgba(10,24,69,0.25);
+      background: white;
+      box-shadow: 0 8px 24px rgba(10,24,69,0.06);
+    }
+    .lp-faq__q {
+      width: 100%;
+      padding: 16px 18px;
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--brand-navy);
+      text-align: left;
+      cursor: pointer;
+    }
+    .lp-faq__q svg {
+      flex-shrink: 0;
+      color: var(--brand-red);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .lp-faq__item[aria-expanded="true"] .lp-faq__q svg { transform: rotate(180deg); }
+    .lp-faq__a {
+      padding: 0 18px 18px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      display: none;
+    }
+    .lp-faq__item[aria-expanded="true"] .lp-faq__a { display: block; }
+
+    /* ---------- CTA FINAL ---------- */
+    .lp-cta {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #001236 0%, #0A1845 35%, #1E3A8A 50%, #0A1845 65%, #001236 100%);
+      color: white;
+      padding: 70px 0;
+      text-align: center;
+    }
+    .lp-cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(45deg, rgba(93,168,255,0.10) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(93,168,255,0.10) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(93,168,255,0.10) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(93,168,255,0.10) 75%);
+      background-size: 28px 28px;
+      background-position: 0 0, 0 14px, 14px -14px, -14px 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.7;
+    }
+    .lp-cta__inner { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 0 var(--space-md); }
+    .lp-cta h2 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: clamp(26px, 3.6vw, 40px);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      color: white;
+      margin-bottom: 12px;
+    }
+    .lp-cta p {
+      font-size: 16px;
+      line-height: 1.55;
+      color: rgba(255,255,255,0.80);
+      margin-bottom: 28px;
+    }
+    .lp-cta__btns { display: inline-flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .lp-cta__primary, .lp-cta__secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+      transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease;
+      cursor: pointer;
+      border: none;
+    }
+    .lp-cta__primary {
+      background: linear-gradient(180deg, #FF2638 0%, #E30613 50%, #B0050F 100%);
+      color: white;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.25),
+        0 8px 24px rgba(227,6,19,0.45);
+    }
+    .lp-cta__primary:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.30),
+        0 14px 32px rgba(227,6,19,0.60);
+    }
+    .lp-cta__secondary {
+      background: linear-gradient(180deg, #2EEB76 0%, #25D366 50%, #1AAF54 100%);
+      color: white;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.25),
+        0 8px 24px rgba(37,211,102,0.45);
+    }
+    .lp-cta__secondary:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.30),
+        0 14px 32px rgba(37,211,102,0.60);
+    }
+
+    /* ---------- FOOTER MINIMAL ---------- */
+    .lp-foot {
+      background: var(--brand-navy-darker);
+      color: rgba(255,255,255,0.65);
+      padding: 26px 0;
+      text-align: center;
+      font-size: 13px;
+    }
+    .lp-foot a { color: rgba(255,255,255,0.85); text-decoration: none; font-weight: 600; }
+    .lp-foot a:hover { color: white; }
+    .lp-foot__inner {
+      max-width: var(--container-wide);
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+      display: flex;
+      gap: 14px;
+      flex-direction: column;
+      align-items: center;
+    }
+    @media (min-width: 720px) {
+      .lp-foot__inner { flex-direction: row; justify-content: space-between; }
+    }
+
+    /* ---------- WhatsApp icono navbar landing ---------- */
+    .lp-wa-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #2EEB76 0%, #25D366 50%, #1AAF54 100%);
+      color: white;
+      text-decoration: none;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.30),
+        0 6px 18px rgba(37,211,102,0.55);
+      transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .lp-wa-btn:hover { transform: scale(1.06) translateY(-1px); }
+
+    /* ---------- WhatsApp flotante (siempre visible) ---------- */
+    .lp-wa-float {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #2EEB76 0%, #25D366 50%, #1AAF54 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      z-index: 90;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.30),
+        0 12px 28px rgba(37,211,102,0.55);
+      animation: lp-wa-pulse 2.6s ease-in-out infinite;
+    }
+    @keyframes lp-wa-pulse {
+      0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.30), 0 12px 28px rgba(37,211,102,0.55), 0 0 0 0 rgba(37,211,102,0.45); }
+      50%      { box-shadow: inset 0 1px 0 rgba(255,255,255,0.30), 0 12px 28px rgba(37,211,102,0.55), 0 0 0 16px rgba(37,211,102,0); }
+    }
+
+    /* ============================================
+       REVEAL ANIMATIONS (Apple-style)
+       ============================================ */
+    .lp-reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .lp-reveal.is-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .lp-reveal--slow {
+      transition-duration: 1300ms;
+    }
+    .lp-reveal--right {
+      transform: translateX(36px);
+    }
+    .lp-reveal--right.is-in { transform: translateX(0); }
+    .lp-reveal--delay-1 { transition-delay: 100ms; }
+    .lp-reveal--delay-2 { transition-delay: 220ms; }
+    .lp-reveal--delay-3 { transition-delay: 340ms; }
+    .lp-reveal--delay-4 { transition-delay: 460ms; }
+    .lp-reveal--delay-5 { transition-delay: 580ms; }
+    @media (prefers-reduced-motion: reduce) {
+      .lp-reveal, .lp-reveal--right {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ============== NAVBAR MINIMAL ============== -->
+  <header class="lp-nav nav" role="banner">
+    <div class="lp-nav__inner">
+      <a class="lp-nav__logo" href="index.html" aria-label="Trasteos Ya">
+        <img src="assets/img/logo.png" alt="Trasteos Ya">
+      </a>
+      <a class="lp-wa-btn" href="https://wa.me/573143095194?text=Hola%2C%20quiero%20cotizar%20una%20mudanza%20de%20hogar" target="_blank" rel="noopener" aria-label="Hablar por WhatsApp">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1 2.9 1.2 3.1c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.5-.3Z"/><path d="M20 4.9A10 10 0 0 0 12 2 10 10 0 0 0 3.1 17l-1.1 4.1 4.2-1.1A10 10 0 0 0 12 22a10 10 0 0 0 8-15.1Z"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- ============== HERO ============== -->
+  <section class="lp-hero" aria-label="Cotiza tu mudanza de hogar">
+    <div class="lp-hero__grid">
+
+      <!-- LEFT -->
+      <div class="lp-hero__left">
+        <span class="lp-hero__eyebrow lp-reveal lp-reveal--delay-1">
+          <span class="dot"></span> Mudanza de hogar · Bogotá y Colombia
+        </span>
+        <h1 class="lp-hero__title lp-reveal lp-reveal--delay-2">
+          Tu mudanza de hogar,<br>
+          <strong>cotizada en 15 minutos.</strong>
+        </h1>
+        <p class="lp-hero__lead lp-reveal lp-reveal--delay-3">
+          Empacamos, transportamos y armamos. Llegamos a la hora, completos, sin sorpresas.
+          15 años moviendo Bogotá con equipo propio uniformado.
+        </p>
+
+        <ul class="lp-hero__bullets lp-reveal lp-reveal--delay-4">
+          <li>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            <span>Cotización personalizada por WhatsApp, sin compromiso</span>
+          </li>
+          <li>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            <span>Empaque profesional, transporte e instalación incluidos</span>
+          </li>
+          <li>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            <span>Respuesta humana en menos de 15 minutos hábiles</span>
+          </li>
+        </ul>
+
+        <div class="lp-hero__stats lp-reveal lp-reveal--delay-5">
+          <div class="lp-hero__stat">
+            <span class="lp-hero__stat-num">15</span>
+            <span class="lp-hero__stat-lbl">Años en el sector</span>
+          </div>
+          <div class="lp-hero__stat">
+            <span class="lp-hero__stat-num">5.000+</span>
+            <span class="lp-hero__stat-lbl">Trasteos completados</span>
+          </div>
+          <div class="lp-hero__stat">
+            <span class="lp-hero__stat-num">98%</span>
+            <span class="lp-hero__stat-lbl">Clientes satisfechos</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="lp-hero__right">
+
+        <div class="lp-hero__photo lp-reveal lp-reveal--right lp-reveal--delay-2">
+          <img src="assets/img/Hogar%201.png" alt="Equipo Trasteos Ya empacando una mudanza residencial en Bogotá" loading="eager" fetchpriority="high">
+          <span class="lp-hero__photo-tag"><span class="dot"></span> Mudanza · Hogar</span>
+        </div>
+
+        <form class="lp-form ty-form lp-reveal lp-reveal--right lp-reveal--delay-3 lp-reveal--slow"
+              data-source="landing-cotizar-hogar"
+              novalidate>
+          <input type="hidden" name="servicio" value="Mudanza Hogar (landing)">
+
+          <header class="lp-form__header">
+            <h2 class="lp-form__title">Cotiza tu mudanza ahora</h2>
+            <p class="lp-form__sub">Cuéntanos lo esencial. Te respondemos por WhatsApp con el detalle.</p>
+          </header>
+
+          <div class="field">
+            <label class="label" for="lp-nombre">Tu nombre</label>
+            <input class="input" type="text" name="nombre" id="lp-nombre" required placeholder="¿Cómo te llamas?">
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label class="label" for="lp-tel">WhatsApp</label>
+              <input class="input" type="tel" name="telefono" id="lp-tel" required placeholder="300 XXX XXXX">
+            </div>
+            <div class="field">
+              <label class="label" for="lp-email">Email</label>
+              <input class="input" type="email" name="email" id="lp-email" placeholder="tu@correo.com">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label class="label" for="lp-origen">Origen</label>
+              <input class="input" type="text" name="origen" id="lp-origen" required placeholder="Barrio actual">
+            </div>
+            <div class="field">
+              <label class="label" for="lp-destino">Destino</label>
+              <input class="input" type="text" name="destino" id="lp-destino" required placeholder="Barrio destino">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label class="label" for="lp-tamano">Tamaño</label>
+              <select class="select" name="tamano" id="lp-tamano" required>
+                <option value="">Selecciona…</option>
+                <option>Apartaestudio</option>
+                <option>1 habitación</option>
+                <option>2 habitaciones</option>
+                <option>3 habitaciones</option>
+                <option>4+ habitaciones</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="label" for="lp-fecha">Fecha estimada</label>
+              <input class="input" type="date" name="fecha" id="lp-fecha">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="lp-detalles">Detalles (opcional)</label>
+            <textarea class="textarea" name="detalles" id="lp-detalles" placeholder="¿Algo frágil, escalas, parqueadero?"></textarea>
+          </div>
+
+          <button type="submit" class="lp-form__submit">
+            Recibir cotización por WhatsApp
+          </button>
+          <p class="lp-form__note">
+            <strong>Sin compromiso · Sin tarjeta de crédito.</strong> Solo recibirás la cotización detallada.
+          </p>
+        </form>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== TRUST · 3 CARDS ============== -->
+  <section class="lp-trust" aria-label="Por qué elegir Trasteos Ya">
+    <div class="lp-trust__head lp-reveal">
+      <span class="lp-trust__eyebrow">¿Por qué Trasteos Ya?</span>
+      <h2 class="lp-trust__title">Mudanzas hechas como deben hacerse.</h2>
+      <p class="lp-trust__sub">Sin sustos, sin sorpresas, sin objetos rotos. Equipo propio, materiales profesionales, atención humana.</p>
+    </div>
+
+    <div class="lp-trust__grid">
+      <article class="lp-trust__card lp-reveal lp-reveal--delay-1">
+        <div class="lp-trust__icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h3>Llegamos a la hora</h3>
+        <p>Si dijimos 8 am, estamos a las 7:50. Si nos vamos a demorar, te llamamos antes — no después.</p>
+      </article>
+
+      <article class="lp-trust__card lp-trust__card--blue lp-reveal lp-reveal--delay-2">
+        <div class="lp-trust__icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <h3>Cuidamos lo tuyo</h3>
+        <p>Vinipel, burbuja, cartón y cobijas profesionales. Tratamos tu vajilla heredada como si fuera nuestra.</p>
+      </article>
+
+      <article class="lp-trust__card lp-reveal lp-reveal--delay-3">
+        <div class="lp-trust__icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h3>Equipo propio uniformado</h3>
+        <p>No subcontratamos. La gente que llega a tu casa es de Trasteos Ya, identificada, capacitada y con seguro.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============== TESTIMONIALS ============== -->
+  <section class="lp-testimonials" aria-label="Testimonios de clientes reales">
+    <div class="lp-testimonials__head lp-reveal">
+      <span class="lp-trust__eyebrow">Lo que dicen nuestros clientes</span>
+      <h2>5.000+ familias confiaron. Esto cuentan.</h2>
+    </div>
+
+    <div class="lp-testimonials__grid">
+      <article class="lp-testimonial lp-reveal lp-reveal--delay-1">
+        <div class="lp-testimonial__quote-mark">"</div>
+        <p class="lp-testimonial__text">Se encargaron <strong>absolutamente de todo.</strong> Súper cuidadosos, amables, atentos hasta del más mínimo detalle. Mi experiencia fue perfecta de principio a fin.</p>
+        <div class="lp-testimonial__author">
+          <div class="lp-testimonial__avatar">CR</div>
+          <div>
+            <div class="lp-testimonial__name">Catalina Rodríguez</div>
+            <div class="lp-testimonial__loc">Cajicá, Cundinamarca</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="lp-testimonial lp-reveal lp-reveal--delay-2">
+        <div class="lp-testimonial__quote-mark">"</div>
+        <p class="lp-testimonial__text">Son <strong>verdaderos expertos.</strong> Llevo años confiando en Trasteos Ya. Probé otra empresa una vez y fue terrible — volví con ellos al instante. No hay punto de comparación.</p>
+        <div class="lp-testimonial__author">
+          <div class="lp-testimonial__avatar">DC</div>
+          <div>
+            <div class="lp-testimonial__name">Daniela Castaño</div>
+            <div class="lp-testimonial__loc">Chapinero, Bogotá</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="lp-testimonial lp-reveal lp-reveal--delay-3">
+        <div class="lp-testimonial__quote-mark">"</div>
+        <p class="lp-testimonial__text">Llegaron <strong>puntuales, completos y bien preparados.</strong> Empacaron todo, armaron los muebles en mi nueva casa y dejaron todo en orden. Cero estrés.</p>
+        <div class="lp-testimonial__author">
+          <div class="lp-testimonial__avatar">MH</div>
+          <div>
+            <div class="lp-testimonial__name">Manuel Hernández</div>
+            <div class="lp-testimonial__loc">Usaquén, Bogotá</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============== FAQ ============== -->
+  <section class="lp-faq" aria-label="Preguntas frecuentes sobre mudanza de hogar">
+    <div class="lp-faq__head lp-reveal">
+      <span class="lp-trust__eyebrow">Preguntas frecuentes</span>
+      <h2>Lo que la gente nos pregunta.</h2>
+    </div>
+
+    <div class="lp-faq__list">
+      <div class="lp-faq__item lp-reveal lp-reveal--delay-1" aria-expanded="false">
+        <button type="button" class="lp-faq__q">
+          <span>¿Cuánto demora la cotización?</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="lp-faq__a">Menos de 15 minutos hábiles. Un coordinador te responde por WhatsApp con el detalle completo, sin compromiso. Si necesitas algo más rápido, llámanos al 314 309 5194.</div>
+      </div>
+
+      <div class="lp-faq__item lp-reveal lp-reveal--delay-2" aria-expanded="false">
+        <button type="button" class="lp-faq__q">
+          <span>¿Qué incluye una mudanza de hogar?</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="lp-faq__a">Empaque profesional con vinipel, burbuja y cajas dobles · Desarmado de muebles · Transporte en camión propio · Cargue/descargue por equipo uniformado · Armado en destino · Soporte de coordinador antes, durante y después.</div>
+      </div>
+
+      <div class="lp-faq__item lp-reveal lp-reveal--delay-3" aria-expanded="false">
+        <button type="button" class="lp-faq__q">
+          <span>¿Mueven solo en Bogotá o también a otras ciudades?</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="lp-faq__a">Bogotá urbano, regional (Chía, Cajicá, Cota, La Calera, Sopó…) y nacional a las principales ciudades de Colombia. Si tu destino es especial, pregúntanos — casi siempre vamos.</div>
+      </div>
+
+      <div class="lp-faq__item lp-reveal lp-reveal--delay-4" aria-expanded="false">
+        <button type="button" class="lp-faq__q">
+          <span>¿Y si algo se daña?</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="lp-faq__a">Trabajamos con responsabilidad civil contractual. Si algo se daña por nuestra causa, lo reparamos o reponemos sin discusión. En 15 años los incidentes han sido mínimos por el cuidado del equipo y los materiales.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== CTA FINAL ============== -->
+  <section class="lp-cta" aria-label="Hablemos">
+    <div class="lp-cta__inner lp-reveal">
+      <h2>¿Listo para mudarte tranquilo?</h2>
+      <p>Diligencia el formulario o escríbenos directo por WhatsApp. Te responde un humano en menos de 15 minutos hábiles.</p>
+      <div class="lp-cta__btns">
+        <a class="lp-cta__primary" href="#top" onclick="document.querySelector('.lp-form').scrollIntoView({behavior:'smooth'});return false;">
+          Cotizar ahora
+        </a>
+        <a class="lp-cta__secondary" href="https://wa.me/573143095194?text=Hola%2C%20quiero%20cotizar%20una%20mudanza%20de%20hogar" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1 2.9 1.2 3.1c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.5-.3Z"/><path d="M20 4.9A10 10 0 0 0 12 2 10 10 0 0 0 3.1 17l-1.1 4.1 4.2-1.1A10 10 0 0 0 12 22a10 10 0 0 0 8-15.1Z"/></svg>
+          Escribir por WhatsApp
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== FOOTER MINIMAL ============== -->
+  <footer class="lp-foot">
+    <div class="lp-foot__inner">
+      <span>© <span data-year>2026</span> Trasteos Ya · Bogotá, Colombia</span>
+      <span>
+        <a href="https://wa.me/573143095194" target="_blank" rel="noopener">314 309 5194</a>
+        ·
+        <a href="index.html">Volver al sitio</a>
+      </span>
+    </div>
+  </footer>
+
+  <!-- WhatsApp flotante -->
+  <a class="lp-wa-float" href="https://wa.me/573143095194?text=Hola%2C%20quiero%20cotizar%20una%20mudanza%20de%20hogar" target="_blank" rel="noopener" aria-label="Hablar por WhatsApp">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1 2.9 1.2 3.1c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.5-.3Z"/><path d="M20 4.9A10 10 0 0 0 12 2 10 10 0 0 0 3.1 17l-1.1 4.1 4.2-1.1A10 10 0 0 0 12 22a10 10 0 0 0 8-15.1Z"/></svg>
+  </a>
+
+  <!-- ============== JS · reveal + FAQ + año + form ============== -->
+  <script>
+    // Reveal en scroll (Apple-style)
+    (function () {
+      var items = document.querySelectorAll('.lp-reveal');
+      if (!('IntersectionObserver' in window) || !items.length) {
+        items.forEach(function (el) { el.classList.add('is-in'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-in');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      items.forEach(function (el) { io.observe(el); });
+    })();
+
+    // FAQ acordeón
+    document.querySelectorAll('.lp-faq__item').forEach(function (item) {
+      var btn = item.querySelector('.lp-faq__q');
+      if (!btn) return;
+      btn.addEventListener('click', function () {
+        var isOpen = item.getAttribute('aria-expanded') === 'true';
+        item.setAttribute('aria-expanded', String(!isOpen));
+      });
+    });
+
+    // Año en footer
+    document.querySelectorAll('[data-year]').forEach(function (el) {
+      el.textContent = String(new Date().getFullYear());
+    });
+  </script>
+
+  <!-- Form handler (igual que el resto del sitio: Email + Telegram + WhatsApp) -->
+  <script src="js/form-handler.js" defer></script>
+</body>
+</html>
