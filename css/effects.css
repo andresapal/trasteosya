@@ -255,6 +255,10 @@
   position: sticky !important;
   top: 0 !important;
   z-index: 1000 !important;
+  /* Forzar altura fija para que ningun child (especialmente .nav__mobile) lo expanda */
+  height: 68px !important;
+  max-height: 68px !important;
+  min-height: 68px !important;
   background:
     linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.30) 100%),
     linear-gradient(135deg, #001236 0%, #0A1845 25%, #1E3A8A 50%, #0A1845 75%, #001236 100%) !important;

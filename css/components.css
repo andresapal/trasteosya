@@ -267,12 +267,12 @@
 @media (max-width: 1023px) {
   .nav__mobile {
     display: block !important;
-    position: fixed;
-    top: 64px;
-    left: 12px;
-    right: 12px;
-    bottom: auto;
-    max-height: calc(100vh - 80px);
+    position: fixed !important;
+    top: 72px !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: auto !important;
+    max-height: calc(100vh - 88px);
     background:
       linear-gradient(45deg, rgba(93,168,255,0.10) 25%, transparent 25%),
       linear-gradient(-45deg, rgba(93,168,255,0.10) 25%, transparent 25%),
