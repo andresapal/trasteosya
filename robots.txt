@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Herramientas internas - uso del operador (gated con PIN)
+Disallow: /cotizador.html
+Disallow: /orden-servicio.html
+
+Sitemap: https://trasteosya.com/sitemap.xml
