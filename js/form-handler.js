@@ -1,6 +1,6 @@
 /* ============================================
-   TRASTEOS YA — Form handler (v2)
-   Email al operador + auto-respuesta al cliente + Telegram push
+   TRASTEOS YA — Form handler (v3)
+   Email al operador + auto-respuesta al cliente + Telegram push + WhatsApp push
    ============================================ */
 
 (function () {
@@ -15,7 +15,11 @@
     TELEGRAM_BOT_TOKEN: '8815751812:AAEGlCiQAZKSamRUfD5r0lmzjLTRAaFcdqw',
     TELEGRAM_CHAT_ID:   '1081707115',
 
-    // 3) Google Sheets webhook (opcional)
+    // 3) CallMeBot WhatsApp · gratis · push directo al WhatsApp del operador
+    CALLMEBOT_APIKEY: '9452184',
+    CALLMEBOT_PHONE:  '573143095194', // formato: 57 (Colombia) + 10 digitos sin +
+
+    // 4) Google Sheets webhook (opcional)
     SHEETS_WEBHOOK: '',
 
     THANK_YOU_URL: 'gracias.html',
@@ -108,6 +112,34 @@
     } catch (e) { /* silent */ }
   }
 
+  /* ---------- WhatsApp push al operador (via CallMeBot) ---------- */
+  async function postWhatsApp(data, source) {
+    if (!CONFIG.CALLMEBOT_APIKEY || !CONFIG.CALLMEBOT_PHONE) return;
+    try {
+      const lines = [
+        '🔔 *Nueva cotización · Trasteos Ya*',
+        '',
+        '📋 Origen: ' + source,
+        '👤 ' + (data.nombre || '-'),
+        '📱 ' + (data.telefono || '-'),
+        '📧 ' + (data.email || '-'),
+        '🛒 ' + (data.servicio || '-'),
+        '📍 ' + (data.origen || '-') + ' → ' + (data.destino || '-'),
+        '📦 ' + (data.tamano || '-'),
+        '📅 ' + (data.fecha || '-'),
+        '💬 ' + (data.detalles || '-'),
+        '',
+        '⏰ ' + new Date().toLocaleString('es-CO')
+      ];
+      const text = encodeURIComponent(lines.join('\n'));
+      const url = 'https://api.callmebot.com/whatsapp.php' +
+                  '?phone=' + CONFIG.CALLMEBOT_PHONE +
+                  '&text=' + text +
+                  '&apikey=' + CONFIG.CALLMEBOT_APIKEY;
+      await fetch(url, { method: 'GET', mode: 'no-cors' });
+    } catch (e) { /* silent */ }
+  }
+
   /* ---------- Sheets webhook (opcional) ---------- */
   async function postSheets(data, source) {
     if (!CONFIG.SHEETS_WEBHOOK) return Promise.resolve();
@@ -148,8 +180,9 @@
       fd.set('_autoresponse_subject', CONFIG.CLIENT_AUTOREPLY_SUBJECT);
     }
 
-    // Dispara Telegram + Sheets en paralelo (no bloqueante)
+    // Dispara Telegram + WhatsApp + Sheets en paralelo (no bloqueante)
     postTelegram(data, source);
+    postWhatsApp(data, source);
     postSheets(data, source);
 
     fetch('https://api.web3forms.com/submit', {
