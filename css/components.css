@@ -266,11 +266,12 @@
 @media (max-width: 1023px) {
   .nav__mobile {
     display: block !important;
-    visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
     position: fixed;
-    inset: 64px 0 0 0;
+    top: 64px;
+    left: 12px;
+    right: 12px;
+    bottom: auto;
+    max-height: calc(100vh - 80px);
     background:
       linear-gradient(45deg, rgba(93,168,255,0.10) 25%, transparent 25%),
       linear-gradient(-45deg, rgba(93,168,255,0.10) 25%, transparent 25%),
@@ -280,12 +281,16 @@
     background-size: 26px 26px, 26px 26px, 26px 26px, 26px 26px, 100% 100%;
     background-position: 0 0, 0 13px, 13px -13px, -13px 0, 0 0;
     color: white;
-    padding: var(--space-lg) var(--space-lg) 140px;
+    padding: 12px 18px 20px;
     overflow-y: auto;
     z-index: var(--z-overlay);
+    border-radius: 18px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.10);
+    border: 1px solid rgba(93,168,255,0.30);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-8px);
+    transform: translateY(-8px) scale(0.98);
+    transform-origin: top center;
     transition: opacity 280ms cubic-bezier(0.4, 0, 0.2, 1),
                 transform 280ms cubic-bezier(0.4, 0, 0.2, 1),
                 visibility 0s linear 280ms;
@@ -294,17 +299,61 @@
   .nav__mobile.is-open {
     opacity: 1 !important;
     visibility: visible !important;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
     pointer-events: auto !important;
     transition: opacity 280ms cubic-bezier(0.4, 0, 0.2, 1),
                 transform 280ms cubic-bezier(0.4, 0, 0.2, 1),
                 visibility 0s linear 0s;
   }
+
+  /* Items con emblem + transicion sincronizada (todos al mismo tiempo) */
   .nav__mobile .nav__mobile-link {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 8px !important;
+    font-size: 16px !important;
     color: rgba(255,255,255,0.92) !important;
-    border-bottom: 1px solid rgba(255,255,255,0.10) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 360ms ease 100ms,
+                transform 360ms cubic-bezier(0.16, 1, 0.3, 1) 100ms,
+                color 150ms ease;
   }
-  .nav__mobile .nav__mobile-link:hover { color: white !important; }
+  .nav__mobile.is-open .nav__mobile-link {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .nav__mobile .nav__mobile-link:hover { color: #5DA8FF !important; }
+
+  /* Emblem antes de cada texto -> rota 0 a 90 grados al abrir */
+  .nav__mobile .nav__mobile-link::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    background: url('../assets/img/emblem.png') center/contain no-repeat;
+    transform: rotate(0deg);
+    opacity: 0.85;
+    transition: transform 650ms cubic-bezier(0.4, 0, 0.2, 1) 100ms;
+  }
+  .nav__mobile.is-open .nav__mobile-link::before {
+    transform: rotate(90deg);
+  }
+
+  /* Botones (WhatsApp + Cotizar) tambien aparecen al mismo tiempo */
+  .nav__mobile > div {
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 360ms ease 100ms,
+                transform 360ms cubic-bezier(0.16, 1, 0.3, 1) 100ms;
+  }
+  .nav__mobile.is-open > div {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .nav__mobile-link {
   display: block;
