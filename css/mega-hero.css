@@ -94,6 +94,18 @@
 @media (min-width: 1024px) {
   .mega-hero__content { padding: 100px var(--space-3xl) 220px; }
 }
+/* Hero compacto en mobile (eliminar espacio muerto arriba) */
+@media (max-width: 767px) {
+  .mega-hero {
+    height: auto !important;
+    min-height: 560px !important;
+    max-height: none !important;
+  }
+  .mega-hero__content {
+    padding: 28px var(--space-md) 60px !important;
+    justify-content: flex-start !important;
+  }
+}
 
 .mega-hero__slide-content { max-width: 880px; }
 

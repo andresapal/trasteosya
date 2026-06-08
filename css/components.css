@@ -9,6 +9,7 @@
   max-width: var(--container);
   margin: 0 auto;
   padding: 0 var(--space-md);
+  box-sizing: border-box;
 }
 @media (min-width: 768px) { .container { padding: 0 var(--space-lg); } }
 
@@ -327,7 +328,7 @@
   }
   .nav__mobile .nav__mobile-link:hover { color: #5DA8FF !important; }
 
-  /* Emblem antes de cada texto -> rota 0 a 90 grados al abrir */
+  /* Emblem antes de cada texto -> arranca a 270 grados y termina recto (0/360) */
   .nav__mobile .nav__mobile-link::before {
     content: '';
     display: inline-block;
@@ -335,12 +336,12 @@
     height: 24px;
     flex-shrink: 0;
     background: url('../assets/img/emblem.png') center/contain no-repeat;
-    transform: rotate(0deg);
+    transform: rotate(-90deg);
     opacity: 0.85;
     transition: transform 650ms cubic-bezier(0.4, 0, 0.2, 1) 100ms;
   }
   .nav__mobile.is-open .nav__mobile-link::before {
-    transform: rotate(90deg);
+    transform: rotate(0deg);
   }
 
   /* Botones (WhatsApp + Cotizar) tambien aparecen al mismo tiempo */
@@ -723,9 +724,25 @@
   padding: var(--space-xl) var(--space-lg);
   position: relative;
   overflow: hidden;
+  width: 100%;
   max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
+}
+@media (max-width: 640px) {
+  .quick-quote {
+    padding: 20px 16px !important;
+    border-radius: 14px;
+  }
+  .quick-quote h2 {
+    font-size: 22px !important;
+    line-height: 1.18 !important;
+  }
+  .quick-quote__lead { font-size: 14px !important; }
+  .quick-quote__form { padding: 16px !important; }
+  .quick-quote__inner { gap: 18px !important; }
 }
 .quick-quote h2 {
   word-break: break-word;

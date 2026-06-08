@@ -53,6 +53,35 @@ body.is-operator { padding-bottom: 88px !important; }
   body.is-operator { padding-bottom: 110px !important; }
 }
 
+/* En el cotizador, el drawer es fixed y no respeta padding-bottom del body.
+   Le agregamos margen interno extra para que los botones PDF/WhatsApp queden
+   ARRIBA del toolbar de operador, no detras. */
+body.is-operator .drawer .drawer-actions {
+  padding-bottom: 80px !important;
+}
+@media (max-width: 640px) {
+  body.is-operator .drawer .drawer-actions {
+    padding-bottom: 100px !important;
+  }
+  /* Toolbar mas compacto en mobile para no tapar tanto */
+  .ty-op-toolbar {
+    bottom: 10px !important;
+    padding: 6px !important;
+    font-size: 12px !important;
+    max-width: 94vw;
+  }
+  .ty-op-toolbar__badge {
+    padding: 5px 8px !important;
+    font-size: 10px !important;
+  }
+  .ty-op-toolbar__link {
+    padding: 6px 9px !important;
+  }
+  .ty-op-toolbar__logout {
+    padding: 6px 10px !important;
+  }
+}
+
 /* ---------- Toolbar operador (cuando esta autenticado) ---------- */
 .ty-op-toolbar {
   position: fixed;

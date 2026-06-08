@@ -107,8 +107,8 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
-  overflow-x: hidden;
-  max-width: 100vw;
+  /* NO overflow-x: hidden en html — rompe position:sticky del navbar.
+     Lo dejamos solo en body. */
 }
 
 body {
