@@ -1230,6 +1230,14 @@
 @media (prefers-reduced-motion: reduce) {
   [data-reveal] { opacity: 1; transform: none; transition: none; }
 }
+/* En mobile: TODO el contenido siempre visible (sin animacion de reveal que deja huecos vacios) */
+@media (max-width: 767px) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
 
 /* ---------- UTILITIES ---------- */
 

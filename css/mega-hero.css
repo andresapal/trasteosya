@@ -98,13 +98,20 @@
 @media (max-width: 767px) {
   .mega-hero {
     height: auto !important;
-    min-height: 560px !important;
+    min-height: 420px !important;
     max-height: none !important;
   }
   .mega-hero__content {
-    padding: 28px var(--space-md) 60px !important;
+    padding: 24px var(--space-md) 36px !important;
     justify-content: flex-start !important;
   }
+  /* Forzar visibilidad del slide activo y su contenido en mobile (sin esperar JS) */
+  .mega-hero__slide:first-child { opacity: 1 !important; pointer-events: auto !important; z-index: 2 !important; }
+  .mega-hero__slide:first-child .mega-hero__slide-content { opacity: 1 !important; transform: none !important; }
+  .mega-hero__slide-content { opacity: 1 !important; transform: none !important; }
+  /* Reducir tamaño del titulo en mobile */
+  .mega-hero__title { font-size: clamp(26px, 7vw, 36px) !important; line-height: 1.12 !important; }
+  .mega-hero__lead { font-size: 15px !important; line-height: 1.4 !important; }
 }
 
 .mega-hero__slide-content { max-width: 880px; }

@@ -252,7 +252,8 @@
    ============================================ */
 
 .nav {
-  position: sticky;
+  position: sticky !important;
+  top: 0 !important;
   z-index: 1000 !important;
   background:
     linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.30) 100%),
@@ -306,7 +307,11 @@
   box-shadow: 0 2px 8px rgba(227,6,19,0.50);
 }
 
-.nav__burger span { background: white; }
+.nav__burger span { background: white !important; }
+/* Refuerzo de la X cuando esta abierto (sobre fondo navy) */
+.nav__burger.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg) !important; background: white !important; }
+.nav__burger.is-open span:nth-child(2) { opacity: 0 !important; }
+.nav__burger.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg) !important; background: white !important; }
 
 .nav__mobile {
   background:
