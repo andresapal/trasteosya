@@ -62,23 +62,32 @@ body.is-operator .drawer .drawer-actions {
 
 /* ============================================
    MOBILE FIXES · cotizador
-   - Candado movido para no chocar con "Mostrar costos"
-   - Toolbar mas compacto (cabe en pantallas chicas)
+   - Candado siempre visible pero NO en top-right (chocaba con "Mostrar costos")
+   - Mobile-bar de totales subida cuando hay toolbar de operador
+   - Toolbar mas compacto y arrastrable
    ============================================ */
 @media (max-width: 640px) {
-  /* Candado pequeno en bottom-LEFT (lejos del toggle del cotizador) */
+  /* Candado SIEMPRE visible, top-LEFT discreto (lejos del toggle "Mostrar costos") */
   .ty-lock-btn {
-    top: auto !important;
-    bottom: 14px !important;
-    left: 14px !important;
+    top: 10px !important;
+    left: 8px !important;
     right: auto !important;
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 13px !important;
-    opacity: 0.65;
+    bottom: auto !important;
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 14px !important;
+    opacity: 0.85 !important;
+    z-index: 1100 !important; /* arriba del header sticky */
   }
-  /* En modo operador escondemos el candado (la toolbar ya tiene "Salir") */
-  body.is-operator .ty-lock-btn { display: none !important; }
+
+  /* En el cotizador la mobile-bar (Total + WA + PDF) esta fixed bottom: 0.
+     Cuando hay toolbar de operador, la subimos para que ambas convivan. */
+  body.is-operator .mobile-bar {
+    bottom: 56px !important;
+    border-radius: 14px 14px 0 0;
+    border: 1px solid var(--border, #E2E8F0);
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.12);
+  }
 
   /* Drawer del cotizador: mas padding para que sus botones no queden
      detras del toolbar */
