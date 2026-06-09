@@ -50,7 +50,7 @@
 /* ---------- Espacio en el fondo para que el toolbar no tape contenido ---------- */
 body.is-operator { padding-bottom: 88px !important; }
 @media (max-width: 640px) {
-  body.is-operator { padding-bottom: 110px !important; }
+  body.is-operator { padding-bottom: 96px !important; }
 }
 
 /* En el cotizador, el drawer es fixed y no respeta padding-bottom del body.
@@ -59,26 +59,61 @@ body.is-operator { padding-bottom: 88px !important; }
 body.is-operator .drawer .drawer-actions {
   padding-bottom: 80px !important;
 }
+
+/* ============================================
+   MOBILE FIXES · cotizador
+   - Candado movido para no chocar con "Mostrar costos"
+   - Toolbar mas compacto (cabe en pantallas chicas)
+   ============================================ */
 @media (max-width: 640px) {
+  /* Candado pequeno en bottom-LEFT (lejos del toggle del cotizador) */
+  .ty-lock-btn {
+    top: auto !important;
+    bottom: 14px !important;
+    left: 14px !important;
+    right: auto !important;
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 13px !important;
+    opacity: 0.65;
+  }
+  /* En modo operador escondemos el candado (la toolbar ya tiene "Salir") */
+  body.is-operator .ty-lock-btn { display: none !important; }
+
+  /* Drawer del cotizador: mas padding para que sus botones no queden
+     detras del toolbar */
   body.is-operator .drawer .drawer-actions {
-    padding-bottom: 100px !important;
+    padding-bottom: 90px !important;
   }
-  /* Toolbar mas compacto en mobile para no tapar tanto */
+
+  /* Toolbar operador: anclado al fondo, ancho 100% del viewport con
+     scroll horizontal, mas compacto */
   .ty-op-toolbar {
-    bottom: 10px !important;
-    padding: 6px !important;
-    font-size: 12px !important;
-    max-width: 94vw;
+    bottom: 8px !important;
+    left: 8px !important;
+    right: 8px !important;
+    transform: none !important;
+    max-width: calc(100vw - 16px) !important;
+    padding: 5px !important;
+    font-size: 11px !important;
+    gap: 2px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .ty-op-toolbar::-webkit-scrollbar { display: none; }
   .ty-op-toolbar__badge {
-    padding: 5px 8px !important;
-    font-size: 10px !important;
+    padding: 4px 8px !important;
+    font-size: 9px !important;
+    letter-spacing: 0.04em !important;
   }
   .ty-op-toolbar__link {
-    padding: 6px 9px !important;
+    padding: 5px 9px !important;
+    font-size: 11px !important;
   }
   .ty-op-toolbar__logout {
-    padding: 6px 10px !important;
+    padding: 5px 10px !important;
+    font-size: 11px !important;
   }
 }
 
