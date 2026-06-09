@@ -19,7 +19,11 @@
     CALLMEBOT_APIKEY: '9452184',
     CALLMEBOT_PHONE:  '573143095194', // formato: 57 (Colombia) + 10 digitos sin +
 
-    // 4) Google Sheets webhook (opcional)
+    // 4) Backup en Google Drive (Apps Script Web App)
+    BACKUP_URL: 'https://script.google.com/macros/s/AKfycbyiiC0VRDbAnmOtznqvgM3NxHdtjdnofPqQENWcCwRJbASHB0RgvzQ-OnEwPWXaT2NpAQ/exec',
+    BACKUP_APIKEY: 'TrasteosYa-2026-Backup',
+
+    // 5) Google Sheets webhook (opcional · legacy)
     SHEETS_WEBHOOK: '',
 
     THANK_YOU_URL: 'gracias.html',
@@ -140,7 +144,41 @@
     } catch (e) { /* silent */ }
   }
 
-  /* ---------- Sheets webhook (opcional) ---------- */
+  /* ---------- Backup en Google Drive · Sheet "Cotizaciones 2026" ---------- */
+  async function postBackup(data, source) {
+    if (!CONFIG.BACKUP_URL) return;
+    try {
+      // Combinar notas con info adicional del form
+      const notasArr = [];
+      if (data.tamano)   notasArr.push('Tamaño: ' + data.tamano);
+      if (data.fecha)    notasArr.push('Fecha: ' + data.fecha);
+      if (data.detalles) notasArr.push(data.detalles);
+      if (data.perfil)   notasArr.push('Perfil: ' + data.perfil);
+
+      const payload = {
+        type:     'cotizacion',
+        apikey:   CONFIG.BACKUP_APIKEY,
+        cliente:  data.nombre || '',
+        email:    data.email || '',
+        telefono: data.telefono || '',
+        servicio: data.servicio || '',
+        origen:   data.origen || '',
+        destino:  data.destino || '',
+        notas:    notasArr.join(' · '),
+        fuente:   source || 'web',
+        asesor:   'Sitio web',
+        // Los siguientes campos solo los llena el cotizador interactivo
+        ingreso: 0, cto_total: 0, utilidad: 0, uti: 0
+      };
+      await fetch(CONFIG.BACKUP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(payload)
+      });
+    } catch (e) { /* silent */ }
+  }
+
+  /* ---------- Sheets webhook (opcional · legacy) ---------- */
   async function postSheets(data, source) {
     if (!CONFIG.SHEETS_WEBHOOK) return Promise.resolve();
     try {
@@ -180,9 +218,10 @@
       fd.set('_autoresponse_subject', CONFIG.CLIENT_AUTOREPLY_SUBJECT);
     }
 
-    // Dispara Telegram + WhatsApp + Sheets en paralelo (no bloqueante)
+    // Dispara Telegram + WhatsApp + Backup + Sheets en paralelo (no bloqueante)
     postTelegram(data, source);
     postWhatsApp(data, source);
+    postBackup(data, source);
     postSheets(data, source);
 
     fetch('https://api.web3forms.com/submit', {
