@@ -4,5 +4,10 @@ Allow: /
 # Herramientas internas - uso del operador (gated con PIN)
 Disallow: /cotizador.html
 Disallow: /orden-servicio.html
+Disallow: /gracias.html
 
-Sitemap: https://trasteosya.com/sitemap.xml
+# Permitir que Google indexe imagenes
+User-agent: Googlebot-Image
+Allow: /assets/img/
+
+Sitemap: https://andresapal.github.io/trasteosya/sitemap.xml

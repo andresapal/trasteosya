@@ -1,12 +1,75 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://trasteosya.com/</loc><priority>1.0</priority><changefreq>weekly</changefreq></url>
-  <url><loc>https://trasteosya.com/hogar.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://trasteosya.com/oficina.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://trasteosya.com/industrial.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://trasteosya.com/empaque.html</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://trasteosya.com/bodegaje.html</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://trasteosya.com/trans-ya-app.html</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
-  <url><loc>https://trasteosya.com/quienes-somos.html</loc><priority>0.6</priority><changefreq>yearly</changefreq></url>
-  <url><loc>https://trasteosya.com/contacto.html</loc><priority>0.6</priority><changefreq>yearly</changefreq></url>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Home -->
+  <url>
+    <loc>https://andresapal.github.io/trasteosya/</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>1.0</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+
+  <!-- Landing de conversion -->
+  <url>
+    <loc>https://andresapal.github.io/trasteosya/cotizar.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>1.0</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+
+  <!-- Servicios principales -->
+  <url>
+    <loc>https://andresapal.github.io/trasteosya/hogar.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.95</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://andresapal.github.io/trasteosya/oficina.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.9</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://andresapal.github.io/trasteosya/industrial.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.9</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://andresapal.github.io/trasteosya/empaque.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://andresapal.github.io/trasteosya/bodegaje.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+
+  <!-- App -->
+  <url>
+    <loc>https://andresapal.github.io/trasteosya/trans-ya-app.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+
+  <!-- Empresa -->
+  <url>
+    <loc>https://andresapal.github.io/trasteosya/quienes-somos.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://andresapal.github.io/trasteosya/contacto.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+
 </urlset>
