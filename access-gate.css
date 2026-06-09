@@ -1,0 +1,393 @@
+/* ============================================
+   TRASTEOS YA — Access Gate · estilos
+   ============================================ */
+
+/* ---------- Boton candado (esquina sup derecha) ---------- */
+.ty-lock-btn {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 999;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.55;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+.ty-lock-btn:hover {
+  opacity: 1;
+  transform: scale(1.06);
+  box-shadow: 0 4px 12px rgba(10,24,69,0.20);
+}
+.ty-lock-btn--on {
+  background:
+    linear-gradient(45deg, rgba(93,168,255,0.18) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(93,168,255,0.18) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(93,168,255,0.18) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(93,168,255,0.18) 75%),
+    linear-gradient(135deg, #001236 0%, #0A1845 50%, #1E3A8A 100%);
+  background-size: 14px 14px, 14px 14px, 14px 14px, 14px 14px, 100% 100%;
+  background-position: 0 0, 0 7px, 7px -7px, -7px 0, 0 0;
+  color: white;
+  border-color: rgba(93,168,255,0.45);
+  opacity: 1;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    0 4px 14px rgba(10,24,69,0.45);
+}
+
+/* ---------- Espacio en el fondo para que el toolbar no tape contenido ---------- */
+body.is-operator { padding-bottom: 88px !important; }
+@media (max-width: 640px) {
+  body.is-operator { padding-bottom: 96px !important; }
+}
+
+/* En el cotizador, el drawer es fixed y no respeta padding-bottom del body.
+   Le agregamos margen interno extra para que los botones PDF/WhatsApp queden
+   ARRIBA del toolbar de operador, no detras. */
+body.is-operator .drawer .drawer-actions {
+  padding-bottom: 80px !important;
+}
+
+/* ============================================
+   MOBILE FIXES · cotizador
+   - Candado movido para no chocar con "Mostrar costos"
+   - Toolbar mas compacto (cabe en pantallas chicas)
+   ============================================ */
+@media (max-width: 640px) {
+  /* Candado pequeno en bottom-LEFT (lejos del toggle del cotizador) */
+  .ty-lock-btn {
+    top: auto !important;
+    bottom: 14px !important;
+    left: 14px !important;
+    right: auto !important;
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 13px !important;
+    opacity: 0.65;
+  }
+  /* En modo operador escondemos el candado (la toolbar ya tiene "Salir") */
+  body.is-operator .ty-lock-btn { display: none !important; }
+
+  /* Drawer del cotizador: mas padding para que sus botones no queden
+     detras del toolbar */
+  body.is-operator .drawer .drawer-actions {
+    padding-bottom: 90px !important;
+  }
+
+  /* Toolbar operador: anclado al fondo, ancho 100% del viewport con
+     scroll horizontal, mas compacto */
+  .ty-op-toolbar {
+    bottom: 8px !important;
+    left: 8px !important;
+    right: 8px !important;
+    transform: none !important;
+    max-width: calc(100vw - 16px) !important;
+    padding: 5px !important;
+    font-size: 11px !important;
+    gap: 2px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .ty-op-toolbar::-webkit-scrollbar { display: none; }
+  .ty-op-toolbar__badge {
+    padding: 4px 8px !important;
+    font-size: 9px !important;
+    letter-spacing: 0.04em !important;
+  }
+  .ty-op-toolbar__link {
+    padding: 5px 9px !important;
+    font-size: 11px !important;
+  }
+  .ty-op-toolbar__logout {
+    padding: 5px 10px !important;
+    font-size: 11px !important;
+  }
+}
+
+/* ---------- Toolbar operador (cuando esta autenticado) ---------- */
+.ty-op-toolbar {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 998;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background:
+    linear-gradient(45deg, rgba(93,168,255,0.12) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(93,168,255,0.12) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(93,168,255,0.12) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(93,168,255,0.12) 75%),
+    linear-gradient(135deg, #001236 0%, #0A1845 50%, #001236 100%);
+  background-size: 22px 22px, 22px 22px, 22px 22px, 22px 22px, 100% 100%;
+  background-position: 0 0, 0 11px, 11px -11px, -11px 0, 0 0;
+  color: white;
+  border-radius: 999px;
+  border: 1px solid rgba(93,168,255,0.40);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    0 8px 24px rgba(10,24,69,0.45);
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-size: 13px;
+  max-width: 96vw;
+  overflow-x: auto;
+}
+.ty-op-toolbar__badge {
+  background: #16A34A;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.ty-op-toolbar__link {
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.ty-op-toolbar__link:hover {
+  background: rgba(255,255,255,0.10);
+  color: white;
+}
+.ty-op-toolbar__logout {
+  background: rgba(227,6,19,0.85);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ty-op-toolbar__logout:hover { background: #E30613; }
+
+/* ---------- Modal PIN ---------- */
+.ty-gate-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.ty-gate-modal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 14, 45, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.ty-gate-modal__box {
+  position: relative;
+  background:
+    linear-gradient(45deg, rgba(93,168,255,0.12) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(93,168,255,0.12) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(93,168,255,0.12) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(93,168,255,0.12) 75%),
+    linear-gradient(180deg, rgba(255,255,255,0.10) 0%, transparent 30%),
+    linear-gradient(135deg, #001236 0%, #0A1845 50%, #001236 100%);
+  background-size: 28px 28px, 28px 28px, 28px 28px, 28px 28px, 100% 100%, 100% 100%;
+  background-position: 0 0, 0 14px, 14px -14px, -14px 0, 0 0, 0 0;
+  border: 1px solid rgba(93,168,255,0.40);
+  color: white;
+  border-radius: 18px;
+  padding: 36px 32px 28px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 24px 80px rgba(5,14,45,0.60), inset 0 1px 0 rgba(255,255,255,0.18);
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  animation: ty-gate-pop 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ty-gate-modal__box > * { position: relative; z-index: 1; }
+@keyframes ty-gate-pop {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.ty-gate-modal__box.shake {
+  animation: ty-gate-shake 380ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+@keyframes ty-gate-shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-8px); }
+  40%, 60% { transform: translateX(8px); }
+}
+.ty-gate-modal__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(93,168,255,0.18);
+  border: 2px solid rgba(93,168,255,0.40);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 16px;
+}
+.ty-gate-modal__title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  text-align: center;
+  color: white;
+}
+.ty-gate-modal__lead {
+  font-size: 14px;
+  color: rgba(255,255,255,0.75);
+  text-align: center;
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+.ty-gate-modal__input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.08);
+  border: 1.5px solid rgba(255,255,255,0.20);
+  border-radius: 10px;
+  color: white;
+  font-size: 18px;
+  font-family: inherit;
+  letter-spacing: 0.06em;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.ty-gate-modal__input::placeholder { color: rgba(255,255,255,0.40); letter-spacing: 0.06em; }
+.ty-gate-modal__input:focus {
+  border-color: rgba(93,168,255,0.80);
+  box-shadow: 0 0 0 4px rgba(93,168,255,0.16);
+  background: rgba(255,255,255,0.12);
+}
+.ty-gate-modal__err {
+  min-height: 18px;
+  color: #FF7A85;
+  font-size: 13px;
+  text-align: center;
+  margin: 10px 0 12px;
+  font-weight: 600;
+}
+.ty-gate-modal__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+.ty-gate-modal__cancel,
+.ty-gate-modal__ok {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+}
+.ty-gate-modal__cancel {
+  background: rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.20);
+}
+.ty-gate-modal__cancel:hover { background: rgba(255,255,255,0.16); }
+.ty-gate-modal__ok {
+  background: linear-gradient(180deg, #FF2638 0%, #E30613 50%, #B0050F 100%);
+  color: white;
+  box-shadow: 0 4px 14px rgba(227,6,19,0.40);
+}
+.ty-gate-modal__ok:hover {
+  box-shadow: 0 6px 20px rgba(227,6,19,0.55);
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   MODO PUBLICO (cotizador) — esconde TODO lo de costos
+   ============================================ */
+
+/* Botones / filas de costo conocidos */
+body.is-public #costs-btn,
+body.is-public #row-cost,
+body.is-public #row-util-neta,
+body.is-public #row-margen,
+body.is-public #warn-margen,
+body.is-public #btn-pdf-interno,
+body.is-public #btn-pdf-mats,
+body.is-public #row-dcto,
+body.is-public #field-nac-costo,
+body.is-public #field-emp-cu,
+body.is-public #field-des-cu,
+body.is-public #drawer-btn-interno,
+body.is-public #drawer-btn-mats {
+  display: none !important;
+}
+
+/* Inputs de costo manuales (cardador-cu, adic-*-costo, trans-cu, cintas-cu, etc) */
+body.is-public input[id^="adic-"][id$="-costo"],
+body.is-public input#emp-cu,
+body.is-public input#des-cu,
+body.is-public input#trans-cu,
+body.is-public input#cintas-cu,
+body.is-public input#nac-costo,
+body.is-public .field:has(input[id^="adic-"][id$="-costo"]),
+body.is-public .field:has(input#emp-cu),
+body.is-public .field:has(input#des-cu),
+body.is-public .field:has(input#trans-cu),
+body.is-public .field:has(input#cintas-cu),
+body.is-public .field:has(input#nac-costo) {
+  display: none !important;
+}
+
+/* Cualquier label con inline color:var(--cost) -> es etiqueta de costo */
+body.is-public label[style*="cost"],
+body.is-public .field:has(label[style*="cost"]) {
+  display: none !important;
+}
+
+/* Bloque entero "(solo costo)" en Empaque Full -> Transporte + Cintas */
+body.is-public .ty-cost-block {
+  display: none !important;
+}
+
+/* Descuento (input #descuento y su contenedor) */
+body.is-public .field:has(#descuento),
+body.is-public label[for="descuento"],
+body.is-public #descuento {
+  display: none !important;
+}
+
+/* Filas de "Costo" en summary y drawer */
+body.is-public .sum-line .cost,
+body.is-public .tot-row.cost-row,
+body.is-public .tot-row.profit {
+  display: none !important;
+}
+
+/* Badges de costo en cada line item */
+body.is-public .val.cost,
+body.is-public [class*="cost-row"] {
+  display: none !important;
+}
