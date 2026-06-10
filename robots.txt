@@ -11,3 +11,4 @@ User-agent: Googlebot-Image
 Allow: /assets/img/
 
 Sitemap: https://andresapal.github.io/trasteosya/sitemap.xml
+   
