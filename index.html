@@ -216,6 +216,9 @@
   <link rel="stylesheet" href="css/effects.css">
   <link rel="stylesheet" href="css/mega-hero.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <!-- Google Analytics 4 + eventos custom -->
+  <script src="js/analytics.js" defer></script>
 </head>
 
 <body>
@@ -281,6 +284,7 @@
           </div>
         </div>
         <a class="nav__link" href="cotizador.html" target="_blank" rel="noopener">Cotizador</a>
+        <a class="nav__link" href="blog.html">Blog</a>
         <a class="nav__link" href="trans-ya-app.html">Trans Ya App</a>
         <a class="nav__link" href="quienes-somos.html">Quiénes somos</a>
         <a class="nav__link" href="contacto.html">Contacto</a>
@@ -303,6 +307,7 @@
       <a class="nav__mobile-link" href="empaque.html">Empaque</a>
       <a class="nav__mobile-link" href="bodegaje.html">Bodegaje</a>
       <a class="nav__mobile-link" href="cotizador.html" target="_blank" rel="noopener">Cotizador</a>
+      <a class="nav__mobile-link" href="blog.html">Blog</a>
       <a class="nav__mobile-link" href="trans-ya-app.html">Trans Ya App</a>
       <a class="nav__mobile-link" href="quienes-somos.html">Quiénes somos</a>
       <a class="nav__mobile-link" href="contacto.html">Contacto</a>
@@ -937,6 +942,95 @@
     </div>
   </section>
 
+  <!-- ============== COBERTURA POR ZONAS · landings de zona (SEO) ============== -->
+  <section class="section section--alt" aria-label="Cotiza directo por zona">
+    <div class="container" data-reveal>
+      <div style="text-align:center;max-width:680px;margin:0 auto var(--space-xl);">
+        <span class="eyebrow">Cobertura por zonas</span>
+        <h2 class="section-title">Cotiza directo según tu zona.</h2>
+        <p class="section-subtitle">Conocemos las particularidades de cada barrio del norte de Bogotá y la Sabana.</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;max-width:1100px;margin:0 auto;">
+        <a href="cotizar-chapinero.html" style="display:block;padding:18px 20px;background:white;border:1px solid var(--border);border-radius:14px;text-decoration:none;transition:all 0.2s cubic-bezier(0.16,1,0.3,1);box-shadow:var(--shadow-sm);">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:16px;color:var(--brand-navy);margin-bottom:4px;">Mudanza en Chapinero</div>
+          <div style="font-size:13px;color:var(--text-muted);">Chicó · Rosales · Quinta Camacho · Nogal</div>
+        </a>
+        <a href="cotizar-usaquen.html" style="display:block;padding:18px 20px;background:white;border:1px solid var(--border);border-radius:14px;text-decoration:none;transition:all 0.2s cubic-bezier(0.16,1,0.3,1);box-shadow:var(--shadow-sm);">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:16px;color:var(--brand-navy);margin-bottom:4px;">Mudanza en Usaquén</div>
+          <div style="font-size:13px;color:var(--text-muted);">Country Club · Santa Bárbara · La Calleja</div>
+        </a>
+        <a href="cotizar-chico.html" style="display:block;padding:18px 20px;background:white;border:1px solid var(--border);border-radius:14px;text-decoration:none;transition:all 0.2s cubic-bezier(0.16,1,0.3,1);box-shadow:var(--shadow-sm);">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:16px;color:var(--brand-navy);margin-bottom:4px;">Mudanza en Chicó</div>
+          <div style="font-size:13px;color:var(--text-muted);">Chicó Norte · Reservado · Parque 93</div>
+        </a>
+        <a href="cotizar-cedritos.html" style="display:block;padding:18px 20px;background:white;border:1px solid var(--border);border-radius:14px;text-decoration:none;transition:all 0.2s cubic-bezier(0.16,1,0.3,1);box-shadow:var(--shadow-sm);">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:16px;color:var(--brand-navy);margin-bottom:4px;">Mudanza en Cedritos</div>
+          <div style="font-size:13px;color:var(--text-muted);">Belmira · Multicentro · Bosques de Pinos</div>
+        </a>
+        <a href="cotizar-chia.html" style="display:block;padding:18px 20px;background:white;border:1px solid var(--border);border-radius:14px;text-decoration:none;transition:all 0.2s cubic-bezier(0.16,1,0.3,1);box-shadow:var(--shadow-sm);">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:16px;color:var(--brand-navy);margin-bottom:4px;">Mudanza en Chía</div>
+          <div style="font-size:13px;color:var(--text-muted);">La Balsa · Yerbabuena · Cerca de Piedra</div>
+        </a>
+        <a href="cotizar-cajica.html" style="display:block;padding:18px 20px;background:white;border:1px solid var(--border);border-radius:14px;text-decoration:none;transition:all 0.2s cubic-bezier(0.16,1,0.3,1);box-shadow:var(--shadow-sm);">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:16px;color:var(--brand-navy);margin-bottom:4px;">Mudanza en Cajicá</div>
+          <div style="font-size:13px;color:var(--text-muted);">Calahorra · Hatogrande · La Caro</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== DEL BLOG (artículos top) ============== -->
+  <section class="section" aria-label="Artículos del blog">
+    <div class="container" data-reveal>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;margin-bottom:var(--space-xl);">
+        <div>
+          <span class="eyebrow">Del blog</span>
+          <h2 class="section-title" style="margin-bottom:6px;">Guías honestas, sin trucos.</h2>
+          <p style="font-size:15px;color:var(--text-muted);">15 años de experiencia compartidos en artículos prácticos.</p>
+        </div>
+        <a href="blog.html" style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;color:var(--brand-red);text-decoration:none;text-transform:uppercase;letter-spacing:0.05em;">Ver todo el blog →</a>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;">
+
+        <a href="cuanto-cuesta-mudanza-bogota.html" style="display:block;background:white;border:1px solid var(--border);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;transition:all 0.25s cubic-bezier(0.16,1,0.3,1);box-shadow:var(--shadow-sm);">
+          <div style="aspect-ratio:16/10;overflow:hidden;background:linear-gradient(135deg,#0A1845,#1E3A8A);position:relative;">
+            <img src="assets/img/Hogar%201.png" alt="Cuánto cuesta una mudanza en Bogotá" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+            <span style="position:absolute;top:12px;left:12px;padding:4px 10px;background:rgba(227,6,19,0.92);color:white;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:999px;">Costos</span>
+          </div>
+          <div style="padding:22px 20px;">
+            <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:18px;color:var(--brand-navy);margin-bottom:8px;line-height:1.25;">¿Cuánto cuesta una mudanza en Bogotá en 2026?</h3>
+            <p style="font-size:14px;color:var(--text-muted);line-height:1.5;">Rangos reales por tamaño, distancia y servicio. Sin letra chica.</p>
+          </div>
+        </a>
+
+        <a href="como-empacar-mudanza.html" style="display:block;background:white;border:1px solid var(--border);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;transition:all 0.25s cubic-bezier(0.16,1,0.3,1);box-shadow:var(--shadow-sm);">
+          <div style="aspect-ratio:16/10;overflow:hidden;background:linear-gradient(135deg,#0A1845,#1E3A8A);position:relative;">
+            <img src="assets/img/empaque%201.png" alt="Cómo empacar para una mudanza" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+            <span style="position:absolute;top:12px;left:12px;padding:4px 10px;background:rgba(227,6,19,0.92);color:white;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:999px;">Empaque</span>
+          </div>
+          <div style="padding:22px 20px;">
+            <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:18px;color:var(--brand-navy);margin-bottom:8px;line-height:1.25;">Cómo empacar para una mudanza, paso a paso</h3>
+            <p style="font-size:14px;color:var(--text-muted);line-height:1.5;">Materiales, orden por habitación y los errores que TODOS cometen.</p>
+          </div>
+        </a>
+
+        <a href="como-elegir-empresa-mudanzas.html" style="display:block;background:white;border:1px solid var(--border);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;transition:all 0.25s cubic-bezier(0.16,1,0.3,1);box-shadow:var(--shadow-sm);">
+          <div style="aspect-ratio:16/10;overflow:hidden;background:linear-gradient(135deg,#0A1845,#1E3A8A);position:relative;">
+            <img src="assets/img/Operacion%20general.png" alt="Cómo elegir empresa de mudanzas" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+            <span style="position:absolute;top:12px;left:12px;padding:4px 10px;background:rgba(227,6,19,0.92);color:white;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-radius:999px;">Checklist</span>
+          </div>
+          <div style="padding:22px 20px;">
+            <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:18px;color:var(--brand-navy);margin-bottom:8px;line-height:1.25;">Cómo elegir empresa de mudanzas: checklist 12 pasos</h3>
+            <p style="font-size:14px;color:var(--text-muted);line-height:1.5;">Banderas rojas, preguntas críticas y cláusulas que sí importan.</p>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
   <!-- ============== FAQ ============== -->
   <section class="section">
     <div class="container">
@@ -1093,6 +1187,7 @@
           <ul>
             <li><a href="quienes-somos.html">Quiénes somos</a></li>
             <li><a href="trans-ya-app.html">Trans Ya App</a></li>
+            <li><a href="blog.html">Blog</a></li>
             <li><a href="contacto.html">Contacto</a></li>
             <li><a href="#cotizador">Cotizar</a></li>
           </ul>
