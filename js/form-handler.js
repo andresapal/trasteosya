@@ -37,7 +37,8 @@
       'y un coordinador te responderá por WhatsApp en menos de 15 minutos hábiles.\n\n' +
       'Mientras tanto, si tienes algo urgente, escríbenos al 314 309 5194.\n\n' +
       '¡Gracias por confiar en nosotros!\n' +
-      '— Equipo Trasteos Ya · 15 años moviendo Bogotá'
+      '— Equipo Trasteos Ya · 15 años moviendo Bogotá\n' +
+      '🌐 https://trasteosya.online'
   };
 
   function getPhone() {
@@ -55,7 +56,7 @@
     if (data.tamano)   lines.push('Tamaño: ' + data.tamano);
     if (data.fecha)    lines.push('Fecha estimada: ' + data.fecha);
     if (data.detalles) lines.push('Detalles: ' + data.detalles);
-    lines.push('', '¡Quedo atento a su respuesta!');
+    lines.push('', '¡Quedo atento a su respuesta!', '', '— Trasteos Ya · trasteosya.online');
     return 'https://wa.me/' + getPhone() + '?text=' + encodeURIComponent(lines.join('\n'));
   }
 
@@ -101,7 +102,8 @@
         '📅 *Fecha:* ' + (data.fecha || '-'),
         '💬 *Detalles:* ' + (data.detalles || '-'),
         '',
-        '⏰ ' + new Date().toLocaleString('es-CO')
+        '⏰ ' + new Date().toLocaleString('es-CO'),
+        '🌐 https://trasteosya.online'
       ];
       const url = 'https://api.telegram.org/bot' + CONFIG.TELEGRAM_BOT_TOKEN + '/sendMessage';
       await fetch(url, {
@@ -133,7 +135,8 @@
         '📅 ' + (data.fecha || '-'),
         '💬 ' + (data.detalles || '-'),
         '',
-        '⏰ ' + new Date().toLocaleString('es-CO')
+        '⏰ ' + new Date().toLocaleString('es-CO'),
+        '🌐 https://trasteosya.online'
       ];
       const text = encodeURIComponent(lines.join('\n'));
       const url = 'https://api.callmebot.com/whatsapp.php' +
