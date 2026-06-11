@@ -879,7 +879,7 @@ async function enviarOSWhatsApp(){
     else if(tel.length<10){showToast('Numero de cliente invalido',true);return;}
 
     // Mensaje para el cliente
-    const msg=`Hola ${state.cliente.split(' ')[0]}, te envio tu Orden de Servicio *${state.numeroOS}* de Trasteos Ya.\n\nFecha de servicio: ${state.cargueFecha||state.fecha}\nHora de cargue: ${state.cargueHora||'-'}\n\nCualquier duda quedo atento.`;
+    const msg=`Hola ${state.cliente.split(' ')[0]}, te envio tu Orden de Servicio *${state.numeroOS}* de Trasteos Ya.\n\nFecha de servicio: ${state.cargueFecha||state.fecha}\nHora de cargue: ${state.cargueHora||'-'}\n\nCualquier duda quedo atento.\n\n— Trasteos Ya · https://trasteosya.online`;
 
     // Intentar Web Share API nativo (mobile) — comparte PDF + texto directo, sin URLs leak
     const pdfBlob=pdf.output('blob');
