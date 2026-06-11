@@ -861,12 +861,10 @@ async function enviarOSWhatsApp(){
       heightLeft-=pageH;
     }
 
-    // Descarga local en el dispositivo
     const clienteShort=(state.cliente||'cliente').slice(0,40).replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ\s-]/g,'').trim().replace(/\s+/g,'-');
     const filename=`${state.numeroOS||'OSTY'}-${clienteShort}.pdf`;
-    pdf.save(filename);
 
-    // Tambien backup a Drive (silencioso)
+    // Backup a Drive (silencioso)
     try{
       const pdf_base64=pdf.output('datauristring').split(',')[1];
       fetch(BACKUP_URL,{method:'POST',mode:'no-cors',body:JSON.stringify({
@@ -875,17 +873,36 @@ async function enviarOSWhatsApp(){
       })});
     }catch(_){}
 
-    // Formatear telefono para wa.me (Colombia +57, sin 0 ni espacios)
+    // Formatear telefono para wa.me (Colombia +57)
     let tel=(state.telefono||'').replace(/\D/g,'');
     if(tel.length===10&&tel.startsWith('3')) tel='57'+tel;
-    else if(tel.length===12&&tel.startsWith('57')){} // ya viene completo
     else if(tel.length<10){showToast('Numero de cliente invalido',true);return;}
 
-    // Mensaje pre-llenado
-    const msg=`Hola ${state.cliente.split(' ')[0]}, te envio tu Orden de Servicio *${state.numeroOS}* de Trasteos Ya.\n\nFecha de servicio: ${state.cargueFecha||state.fecha}\nHora de cargue: ${state.cargueHora||'-'}\n\nEl PDF ya esta descargado en este dispositivo — adjuntalo en el siguiente mensaje.\n\nCualquier duda quedo atento.`;
-    const waUrl=`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
+    // Mensaje para el cliente
+    const msg=`Hola ${state.cliente.split(' ')[0]}, te envio tu Orden de Servicio *${state.numeroOS}* de Trasteos Ya.\n\nFecha de servicio: ${state.cargueFecha||state.fecha}\nHora de cargue: ${state.cargueHora||'-'}\n\nCualquier duda quedo atento.`;
 
-    // Toast con instrucciones + abrir WA
+    // Intentar Web Share API nativo (mobile) — comparte PDF + texto directo, sin URLs leak
+    const pdfBlob=pdf.output('blob');
+    const pdfFile=new File([pdfBlob],filename,{type:'application/pdf'});
+
+    if(navigator.canShare && navigator.canShare({files:[pdfFile]})){
+      try{
+        await navigator.share({
+          files:[pdfFile],
+          title:`Orden de Servicio ${state.numeroOS}`,
+          text:msg
+        });
+        showToast('Compartido ✓');
+        return;
+      }catch(err){
+        if(err.name==='AbortError'){showToast('Envio cancelado');return;}
+        // Si falla, sigue al fallback
+      }
+    }
+
+    // Fallback (desktop o navegador sin Web Share): descarga + abrir wa.me
+    pdf.save(filename);
+    const waUrl=`https://wa.me/${tel}?text=${encodeURIComponent(msg+'\n\nEl PDF ya esta descargado · adjuntalo en el siguiente mensaje.')}`;
     showToast('PDF descargado · abriendo WhatsApp...');
     setTimeout(()=>{window.open(waUrl,'_blank');},900);
   }catch(e){
