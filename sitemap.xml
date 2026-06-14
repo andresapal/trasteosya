@@ -4,7 +4,7 @@
 
   <!-- Home -->
   <url>
-    <loc>https://andresapal.github.io/trasteosya/</loc>
+    <loc>https://trasteosya.online/</loc>
     <lastmod>2026-06-09</lastmod>
     <priority>1.0</priority>
     <changefreq>weekly</changefreq>
@@ -12,7 +12,7 @@
 
   <!-- Landing principal de conversion -->
   <url>
-    <loc>https://andresapal.github.io/trasteosya/cotizar.html</loc>
+    <loc>https://trasteosya.online/cotizar.html</loc>
     <lastmod>2026-06-09</lastmod>
     <priority>1.0</priority>
     <changefreq>weekly</changefreq>
@@ -20,25 +20,25 @@
 
   <!-- Landings de zona · Bogota Norte (alta prioridad SEO local) -->
   <url>
-    <loc>https://andresapal.github.io/trasteosya/cotizar-chapinero.html</loc>
+    <loc>https://trasteosya.online/cotizar-chapinero.html</loc>
     <lastmod>2026-06-09</lastmod>
     <priority>0.95</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://andresapal.github.io/trasteosya/cotizar-usaquen.html</loc>
+    <loc>https://trasteosya.online/cotizar-usaquen.html</loc>
     <lastmod>2026-06-09</lastmod>
     <priority>0.95</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://andresapal.github.io/trasteosya/cotizar-chico.html</loc>
+    <loc>https://trasteosya.online/cotizar-chico.html</loc>
     <lastmod>2026-06-09</lastmod>
     <priority>0.95</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://andresapal.github.io/trasteosya/cotizar-cedritos.html</loc>
+    <loc>https://trasteosya.online/cotizar-cedritos.html</loc>
     <lastmod>2026-06-09</lastmod>
     <priority>0.95</priority>
     <changefreq>monthly</changefreq>
@@ -46,45 +46,89 @@
 
   <!-- Landings de zona · Sabana Cundinamarca -->
   <url>
-    <loc>https://andresapal.github.io/trasteosya/cotizar-chia.html</loc>
+    <loc>https://trasteosya.online/cotizar-chia.html</loc>
     <lastmod>2026-06-09</lastmod>
     <priority>0.9</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://andresapal.github.io/trasteosya/cotizar-cajica.html</loc>
+    <loc>https://trasteosya.online/cotizar-cajica.html</loc>
     <lastmod>2026-06-09</lastmod>
     <priority>0.9</priority>
     <changefreq>monthly</changefreq>
   </url>
 
-  <!-- Servicios principales -->
+  <!-- Blog · hub + 6 articulos SEO informacionales -->
   <url>
-    <loc>https://andresapal.github.io/trasteosya/hogar.html</loc>
+    <loc>https://trasteosya.online/blog.html</loc>
     <lastmod>2026-06-09</lastmod>
-    <priority>0.9</priority>
-    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>https://andresapal.github.io/trasteosya/oficina.html</loc>
-    <lastmod>2026-06-09</lastmod>
-    <priority>0.85</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://andresapal.github.io/trasteosya/industrial.html</loc>
+    <loc>https://trasteosya.online/cuanto-cuesta-mudanza-bogota.html</loc>
     <lastmod>2026-06-09</lastmod>
     <priority>0.85</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://andresapal.github.io/trasteosya/empaque.html</loc>
+    <loc>https://trasteosya.online/como-empacar-mudanza.html</loc>
     <lastmod>2026-06-09</lastmod>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://andresapal.github.io/trasteosya/bodegaje.html</loc>
+    <loc>https://trasteosya.online/que-incluye-mudanza-profesional.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.75</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://trasteosya.online/mejores-empresas-mudanzas-bogota.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://trasteosya.online/mudanza-fin-de-semana-bogota.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://trasteosya.online/como-elegir-empresa-mudanzas.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.75</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+
+  <!-- Servicios principales -->
+  <url>
+    <loc>https://trasteosya.online/hogar.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.9</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://trasteosya.online/oficina.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.85</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://trasteosya.online/industrial.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.85</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://trasteosya.online/empaque.html</loc>
+    <lastmod>2026-06-09</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://trasteosya.online/bodegaje.html</loc>
     <lastmod>2026-06-09</lastmod>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
@@ -92,19 +136,19 @@
 
   <!-- App + Empresa -->
   <url>
-    <loc>https://andresapal.github.io/trasteosya/trans-ya-app.html</loc>
+    <loc>https://trasteosya.online/trans-ya-app.html</loc>
     <lastmod>2026-06-09</lastmod>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://andresapal.github.io/trasteosya/quienes-somos.html</loc>
+    <loc>https://trasteosya.online/quienes-somos.html</loc>
     <lastmod>2026-06-09</lastmod>
     <priority>0.6</priority>
     <changefreq>yearly</changefreq>
   </url>
   <url>
-    <loc>https://andresapal.github.io/trasteosya/contacto.html</loc>
+    <loc>https://trasteosya.online/contacto.html</loc>
     <lastmod>2026-06-09</lastmod>
     <priority>0.6</priority>
     <changefreq>yearly</changefreq>
