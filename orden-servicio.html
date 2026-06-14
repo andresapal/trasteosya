@@ -87,6 +87,7 @@ input[readonly]{background:#f8f9fa;color:#6b7280;cursor:default;border-color:#e9
     <button class="btn" onclick="handleNueva()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg> Nueva OS</button>
     <button class="btn" onclick="handleDuplicar()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Duplicar</button>
     <button class="btn btn-primary" onclick="generarPdf()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> PDF</button>
+    <button class="btn" onclick="pedirResena()" style="background:#16A34A;border-color:#16A34A;color:#fff" title="Enviar pedido de reseña al cliente por WhatsApp"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Reseña</button>
   </div>
 </div>
 
@@ -287,6 +288,7 @@ input[readonly]{background:#f8f9fa;color:#6b7280;cursor:default;border-color:#e9
   <div style="display:flex;justify-content:flex-end;gap:10px;padding-top:4px">
     <button class="btn" onclick="setVista('preview')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Vista previa</button>
     <button class="btn btn-primary" onclick="generarPdf()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Generar PDF</button>
+    <button class="btn" onclick="pedirResena()" style="background:#16A34A;border-color:#16A34A;color:#fff" title="Enviar pedido de reseña al cliente por WhatsApp"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Reseña</button>
   </div>
 </div>
 
@@ -949,6 +951,55 @@ window.onload=()=>{
   updateOSDisplay();
   renderOps();renderParadas();initSigs();
 };
+</script>
+<script>
+/* ============================================
+   TRASTEOS YA — Pedir reseña al cliente por WhatsApp (operador)
+   Lee el telefono y nombre del cliente de la Orden de Servicio
+   y abre WhatsApp con el mensaje + tu link de resena de Google.
+   ============================================ */
+(function () {
+  // Si quieres FIJAR tu link aqui, pegalo entre las comillas de abajo.
+  // Si lo dejas vacio, el boton te lo pide UNA sola vez y lo recuerda en este equipo.
+  const RESENA_LINK = "";
+
+  function obtenerLink() {
+    if (RESENA_LINK && RESENA_LINK.indexOf('http') === 0) return RESENA_LINK;
+    let s = '';
+    try { s = localStorage.getItem('ty_resena_link') || ''; } catch (e) {}
+    if (s) return s;
+    s = window.prompt('Pega tu link de resena de Google (lo copias en tu Perfil de Google -> boton "Pide resenas" / "Ask for reviews"). Se guarda en este equipo y no te lo vuelve a pedir:');
+    if (s && s.trim().indexOf('http') === 0) {
+      s = s.trim();
+      try { localStorage.setItem('ty_resena_link', s); } catch (e) {}
+      return s;
+    }
+    return null;
+  }
+
+  window.pedirResena = function () {
+    const link = obtenerLink();
+    if (!link) { alert('No se configuro el link de resena. Vuelve a darle al boton y pega tu link de Google (debe empezar por http).'); return; }
+
+    let tel = '';
+    const inpTel = document.getElementById('telefono');
+    if (inpTel) tel = (inpTel.value || '').replace(/\D/g, '');
+    if (tel && tel.indexOf('57') !== 0) tel = '57' + tel; // formato Colombia
+
+    let nombre = '';
+    const inpNom = document.getElementById('cliente');
+    if (inpNom) nombre = (inpNom.value || '').trim();
+    const primer = nombre ? nombre.split(/\s+/)[0] : '';
+    const saludo = primer ? ('Hola ' + primer) : 'Hola';
+
+    const msg = saludo + ' 👋 ¡Gracias por confiar en *Trasteos Ya* para tu mudanza! '
+      + 'Si quedaste a gusto con el servicio, ¿nos regalas 30 segundos para dejarnos una resena en Google? '
+      + 'Nos ayuda muchisimo a seguir creciendo 🙏\n\n' + link;
+
+    const base = tel ? ('https://wa.me/' + tel) : 'https://wa.me/';
+    window.open(base + '?text=' + encodeURIComponent(msg), '_blank');
+  };
+})();
 </script>
 <script src="js/access-gate.js"></script></body>
 </html>
