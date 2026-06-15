@@ -152,7 +152,7 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
   <!-- Footer -->
   <div style="background:#f4f5f9;padding:10px 20px;display:flex;align-items:center;justify-content:space-between">
     <div style="font-size:11px;color:#6b7280">Gracias por confiar en Trasteos Ya 🚚</div>
-    <div style="font-size:11px;color:#003DA5;font-weight:600">trasteosya.com</div>
+    <div style="font-size:11px;color:#003DA5;font-weight:600">trasteosya.online</div>
   </div>
 </div>
 
@@ -825,6 +825,23 @@ function showMobilePDF(){document.getElementById("pdf-modal").style.display="fle
 function closeMobilePDF(){document.getElementById("pdf-modal").style.display="none";}
 
 // ============ IMAGEN + WHATSAPP ============
+const LINK_TY="trasteosya.online";
+const OBSERVACIONES=
+`*Muchas gracias por contactarnos.*
+
+Con el fin de brindarle una cotización lo más precisa posible y evitar posibles ajustes durante la prestación del servicio, nos permitimos compartir las siguientes observaciones:
+
+• Agradecemos enviarnos fotografías o videos de los artículos a transportar y de los accesos en origen y destino. Esto nos ayuda a calcular adecuadamente los recursos necesarios.
+• Es importante informarnos si existen escaleras, caminados largos, restricciones de acceso, reservas de ascensor o cualquier condición especial que pueda afectar el desarrollo de la mudanza.
+• Si cuenta con artículos especiales como nevecón, secadora, muebles de gran tamaño o elementos delicados, le agradecemos indicarlo previamente.
+• En caso de requerir servicios adicionales como empaque, suministro de cajas, bodegaje o instalaciones, por favor háganoslo saber con anticipación.
+
+Nuestro objetivo es ofrecerle un servicio con el costo más aterrizado posible, sin contratiempos y con la mejor planeación para su presupuesto y su mudanza.
+
+Cordialmente,
+*Trasteos Ya*
+${LINK_TY}`;
+
 function buildCotCard(){
   const lines=getLines();
   const subV=lines.reduce((a,l)=>a+(l.noV?0:l.v),0);
@@ -894,7 +911,7 @@ async function generarImagenYWA(){
     const subV=lines.reduce((a,l)=>a+(l.noV?0:l.v),0);
     const dcto=Math.min(numVal("descuento"),subV);
     const total=subV-dcto;
-    const msg=`📋 *Cotización Trasteos Ya*\n${cliente?"👤 "+cliente+"\n":""}\n💰 *Total: ${COP(total)}*\n\n_Te adjunto la imagen con el detalle completo de tu cotización._\n\n¡Gracias por confiar en Trasteos Ya! 🚚`;
+    const msg=`📋 *Cotización Trasteos Ya*\n${cliente?"👤 "+cliente+"\n":""}\n💰 *Total: ${COP(total)}*\n\n_Te adjunto la imagen con el detalle completo de tu cotización._\n\n${OBSERVACIONES}`;
     setTimeout(()=>{
       window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`,"_blank","noopener,noreferrer");
     },500);
@@ -922,7 +939,7 @@ function sendWA(){
   msg+=`Fecha: ${fechaFmt}\n\nServicios:\n`;
   msg+=lines.filter(l=>!l.noV&&l.v>0).map(l=>`• ${l.l}: ${COP(l.v)}`).join("\n");
   if(dcto>0)msg+=`\nDescuento: - ${COP(dcto)}`;
-  msg+=`\n\n*Total: ${COP(total)}*\n\nGracias por confiar en Trasteos Ya. 🚚`;
+  msg+=`\n\n*Total: ${COP(total)}*\n\n${OBSERVACIONES}`;
   window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`,"_blank","noopener,noreferrer");
 }
 
@@ -1013,7 +1030,7 @@ function pdfCliente(){
     doc.setFont("helvetica","bold");doc.setFontSize(14);
     doc.text("Total",left,y);doc.text(COP(total),right,y,{align:"right"});y+=12;
     doc.setFont("helvetica","italic");doc.setFontSize(9);doc.setTextColor(150);
-    doc.text("Gracias por confiar en Trasteos Ya.",left,y);
+    doc.text("Gracias por confiar en Trasteos Ya.   ·   trasteosya.online",left,y);
     downloadPDF(doc,`cotizacion_${safeName(cliente)}.pdf`);
   });
 }
