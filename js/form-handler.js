@@ -45,9 +45,68 @@
     return (window.TY_WhatsApp && window.TY_WhatsApp.phone) || '573143095194';
   }
 
+  /* ---------- Tarifas Hogar (sincronizadas con Cotizador AAA) ---------- */
+  const TARIFAS_HOGAR = {
+    'pequeno': { label: 'Camión Pequeño', tamano: '1 hab / apartaestudio hasta 60 mts²', precio: 580000 },
+    'mediano': { label: 'Camión Mediano', tamano: '2-3 habs hasta 85 mts²', precio: 730000 },
+    'grande':  { label: 'Camión Grande',  tamano: '+3 habs más de 85 mts²', precio: 870000 }
+  };
+
+  function COP(n) {
+    return '$ ' + n.toLocaleString('es-CO');
+  }
+
+  const OBSERVACIONES_CLIENTE =
+    'Muchas gracias por contactarnos.\n\n' +
+    'Con el fin de brindarle una cotización lo más precisa posible y evitar posibles ajustes durante la prestación del servicio, nos permitimos compartir las siguientes observaciones:\n\n' +
+    '• Agradecemos enviarnos fotografías o videos de los artículos a transportar y de los accesos en origen y destino. Esto nos ayuda a calcular adecuadamente los recursos necesarios.\n' +
+    '• Es importante informarnos si existen escaleras, caminados largos, restricciones de acceso, reservas de ascensor o cualquier condición especial que pueda afectar el desarrollo de la mudanza.\n' +
+    '• Si cuenta con artículos especiales como nevecón, secadora, muebles de gran tamaño o elementos delicados, le agradecemos indicarlo previamente.\n' +
+    '• En caso de requerir servicios adicionales como empaque, suministro de cajas, bodegaje o instalaciones, por favor háganoslo saber con anticipación.\n\n' +
+    'Nuestro objetivo es ofrecerle un servicio con el costo más aterrizado posible, sin contratiempos y con la mejor planeación para su presupuesto y su mudanza.\n\n' +
+    'Cordialmente,\n' +
+    'Trasteos Ya\n' +
+    'trasteosya.online';
+
+  function buildCotizacionHogar(data) {
+    var t = TARIFAS_HOGAR[data.hogar_camion];
+    if (!t) return null;
+    var nombre = (data.nombre || '').trim();
+    var primer = nombre ? nombre.split(/\s+/)[0] : '';
+    var saludo = primer ? ('Hola ' + primer) : 'Hola';
+    var fechaStr = '';
+    if (data.fecha) {
+      try {
+        var p = data.fecha.split('-').map(Number);
+        fechaStr = new Date(p[0], (p[1]||1)-1, p[2]||1)
+          .toLocaleDateString('es-CO', {day:'2-digit',month:'long',year:'numeric'});
+      } catch(e) { fechaStr = data.fecha; }
+    }
+    var lines = [
+      '*Cotización Trasteos Ya*',
+      nombre ? ('Cliente: ' + nombre) : '',
+      fechaStr ? ('Fecha estimada: ' + fechaStr) : '',
+      '',
+      '*Mudanza:*',
+      '• Trasteo Urbano ' + t.label + ': ' + COP(t.precio),
+      '  (' + t.tamano + ')',
+      '',
+      '*Total: ' + COP(t.precio) + '*',
+      '',
+      (data.origen || data.destino) ? ('Ruta: ' + (data.origen||'-') + ' → ' + (data.destino||'-')) : '',
+      '',
+      OBSERVACIONES_CLIENTE
+    ];
+    return lines.filter(function(l){ return l !== ''; }).join('\n');
+  }
+
   /* ---------- WhatsApp link generador (cliente, post-submit) ---------- */
   function buildWaUrl(data) {
-    const lines = ['Acabo de enviar una cotización por el sitio web.', ''];
+    var cotizacion = buildCotizacionHogar(data);
+    if (cotizacion) {
+      return 'https://wa.me/' + getPhone() + '?text=' + encodeURIComponent(cotizacion);
+    }
+    var lines = ['Acabo de enviar una cotización por el sitio web.', ''];
     if (data.nombre)   lines.push('Nombre: ' + data.nombre);
     if (data.email)    lines.push('Email: ' + data.email);
     if (data.servicio) lines.push('Servicio: ' + data.servicio);
@@ -89,7 +148,8 @@
   async function postTelegram(data, source) {
     if (!CONFIG.TELEGRAM_BOT_TOKEN || !CONFIG.TELEGRAM_CHAT_ID) return;
     try {
-      const lines = [
+      var cotizacion = buildCotizacionHogar(data);
+      var lines = [
         '🔔 *Nueva cotización · Trasteos Ya*',
         '',
         '📋 *Origen:* ' + source,
@@ -105,7 +165,14 @@
         '⏰ ' + new Date().toLocaleString('es-CO'),
         '🌐 https://trasteosya.online'
       ];
-      const url = 'https://api.telegram.org/bot' + CONFIG.TELEGRAM_BOT_TOKEN + '/sendMessage';
+      if (cotizacion) {
+        var t = TARIFAS_HOGAR[data.hogar_camion];
+        lines.push('', '─── COTIZACIÓN ENVIADA AL CLIENTE ───', '');
+        lines.push('🚚 *Vehículo:* ' + t.label);
+        lines.push('💰 *Tarifa:* ' + COP(t.precio));
+        lines.push('📐 *Perfil:* ' + t.tamano);
+      }
+      var url = 'https://api.telegram.org/bot' + CONFIG.TELEGRAM_BOT_TOKEN + '/sendMessage';
       await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -122,7 +189,8 @@
   async function postWhatsApp(data, source) {
     if (!CONFIG.CALLMEBOT_APIKEY || !CONFIG.CALLMEBOT_PHONE) return;
     try {
-      const lines = [
+      var cotizacion = buildCotizacionHogar(data);
+      var lines = [
         '🔔 *Nueva cotización · Trasteos Ya*',
         '',
         '📋 Origen: ' + source,
@@ -138,11 +206,17 @@
         '⏰ ' + new Date().toLocaleString('es-CO'),
         '🌐 https://trasteosya.online'
       ];
-      const text = encodeURIComponent(lines.join('\n'));
-      const url = 'https://api.callmebot.com/whatsapp.php' +
-                  '?phone=' + CONFIG.CALLMEBOT_PHONE +
-                  '&text=' + text +
-                  '&apikey=' + CONFIG.CALLMEBOT_APIKEY;
+      if (cotizacion) {
+        var t = TARIFAS_HOGAR[data.hogar_camion];
+        lines.push('', '── COTIZACIÓN ENVIADA ──');
+        lines.push('🚚 ' + t.label + ': ' + COP(t.precio));
+        lines.push('📐 ' + t.tamano);
+      }
+      var text = encodeURIComponent(lines.join('\n'));
+      var url = 'https://api.callmebot.com/whatsapp.php' +
+                '?phone=' + CONFIG.CALLMEBOT_PHONE +
+                '&text=' + text +
+                '&apikey=' + CONFIG.CALLMEBOT_APIKEY;
       await fetch(url, { method: 'GET', mode: 'no-cors' });
     } catch (e) { /* silent */ }
   }
@@ -217,8 +291,14 @@
     // Auto-respuesta al cliente (Web3Forms la envia al email del cliente)
     if (data.email) {
       fd.set('_replyto', data.email);
-      fd.set('_autoresponse', CONFIG.CLIENT_AUTOREPLY_BODY);
-      fd.set('_autoresponse_subject', CONFIG.CLIENT_AUTOREPLY_SUBJECT);
+      var cotEmail = buildCotizacionHogar(data);
+      if (cotEmail) {
+        fd.set('_autoresponse_subject', 'Tu cotización · Trasteos Ya');
+        fd.set('_autoresponse', cotEmail.replace(/\*/g, ''));
+      } else {
+        fd.set('_autoresponse', CONFIG.CLIENT_AUTOREPLY_BODY);
+        fd.set('_autoresponse_subject', CONFIG.CLIENT_AUTOREPLY_SUBJECT);
+      }
     }
 
     // Dispara Telegram + WhatsApp + Backup + Sheets en paralelo (no bloqueante)
