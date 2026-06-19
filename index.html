@@ -635,13 +635,19 @@
             </div>
 
             <div class="field-row">
-              <div class="field">
-                <label class="label" for="qq-tamano">Tamaño aproximado</label>
-                <select class="select" id="qq-tamano" name="tamano" required>
+              <div class="field" id="qq-hogar-wrap">
+                <label class="label" for="qq-hogar-tamano">Tamaño del hogar</label>
+                <select class="select" id="qq-hogar-tamano" name="hogar_camion" required>
                   <option value="">Selecciona…</option>
-                  <option value="Apartaestudio / 1 habitación">Apartaestudio / 1 hab</option>
-                  <option value="2-3 habitaciones">2-3 habitaciones</option>
-                  <option value="4+ habitaciones / casa grande">4+ habitaciones / casa grande</option>
+                  <option value="pequeno">1 hab / apartaestudio — hasta 60 mts²</option>
+                  <option value="mediano">2-3 habs — hasta 85 mts²</option>
+                  <option value="grande">+3 habs — más de 85 mts²</option>
+                </select>
+              </div>
+              <div class="field" id="qq-otro-wrap" style="display:none">
+                <label class="label" for="qq-tamano">Tamaño aproximado</label>
+                <select class="select" id="qq-tamano" name="tamano">
+                  <option value="">Selecciona…</option>
                   <option value="Oficina pequeña (1-10 puestos)">Oficina pequeña (1-10 puestos)</option>
                   <option value="Oficina mediana/grande (10+ puestos)">Oficina mediana/grande</option>
                   <option value="Carga industrial / maquinaria">Carga industrial</option>
@@ -676,6 +682,28 @@
               </a>
             </div>
           </form>
+          <script>
+          (function(){
+            var form=document.querySelector('[data-source="cotizador-home"]');
+            if(!form)return;
+            var radios=form.querySelectorAll('input[name="servicio"]');
+            var hogarW=document.getElementById('qq-hogar-wrap');
+            var otroW=document.getElementById('qq-otro-wrap');
+            var hogarSel=document.getElementById('qq-hogar-tamano');
+            var otroSel=document.getElementById('qq-tamano');
+            function toggle(){
+              var v='';
+              radios.forEach(function(r){if(r.checked)v=r.value;});
+              var esHogar=v==='Mudanza Hogar';
+              hogarW.style.display=esHogar?'':'none';
+              otroW.style.display=esHogar?'none':'';
+              if(esHogar){hogarSel.required=true;otroSel.required=false;otroSel.value='';}
+              else{hogarSel.required=false;otroSel.required=true;hogarSel.value='';}
+            }
+            radios.forEach(function(r){r.addEventListener('change',toggle);});
+            toggle();
+          })();
+          </script>
         </div>
       </div>
     </div>
