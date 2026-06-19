@@ -937,9 +937,21 @@ function sendWA(){
   let msg=`*Cotización Trasteos Ya*\n`;
   if(cliente)msg+=`Cliente: ${cliente}\n`;
   msg+=`Fecha: ${fechaFmt}\n\nServicios:\n`;
-  msg+=lines.filter(l=>!l.noV&&l.v>0).map(l=>`• ${l.l}: ${COP(l.v)}`).join("\n");
-  if(dcto>0)msg+=`\nDescuento: - ${COP(dcto)}`;
-  msg+=`\n\n*Total: ${COP(total)}*\n\n${OBSERVACIONES}`;
+  const GRUPOS=[["trasteo","Mudanza"],["empaque","Empaque"],["instalaciones","Instalaciones"],["desempaque","Desempaque"],["bodegaje","Bodegaje"],["adicionales","Adicionales"]];
+  GRUPOS.forEach(([cat,titulo])=>{
+    const items=lines.filter(l=>l.cat===cat&&!l.noV&&l.v>0);
+    if(items.length){
+      msg+=`\n*${titulo}:*\n`+items.map(l=>`• ${l.l}: ${COP(l.v)}`).join("\n")+"\n";
+    }
+  });
+  if(dcto>0){
+    msg+=`\nTotal: ${COP(subV)}`;
+    msg+=`\nDescuento: - ${COP(dcto)}`;
+    msg+=`\n*Gran Total: ${COP(total)}*`;
+  } else {
+    msg+=`\n*Total: ${COP(subV)}*`;
+  }
+  msg+=`\n\n${OBSERVACIONES}`;
   window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`,"_blank","noopener,noreferrer");
 }
 
