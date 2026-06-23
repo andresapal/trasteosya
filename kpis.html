@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>KPI's · Trasteos Ya</title>
+<link rel="icon" type="image/svg+xml" href="/assets/img/logo.svg"/>
+<link rel="alternate icon" type="image/png" href="/assets/img/logo.png"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ty-blue:#1B3E8C;--ty-red:#E30613;--ty-dark:#1a1a2e;--ty-bg:#f0f2f5;--ty-card:#fff;--ty-border:#e2e5ea;--ty-muted:#6b7280;--ty-green:#15803d;--ty-orange:#d97706;--ty-teal:#0d9488;--radius:12px}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;background:var(--ty-bg);color:var(--ty-dark);min-height:100vh}
+
+/* Header */
+.header{background:var(--ty-card);border-bottom:3px solid var(--ty-blue);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.header img{height:42px}
+.header h1{font-size:16px;font-weight:700;color:var(--ty-blue);margin-left:12px}
+.header-left{display:flex;align-items:center}
+.header-nav{display:flex;gap:12px;align-items:center}
+.header-nav a{font-size:12px;color:var(--ty-blue);font-weight:600;text-decoration:none;padding:6px 12px;border-radius:6px;border:1.5px solid var(--ty-border);transition:all .15s}
+.header-nav a:hover{background:var(--ty-blue);color:#fff}
+.container{max-width:1400px;margin:0 auto;padding:20px 16px 60px}
+
+/* Filters */
+.filters{display:flex;flex-wrap:wrap;gap:10px;background:var(--ty-card);border-radius:var(--radius);border:1px solid var(--ty-border);padding:14px 18px;margin-bottom:20px;align-items:flex-end}
+.filter-group{display:flex;flex-direction:column;gap:3px}
+.filter-group label{font-size:10px;font-weight:700;color:var(--ty-muted);text-transform:uppercase;letter-spacing:.3px}
+.filter-group select,.filter-group input{padding:6px 10px;border:1.5px solid var(--ty-border);border-radius:6px;font-size:12px;font-family:inherit;background:#fff}
+.filter-group select:focus,.filter-group input:focus{outline:none;border-color:var(--ty-blue)}
+.btn-filter{padding:6px 16px;background:var(--ty-blue);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;height:32px}
+.btn-filter:hover{background:#15306e}
+.btn-clear{padding:6px 12px;background:transparent;color:var(--ty-muted);border:1.5px solid var(--ty-border);border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit;height:32px}
+.btn-clear:hover{border-color:var(--ty-blue);color:var(--ty-blue)}
+
+/* KPI Cards */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px}
+.kpi-card{background:var(--ty-card);border-radius:var(--radius);border:1px solid var(--ty-border);padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.04);position:relative;overflow:hidden}
+.kpi-card::after{content:'';position:absolute;top:0;left:0;width:4px;height:100%;border-radius:4px 0 0 4px}
+.kpi-card.c-blue::after{background:var(--ty-blue)}
+.kpi-card.c-green::after{background:var(--ty-green)}
+.kpi-card.c-orange::after{background:var(--ty-orange)}
+.kpi-card.c-red::after{background:var(--ty-red)}
+.kpi-card.c-teal::after{background:var(--ty-teal)}
+.kpi-card .kpi-label{font-size:11px;font-weight:600;color:var(--ty-muted);text-transform:uppercase;letter-spacing:.3px}
+.kpi-card .kpi-value{font-size:28px;font-weight:800;margin-top:4px;line-height:1.1}
+.kpi-card .kpi-sub{font-size:11px;color:var(--ty-muted);margin-top:4px}
+.kpi-card .kpi-trend{font-size:11px;font-weight:600;margin-top:4px}
+.trend-up{color:var(--ty-green)}
+.trend-down{color:var(--ty-red)}
+
+/* Chart sections */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.chart-full{grid-column:1/-1}
+.chart-third{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
+.chart-box{background:var(--ty-card);border-radius:var(--radius);border:1px solid var(--ty-border);padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.chart-box h3{font-size:13px;font-weight:700;color:var(--ty-dark);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.chart-box h3 .tag{font-size:10px;background:var(--ty-bg);padding:2px 8px;border-radius:10px;color:var(--ty-muted);font-weight:600}
+
+/* Funnel */
+.funnel{display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.funnel-step{display:flex;align-items:center;gap:12px}
+.funnel-bar{height:36px;border-radius:6px;display:flex;align-items:center;padding:0 14px;font-size:12px;font-weight:700;color:#fff;min-width:60px;transition:width .6s ease}
+.funnel-label{font-size:12px;color:var(--ty-dark);white-space:nowrap}
+.funnel-pct{font-size:11px;color:var(--ty-muted);font-weight:600;min-width:40px;text-align:right}
+
+/* Ranking table */
+.rank-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.rank-tbl th{text-align:left;font-size:10px;font-weight:700;color:var(--ty-muted);text-transform:uppercase;padding:8px 10px;border-bottom:2px solid var(--ty-border)}
+.rank-tbl td{padding:8px 10px;border-bottom:1px solid #f0f0f0}
+.rank-tbl tr:hover{background:#f8faff}
+.rank-num{font-weight:800;color:var(--ty-blue);font-size:14px;width:30px}
+.rank-bar{height:6px;background:var(--ty-blue);border-radius:3px;transition:width .5s ease}
+.rank-bar-bg{height:6px;background:#f0f2f5;border-radius:3px;width:100%;min-width:80px}
+.rank-pct{font-size:11px;font-weight:600;color:var(--ty-muted);text-align:right}
+
+/* Empty state */
+.empty-dash{text-align:center;padding:60px 20px;color:var(--ty-muted)}
+.empty-dash h2{font-size:18px;color:var(--ty-dark);margin-bottom:8px}
+.empty-dash p{font-size:14px;max-width:400px;margin:0 auto}
+
+/* Section titles */
+.sec-title{font-size:14px;font-weight:700;color:var(--ty-dark);margin:24px 0 12px;padding-left:4px;border-left:3px solid var(--ty-blue);padding-left:12px}
+
+@media(max-width:900px){
+  .chart-grid,.chart-third{grid-template-columns:1fr}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .filters{flex-direction:column}
+}
+@media(max-width:500px){
+  .kpi-grid{grid-template-columns:1fr}
+  .header h1{font-size:14px}
+}
+</style>
+<link rel="stylesheet" href="css/access-gate.css"/>
+</head>
+<body data-gate="admin-only">
+
+<div class="header">
+  <div class="header-left">
+    <img src="/assets/img/logo.png" alt="Trasteos Ya"/>
+    <h1>KPI's</h1>
+  </div>
+  <div class="header-nav">
+    <a href="/servicios.html">Servicios</a>
+    <a href="/orden-servicio.html">Orden de Servicio</a>
+  </div>
+</div>
+
+<div class="container" id="main-container">
+  <!-- Filters -->
+  <div class="filters">
+    <div class="filter-group">
+      <label>Desde</label>
+      <input type="date" id="f-desde"/>
+    </div>
+    <div class="filter-group">
+      <label>Hasta</label>
+      <input type="date" id="f-hasta"/>
+    </div>
+    <div class="filter-group">
+      <label>Ciudad</label>
+      <select id="f-ciudad"><option value="">Todas</option></select>
+    </div>
+    <div class="filter-group">
+      <label>Tipo veh&iacute;culo</label>
+      <select id="f-vehiculo"><option value="">Todos</option></select>
+    </div>
+    <div class="filter-group">
+      <label>Estado</label>
+      <select id="f-estado"><option value="">Todos</option><option value="pendiente">Pendientes</option><option value="ejecutado">Ejecutados</option></select>
+    </div>
+    <button class="btn-filter" onclick="applyFilters()">Filtrar</button>
+    <button class="btn-clear" onclick="clearFilters()">Limpiar</button>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid" id="kpi-cards"></div>
+
+  <!-- Funnel -->
+  <div class="sec-title">Embudo de conversi&oacute;n</div>
+  <div class="chart-grid">
+    <div class="chart-box chart-full" id="funnel-box">
+      <h3>Flujo del proceso comercial</h3>
+      <div class="funnel" id="funnel"></div>
+    </div>
+  </div>
+
+  <!-- Tendencias -->
+  <div class="sec-title">Tendencias en el tiempo</div>
+  <div class="chart-grid">
+    <div class="chart-box"><h3>Servicios por mes <span class="tag">tendencia</span></h3><canvas id="ch-month"></canvas></div>
+    <div class="chart-box"><h3>Servicios por d&iacute;a de la semana <span class="tag">patr&oacute;n</span></h3><canvas id="ch-dow"></canvas></div>
+  </div>
+
+  <!-- Distribución -->
+  <div class="sec-title">Distribuci&oacute;n y composici&oacute;n</div>
+  <div class="chart-third">
+    <div class="chart-box"><h3>Tipo de veh&iacute;culo</h3><canvas id="ch-vehiculo"></canvas></div>
+    <div class="chart-box"><h3>Urbano vs Nacional</h3><canvas id="ch-urbano"></canvas></div>
+    <div class="chart-box"><h3>Tipo de empaque</h3><canvas id="ch-empaque"></canvas></div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-box"><h3>Operarios por servicio <span class="tag">distribuci&oacute;n</span></h3><canvas id="ch-ops"></canvas></div>
+    <div class="chart-box"><h3>Empaque por mes <span class="tag">tendencia</span></h3><canvas id="ch-emp-month"></canvas></div>
+  </div>
+
+  <!-- Clientes -->
+  <div class="sec-title">Clientes y demanda</div>
+  <div class="chart-grid">
+    <div class="chart-box"><h3>Nuevo vs Recurrente</h3><canvas id="ch-clientes"></canvas></div>
+    <div class="chart-box">
+      <h3>Top 10 Clientes <span class="tag">ranking</span></h3>
+      <table class="rank-tbl" id="rank-clientes"><thead><tr><th>#</th><th>Cliente</th><th>Servicios</th><th></th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <!-- Geografía -->
+  <div class="sec-title">Geograf&iacute;a y zonas</div>
+  <div class="chart-grid">
+    <div class="chart-box"><h3>Top zonas con mayor demanda <span class="tag">ranking</span></h3><canvas id="ch-zonas"></canvas></div>
+    <div class="chart-box">
+      <h3>Ranking de ciudades <span class="tag">Top 10</span></h3>
+      <table class="rank-tbl" id="rank-ciudades"><thead><tr><th>#</th><th>Ciudad</th><th>Servicios</th><th></th><th>%</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <!-- Rankings vehículo -->
+  <div class="chart-grid">
+    <div class="chart-box">
+      <h3>Ranking tipo de cami&oacute;n <span class="tag">Top 10</span></h3>
+      <table class="rank-tbl" id="rank-vehiculos"><thead><tr><th>#</th><th>Veh&iacute;culo</th><th>Servicios</th><th></th><th>%</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div class="chart-box"><h3>Servicios por d&iacute;a <span class="tag">calendario</span></h3><canvas id="ch-daily"></canvas></div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-dash" id="empty-dash" style="display:none">
+    <h2>Sin datos a&uacute;n</h2>
+    <p>Genera &oacute;rdenes de servicio para ver los KPI's aqu&iacute;. Los datos se calculan autom&aacute;ticamente.</p>
+  </div>
+</div>
+
+<script>
+var FIN_KEY='ty_os_financials';
+var COLORS={blue:'#1B3E8C',red:'#E30613',green:'#15803d',orange:'#d97706',teal:'#0d9488',purple:'#7c3aed',pink:'#db2777',sky:'#0284c7',lime:'#65a30d',amber:'#b45309'};
+var PALETTE=['#1B3E8C','#E30613','#0d9488','#d97706','#7c3aed','#db2777','#0284c7','#65a30d','#b45309','#6366f1','#059669','#ea580c'];
+var charts={};
+
+function getFinancials(){try{return JSON.parse(localStorage.getItem(FIN_KEY)||'{}');}catch(_){return{};}}
+
+function getAllOrders(){
+  try{
+    var idx=JSON.parse(localStorage.getItem('ty_os_index')||'[]');
+    var orders=[];
+    var fin=getFinancials();
+    for(var i=0;i<idx.length;i++){
+      try{
+        var raw=localStorage.getItem(idx[i].key);
+        if(!raw)continue;
+        var s=JSON.parse(raw);
+        var f=fin[idx[i].key]||{};
+        var origCiudad=(s.recogidas&&s.recogidas[0]?s.recogidas[0].ciudad:'')||'';
+        var destCiudad=(s.entregas&&s.entregas[0]?s.entregas[0].ciudad:'')||'';
+        var origDir=(s.recogidas&&s.recogidas[0]?s.recogidas[0].direccion:'')||'';
+        var destDir=(s.entregas&&s.entregas[0]?s.entregas[0].direccion:'')||'';
+        var emp=s.empaque||{};
+        var cajas=parseInt(emp.cajas,10)||0;
+        var vinipel=parseInt(emp.vinipel,10)||0;
+        var burbuja=parseInt(emp.burbuja,10)||0;
+        var craft=parseInt(emp.craft,10)||0;
+        var tieneEmpaque=cajas>0||vinipel>0||burbuja>0||craft>0;
+        var tipoEmpaque='Sin empaque';
+        if(tieneEmpaque){
+          if(cajas>25||(cajas>0&&burbuja>0&&craft>0))tipoEmpaque='Full';
+          else if(cajas>0&&cajas<=25)tipoEmpaque='Semicompleto';
+          else tipoEmpaque='Básico';
+        }
+        var esUrbano=origCiudad&&destCiudad&&origCiudad.toUpperCase()===destCiudad.toUpperCase();
+        orders.push({
+          key:idx[i].key,
+          os:s.numeroOS||idx[i].os||'',
+          cliente:(s.cliente||'').trim(),
+          fecha:s.cargueFecha||s.fecha||'',
+          tipoVehiculo:s.tipoVehiculo||'',
+          numOperarios:parseInt(s.numOperarios,10)||0,
+          ciudadOrigen:origCiudad,ciudadDestino:destCiudad,
+          dirOrigen:origDir,dirDestino:destDir,
+          empaque:emp,tieneEmpaque:tieneEmpaque,tipoEmpaque:tipoEmpaque,
+          esUrbano:esUrbano,
+          valor:f.valor||0,costo:f.costo||0,
+          personas:s.personas||[],
+          empacadores:(s.personas||[]).filter(function(p){return p.esEmp;}).length
+        });
+      }catch(_){}
+    }
+    return orders;
+  }catch(_){return[];}
+}
+
+function isPending(fecha){
+  if(!fecha)return false;
+  var hoy=new Date();hoy.setHours(0,0,0,0);
+  var p=fecha.split('-');
+  var y=parseInt(p[0],10),m=parseInt(p[1],10),d=parseInt(p[2],10);
+  if(!y)return false;
+  var f=new Date(y,(m||1)-1,d||1);f.setHours(0,0,0,0);
+  return f>=hoy;
+}
+
+function fmtM(n){return'$ '+String(Math.abs(Math.round(n||0))).replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+
+// Filters
+var filteredOrders=[];
+
+function populateFilters(orders){
+  var ciudades={},vehiculos={};
+  for(var i=0;i<orders.length;i++){
+    if(orders[i].ciudadOrigen)ciudades[orders[i].ciudadOrigen.toUpperCase()]=1;
+    if(orders[i].ciudadDestino)ciudades[orders[i].ciudadDestino.toUpperCase()]=1;
+    if(orders[i].tipoVehiculo)vehiculos[orders[i].tipoVehiculo]=1;
+  }
+  var selC=document.getElementById('f-ciudad');
+  selC.innerHTML='<option value="">Todas</option>';
+  Object.keys(ciudades).sort().forEach(function(c){selC.innerHTML+='<option value="'+c+'">'+c+'</option>';});
+  var selV=document.getElementById('f-vehiculo');
+  selV.innerHTML='<option value="">Todos</option>';
+  Object.keys(vehiculos).sort().forEach(function(v){selV.innerHTML+='<option value="'+v+'">'+v+'</option>';});
+}
+
+function applyFilters(){
+  var all=getAllOrders();
+  var desde=document.getElementById('f-desde').value;
+  var hasta=document.getElementById('f-hasta').value;
+  var ciudad=document.getElementById('f-ciudad').value;
+  var vehiculo=document.getElementById('f-vehiculo').value;
+  var estado=document.getElementById('f-estado').value;
+  filteredOrders=all.filter(function(o){
+    if(desde&&o.fecha<desde)return false;
+    if(hasta&&o.fecha>hasta)return false;
+    if(ciudad&&o.ciudadOrigen.toUpperCase()!==ciudad&&o.ciudadDestino.toUpperCase()!==ciudad)return false;
+    if(vehiculo&&o.tipoVehiculo!==vehiculo)return false;
+    if(estado==='pendiente'&&!isPending(o.fecha))return false;
+    if(estado==='ejecutado'&&isPending(o.fecha))return false;
+    return true;
+  });
+  renderDashboard(filteredOrders,all);
+}
+
+function clearFilters(){
+  document.getElementById('f-desde').value='';
+  document.getElementById('f-hasta').value='';
+  document.getElementById('f-ciudad').value='';
+  document.getElementById('f-vehiculo').value='';
+  document.getElementById('f-estado').value='';
+  applyFilters();
+}
+
+// Count helpers
+function countBy(arr,fn){
+  var m={};
+  for(var i=0;i<arr.length;i++){var k=fn(arr[i]);if(k){m[k]=(m[k]||0)+1;}}
+  return m;
+}
+function topN(map,n){
+  var arr=[];for(var k in map)arr.push({key:k,val:map[k]});
+  arr.sort(function(a,b){return b.val-a.val;});
+  return arr.slice(0,n||10);
+}
+function monthKey(fecha){return fecha?fecha.substring(0,7):'';}
+var DIAS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+function dow(fecha){
+  if(!fecha)return-1;
+  var p=fecha.split('-');
+  return new Date(parseInt(p[0],10),parseInt(p[1],10)-1,parseInt(p[2],10)).getDay();
+}
+
+// Destroy old charts
+function destroyCharts(){
+  for(var k in charts){if(charts[k]){charts[k].destroy();delete charts[k];}}
+}
+
+// Render
+function renderDashboard(orders,allOrders){
+  destroyCharts();
+  var dash=document.getElementById('main-container');
+  var empty=document.getElementById('empty-dash');
+
+  if(!allOrders.length){
+    empty.style.display='block';
+    return;
+  }
+  empty.style.display='none';
+
+  var total=orders.length;
+  var pending=orders.filter(function(o){return isPending(o.fecha);});
+  var done=orders.filter(function(o){return !isPending(o.fecha);});
+  var totalValor=0,totalCosto=0;
+  for(var i=0;i<orders.length;i++){totalValor+=orders[i].valor;totalCosto+=orders[i].costo;}
+  var totalUtil=totalValor-totalCosto;
+
+  // Months
+  var months=countBy(orders,function(o){return monthKey(o.fecha);});
+  var monthKeys=Object.keys(months).sort();
+  var avgPerMonth=monthKeys.length?Math.round(total/monthKeys.length*10)/10:0;
+
+  // Operators avg
+  var sumOps=0;for(var j=0;j<orders.length;j++)sumOps+=orders[j].numOperarios;
+  var avgOps=total?Math.round(sumOps/total*10)/10:0;
+
+  // Empaque count
+  var conEmpaque=orders.filter(function(o){return o.tieneEmpaque;}).length;
+
+  // New vs recurring
+  var clientCount=countBy(orders,function(o){return o.cliente.toUpperCase();});
+  var newClients=0,recurClients=0;
+  for(var ck in clientCount){if(clientCount[ck]===1)newClients++;else recurClients++;}
+
+  // === KPI Cards ===
+  var cardsHTML=''
+    +'<div class="kpi-card c-blue"><div class="kpi-label">Total servicios</div><div class="kpi-value" style="color:var(--ty-blue)">'+total+'</div><div class="kpi-sub">'+pending.length+' pendientes · '+done.length+' ejecutados</div></div>'
+    +'<div class="kpi-card c-green"><div class="kpi-label">Promedio mensual</div><div class="kpi-value" style="color:var(--ty-green)">'+avgPerMonth+'</div><div class="kpi-sub">en '+monthKeys.length+' meses con actividad</div></div>'
+    +'<div class="kpi-card c-orange"><div class="kpi-label">Valor total</div><div class="kpi-value" style="color:var(--ty-orange)">'+fmtM(totalValor)+'</div><div class="kpi-sub">Utilidad: '+fmtM(totalUtil)+(totalValor?' ('+Math.round(totalUtil/totalValor*100)+'%)':'')+'</div></div>'
+    +'<div class="kpi-card c-teal"><div class="kpi-label">Con empaque</div><div class="kpi-value" style="color:var(--ty-teal)">'+conEmpaque+'</div><div class="kpi-sub">'+(total?Math.round(conEmpaque/total*100):0)+'% de los servicios</div></div>'
+    +'<div class="kpi-card c-red"><div class="kpi-label">Promedio operarios</div><div class="kpi-value" style="color:var(--ty-red)">'+avgOps+'</div><div class="kpi-sub">por servicio</div></div>';
+  document.getElementById('kpi-cards').innerHTML=cardsHTML;
+
+  // === Funnel ===
+  var totalCot=allOrders.length;
+  var confirmados=allOrders.filter(function(o){return o.fecha;}).length;
+  var ejecutados=allOrders.filter(function(o){return o.fecha&&!isPending(o.fecha);}).length;
+  var facturados=allOrders.filter(function(o){return o.valor>0;}).length;
+  var funnelData=[
+    {label:'Órdenes creadas',val:totalCot,color:COLORS.blue},
+    {label:'Con fecha confirmada',val:confirmados,color:COLORS.teal},
+    {label:'Ejecutados',val:ejecutados,color:COLORS.green},
+    {label:'Con valor asignado',val:facturados,color:COLORS.orange}
+  ];
+  var funnelHTML='';
+  var maxFunnel=Math.max(totalCot,1);
+  for(var fi=0;fi<funnelData.length;fi++){
+    var pct=Math.round(funnelData[fi].val/maxFunnel*100);
+    var convPct=fi>0?Math.round(funnelData[fi].val/Math.max(funnelData[fi-1].val,1)*100):100;
+    funnelHTML+='<div class="funnel-step">'
+      +'<div class="funnel-bar" style="width:'+Math.max(pct,8)+'%;background:'+funnelData[fi].color+'">'+funnelData[fi].val+'</div>'
+      +'<div class="funnel-label">'+funnelData[fi].label+'</div>'
+      +'<div class="funnel-pct">'+(fi>0?convPct+'%':'')+'</div>'
+      +'</div>';
+  }
+  document.getElementById('funnel').innerHTML=funnelHTML;
+
+  // === Servicios por mes (line) ===
+  var monthVals=monthKeys.map(function(k){return months[k]||0;});
+  var monthLabels=monthKeys.map(function(k){var p=k.split('-');var meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];return meses[parseInt(p[1],10)-1]+' '+p[0].substring(2);});
+  charts.month=new Chart(document.getElementById('ch-month'),{
+    type:'line',
+    data:{labels:monthLabels,datasets:[{label:'Servicios',data:monthVals,borderColor:COLORS.blue,backgroundColor:'rgba(27,62,140,.1)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:COLORS.blue}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}
+  });
+
+  // === Día de la semana (bar) ===
+  var dowCount=[0,0,0,0,0,0,0];
+  for(var di=0;di<orders.length;di++){var d=dow(orders[di].fecha);if(d>=0)dowCount[d]++;}
+  var dowLabels=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  var dowVals=[dowCount[1],dowCount[2],dowCount[3],dowCount[4],dowCount[5],dowCount[6],dowCount[0]];
+  var dowColors=dowVals.map(function(v,i){return i>=5?COLORS.orange:COLORS.blue;});
+  charts.dow=new Chart(document.getElementById('ch-dow'),{
+    type:'bar',
+    data:{labels:dowLabels,datasets:[{label:'Servicios',data:dowVals,backgroundColor:dowColors,borderRadius:6}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}
+  });
+
+  // === Tipo de vehículo (doughnut) ===
+  var vehCount=countBy(orders,function(o){return o.tipoVehiculo||'Sin asignar';});
+  var vehTop=topN(vehCount,8);
+  charts.vehiculo=new Chart(document.getElementById('ch-vehiculo'),{
+    type:'doughnut',
+    data:{labels:vehTop.map(function(v){return v.key;}),datasets:[{data:vehTop.map(function(v){return v.val;}),backgroundColor:PALETTE.slice(0,vehTop.length),borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:8}}}}
+  });
+
+  // === Urbano vs Nacional (doughnut) ===
+  var urbano=orders.filter(function(o){return o.esUrbano;}).length;
+  var nacional=total-urbano;
+  charts.urbano=new Chart(document.getElementById('ch-urbano'),{
+    type:'doughnut',
+    data:{labels:['Urbano','Nacional'],datasets:[{data:[urbano,nacional],backgroundColor:[COLORS.blue,COLORS.orange],borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:8}}}}
+  });
+
+  // === Tipo empaque (doughnut) ===
+  var empCount=countBy(orders,function(o){return o.tipoEmpaque;});
+  var empLabels=['Full','Semicompleto','Básico','Sin empaque'];
+  var empVals=empLabels.map(function(l){return empCount[l]||0;});
+  var empColors=[COLORS.green,COLORS.teal,COLORS.orange,COLORS.blue];
+  // Only show non-zero
+  var empDataF=[];for(var ei=0;ei<empLabels.length;ei++){if(empVals[ei]>0)empDataF.push({l:empLabels[ei],v:empVals[ei],c:empColors[ei]});}
+  if(!empDataF.length)empDataF=[{l:'Sin datos',v:1,c:'#e2e5ea'}];
+  charts.empaque=new Chart(document.getElementById('ch-empaque'),{
+    type:'doughnut',
+    data:{labels:empDataF.map(function(e){return e.l;}),datasets:[{data:empDataF.map(function(e){return e.v;}),backgroundColor:empDataF.map(function(e){return e.c;}),borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:8}}}}
+  });
+
+  // === Operarios por servicio (bar distribution) ===
+  var opsCount={};
+  for(var oi=0;oi<orders.length;oi++){var no=orders[oi].numOperarios;opsCount[no]=(opsCount[no]||0)+1;}
+  var opsKeys=Object.keys(opsCount).map(Number).sort(function(a,b){return a-b;});
+  charts.ops=new Chart(document.getElementById('ch-ops'),{
+    type:'bar',
+    data:{labels:opsKeys.map(function(k){return k+' op.';}),datasets:[{label:'Servicios',data:opsKeys.map(function(k){return opsCount[k];}),backgroundColor:COLORS.teal,borderRadius:6}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}
+  });
+
+  // === Empaque por mes (stacked bar) ===
+  var empMonths={};
+  for(var emi=0;emi<orders.length;emi++){
+    var mk=monthKey(orders[emi].fecha);
+    if(!mk)continue;
+    if(!empMonths[mk])empMonths[mk]={Full:0,Semicompleto:0,'Básico':0,'Sin empaque':0};
+    empMonths[mk][orders[emi].tipoEmpaque]++;
+  }
+  var empMKeys=Object.keys(empMonths).sort();
+  var empMLabels=empMKeys.map(function(k){var p=k.split('-');var meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];return meses[parseInt(p[1],10)-1]+' '+p[0].substring(2);});
+  var empTypes=['Full','Semicompleto','Básico','Sin empaque'];
+  var empMColors=[COLORS.green,COLORS.teal,COLORS.orange,'#d1d5db'];
+  var empMDatasets=empTypes.map(function(t,ti){
+    return{label:t,data:empMKeys.map(function(k){return empMonths[k][t]||0;}),backgroundColor:empMColors[ti],borderRadius:4};
+  });
+  charts.empMonth=new Chart(document.getElementById('ch-emp-month'),{
+    type:'bar',
+    data:{labels:empMLabels,datasets:empMDatasets},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true,ticks:{stepSize:1}}}}
+  });
+
+  // === Nuevo vs Recurrente (doughnut) ===
+  var newCount=0,recurCount=0;
+  for(var cli in clientCount){if(clientCount[cli]===1)newCount++;else recurCount++;}
+  var newServ=0,recurServ=0;
+  for(var cli2 in clientCount){if(clientCount[cli2]===1)newServ+=clientCount[cli2];else recurServ+=clientCount[cli2];}
+  charts.clientes=new Chart(document.getElementById('ch-clientes'),{
+    type:'doughnut',
+    data:{labels:['Nuevos ('+newCount+' clientes, '+newServ+' serv.)','Recurrentes ('+recurCount+' clientes, '+recurServ+' serv.)'],datasets:[{data:[newServ,recurServ],backgroundColor:[COLORS.blue,COLORS.green],borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:8}}}}
+  });
+
+  // === Top 10 Clientes (table) ===
+  var topClients=topN(clientCount,10);
+  var rankCliHTML='';
+  for(var rc=0;rc<topClients.length;rc++){
+    var barW=Math.round(topClients[rc].val/Math.max(topClients[0].val,1)*100);
+    rankCliHTML+='<tr><td class="rank-num">'+(rc+1)+'</td><td>'+topClients[rc].key+'</td><td style="font-weight:700">'+topClients[rc].val+'</td><td><div class="rank-bar-bg"><div class="rank-bar" style="width:'+barW+'%"></div></div></td></tr>';
+  }
+  document.querySelector('#rank-clientes tbody').innerHTML=rankCliHTML||'<tr><td colspan="4" style="text-align:center;color:var(--ty-muted);padding:20px">Sin datos</td></tr>';
+
+  // === Top zonas (horizontal bar) ===
+  var allCities={};
+  for(var zi=0;zi<orders.length;zi++){
+    var co=orders[zi].ciudadOrigen.toUpperCase();
+    var cd=orders[zi].ciudadDestino.toUpperCase();
+    if(co)allCities[co]=(allCities[co]||0)+1;
+    if(cd&&cd!==co)allCities[cd]=(allCities[cd]||0)+1;
+  }
+  var topZonas=topN(allCities,10);
+  charts.zonas=new Chart(document.getElementById('ch-zonas'),{
+    type:'bar',
+    data:{labels:topZonas.map(function(z){return z.key;}),datasets:[{label:'Servicios',data:topZonas.map(function(z){return z.val;}),backgroundColor:PALETTE.slice(0,topZonas.length),borderRadius:6}]},
+    options:{responsive:true,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}}}}
+  });
+
+  // === Ranking ciudades (table) ===
+  var rankCiuHTML='';
+  for(var rci=0;rci<topZonas.length;rci++){
+    var barWc=Math.round(topZonas[rci].val/Math.max(topZonas[0].val,1)*100);
+    var pctC=total?Math.round(topZonas[rci].val/total*100):0;
+    rankCiuHTML+='<tr><td class="rank-num">'+(rci+1)+'</td><td>'+topZonas[rci].key+'</td><td style="font-weight:700">'+topZonas[rci].val+'</td><td><div class="rank-bar-bg"><div class="rank-bar" style="width:'+barWc+'%"></div></div></td><td class="rank-pct">'+pctC+'%</td></tr>';
+  }
+  document.querySelector('#rank-ciudades tbody').innerHTML=rankCiuHTML||'<tr><td colspan="5" style="text-align:center;color:var(--ty-muted);padding:20px">Sin datos</td></tr>';
+
+  // === Ranking vehículos (table) ===
+  var vehTopAll=topN(vehCount,10);
+  var rankVehHTML='';
+  for(var rv=0;rv<vehTopAll.length;rv++){
+    var barWv=Math.round(vehTopAll[rv].val/Math.max(vehTopAll[0].val,1)*100);
+    var pctV=total?Math.round(vehTopAll[rv].val/total*100):0;
+    rankVehHTML+='<tr><td class="rank-num">'+(rv+1)+'</td><td>'+vehTopAll[rv].key+'</td><td style="font-weight:700">'+vehTopAll[rv].val+'</td><td><div class="rank-bar-bg"><div class="rank-bar" style="width:'+barWv+'%"></div></div></td><td class="rank-pct">'+pctV+'%</td></tr>';
+  }
+  document.querySelector('#rank-vehiculos tbody').innerHTML=rankVehHTML||'<tr><td colspan="5" style="text-align:center;color:var(--ty-muted);padding:20px">Sin datos</td></tr>';
+
+  // === Servicios por día (line) ===
+  var dailyCount=countBy(orders,function(o){return o.fecha;});
+  var dailyKeys=Object.keys(dailyCount).sort();
+  var last30=dailyKeys.slice(-30);
+  var dailyLabels=last30.map(function(k){return k.substring(5);});
+  charts.daily=new Chart(document.getElementById('ch-daily'),{
+    type:'line',
+    data:{labels:dailyLabels,datasets:[{label:'Servicios',data:last30.map(function(k){return dailyCount[k];}),borderColor:COLORS.red,backgroundColor:'rgba(227,6,19,.08)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:COLORS.red}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}
+  });
+}
+
+// Init
+var allOrders=getAllOrders();
+populateFilters(allOrders);
+filteredOrders=allOrders.slice();
+renderDashboard(filteredOrders,allOrders);
+</script>
+<script src="js/access-gate.js"></script>
+</body>
+</html>
