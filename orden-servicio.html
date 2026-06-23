@@ -497,6 +497,7 @@ const clearSig=i=>{const c=document.getElementById("sig"+i);c.getContext("2d").c
 let vista="form";
 const setVista=v=>{
   vista=v;
+  document.title=v==="preview"?(state.numeroOS||'OSTY'):'Orden de Servicio · Trasteos Ya';
   document.getElementById("view-form").style.display=v==="form"?"block":"none";
   document.getElementById("view-preview").style.display=v==="preview"?"block":"none";
   document.getElementById("tab-form").className="tab"+(v==="form"?" active":"");
@@ -838,6 +839,7 @@ function pdfEmpaque(){
 const generarPdf=()=>{
   if(!state.cliente.trim()){showToast("Falta el nombre del cliente.",true);return;}
   guardarOS();
+  document.title=state.numeroOS||'OSTY';
   setVista("preview");showToast("Usa Imprimir → Guardar como PDF");
   // Backup automatico a Drive (no bloquea)
   setTimeout(()=>backupOrden(),800);
