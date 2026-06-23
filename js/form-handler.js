@@ -20,7 +20,7 @@
     CALLMEBOT_PHONE:  '573143095194', // formato: 57 (Colombia) + 10 digitos sin +
 
     // 4) Backup en Google Drive (Apps Script Web App)
-    BACKUP_URL: 'https://script.google.com/macros/s/AKfycbyiiC0VRDbAnmOtznqvgM3NxHdtjdnofPqQENWcCwRJbASHB0RgvzQ-OnEwPWXaT2NpAQ/exec',
+    BACKUP_URL: 'https://script.google.com/macros/s/AKfycbytFjQC4osp6QNdCyALI5DGLCMtomQ_DYGqa56MQkGJoykyZcJIPiA1JVyrJ2Smj3ST-w/exec',
     BACKUP_APIKEY: 'TrasteosYa-2026-Backup',
 
     // 5) Google Sheets webhook (opcional · legacy)
@@ -247,11 +247,13 @@
         // Los siguientes campos solo los llena el cotizador interactivo
         ingreso: 0, cto_total: 0, utilidad: 0, uti: 0
       };
-      await fetch(CONFIG.BACKUP_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify(payload)
-      });
+      try {
+        const r = await fetch(CONFIG.BACKUP_URL, { method: 'POST', body: JSON.stringify(payload), redirect: 'follow' });
+        const t = await r.text();
+        try { if (!JSON.parse(t).success) console.warn('Backup cotizacion fallo'); } catch(_) {}
+      } catch(_) {
+        await fetch(CONFIG.BACKUP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+      }
     } catch (e) { /* silent */ }
   }
 
