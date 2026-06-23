@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Informes de Servicios · Trasteos Ya</title>
+<link rel="icon" type="image/svg+xml" href="/assets/img/logo.svg"/>
+<link rel="alternate icon" type="image/png" href="/assets/img/logo.png"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+.header{background:#fff;border-bottom:3px solid #1B3E8C;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.header img{height:42px}
+.header h1{font-size:16px;font-weight:700;color:#1B3E8C;margin-left:12px}
+.header-left{display:flex;align-items:center}
+.container{max-width:1200px;margin:0 auto;padding:20px 16px 60px}
+
+/* Summary cards */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.sum-card{background:#fff;border-radius:12px;border:1px solid #e2e5ea;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.sum-card .label{font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.3px}
+.sum-card .value{font-size:24px;font-weight:700;margin-top:4px;font-family:'Segoe UI',monospace}
+.sum-card .sub{font-size:11px;color:#9ca3af;margin-top:2px}
+.sum-card.clickable{cursor:pointer;transition:transform .15s,box-shadow .15s}
+.sum-card.clickable:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(27,62,140,.12);border-color:#1B3E8C}
+.v-blue{color:#1B3E8C}
+.v-green{color:#15803d}
+.v-red{color:#E30613}
+.v-orange{color:#d97706}
+
+/* Tabs */
+.tabs{display:flex;background:#fff;border-radius:10px;border:1px solid #e2e5ea;padding:4px;gap:4px;margin-bottom:16px}
+.tab{flex:1;padding:10px 16px;border:none;background:transparent;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:#666;font-family:inherit;transition:all .15s}
+.tab:hover{color:#1B3E8C}
+.tab.active{background:#1B3E8C;color:#fff;font-weight:600}
+.tab .badge{display:inline-block;background:rgba(255,255,255,.25);border-radius:10px;padding:1px 7px;font-size:11px;margin-left:5px}
+.tab:not(.active) .badge{background:#e2e5ea;color:#666}
+
+/* Table */
+.tbl-wrap{background:#fff;border-radius:12px;border:1px solid #e2e5ea;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl thead{background:#f8f9fb;position:sticky;top:60px;z-index:10}
+.tbl th{padding:10px 12px;text-align:left;font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #e2e5ea;white-space:nowrap}
+.tbl td{padding:10px 12px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+.tbl tr.main-row:hover{background:#f8faff}
+.tbl .os-num{font-weight:700;color:#1B3E8C;font-size:12px;white-space:nowrap}
+.tbl .cliente-name{font-weight:600;font-size:12px}
+.tbl .detail{font-size:11px;color:#6b7280}
+.tbl .money-input{width:100px;padding:5px 8px;border:1.5px solid #e2e5ea;border-radius:6px;font-size:12px;font-family:inherit;text-align:right;background:#fff;transition:border-color .2s}
+.tbl .money-input:focus{outline:none;border-color:#1B3E8C;box-shadow:0 0 0 3px rgba(27,62,140,.08)}
+.tbl .money-input.readonly{background:#f8f9fa;border-color:#e9ecef;color:#15803d;font-weight:600}
+.status{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.status.pending{background:#FEF3C7;color:#92400e}
+.status.done{background:#DCFCE7;color:#166534}
+.btn-load{border:none;background:none;color:#1B3E8C;cursor:pointer;font-size:11px;font-weight:600;text-decoration:underline;padding:2px 4px}
+.btn-load:hover{color:#15306e}
+.empty-msg{text-align:center;padding:40px 20px;color:#9ca3af;font-size:14px}
+
+/* KPI row */
+.kpi-row td{background:#f8f9fb;padding:6px 12px 12px;border-bottom:2px solid #e2e5ea}
+.kpi-row.hidden{display:none}
+.kpi-grid{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+.kpi-field{display:flex;flex-direction:column;gap:3px}
+.kpi-field .kpi-label{font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.3px}
+
+/* Stars */
+.stars{display:inline-flex;gap:2px;cursor:pointer}
+.stars .star{font-size:20px;color:#d1d5db;transition:color .15s;user-select:none}
+.stars .star.active{color:#f59e0b}
+.stars .star:hover{color:#fbbf24}
+
+/* KPI select */
+.kpi-sel{padding:5px 10px;border:1.5px solid #e2e5ea;border-radius:6px;font-size:12px;font-family:inherit;background:#fff;cursor:pointer;min-width:110px}
+.kpi-sel:focus{outline:none;border-color:#1B3E8C}
+.kpi-sel.val-si{background:#DCFCE7;color:#166534;border-color:#86efac}
+.kpi-sel.val-no{background:#FEE2E2;color:#991b1b;border-color:#fca5a5}
+
+/* KPI notes */
+.kpi-notes{padding:5px 8px;border:1.5px solid #e2e5ea;border-radius:6px;font-size:12px;font-family:inherit;width:260px;max-width:100%;resize:none;min-height:30px}
+.kpi-notes:focus{outline:none;border-color:#1B3E8C;box-shadow:0 0 0 3px rgba(27,62,140,.08)}
+
+/* KPI summary bar */
+.kpi-summary{display:flex;gap:16px;flex-wrap:wrap;background:#fff;border-radius:10px;border:1px solid #e2e5ea;padding:12px 18px;margin-bottom:16px;align-items:center}
+.kpi-summary .kpi-stat{display:flex;align-items:center;gap:6px;font-size:12px;color:#374151}
+.kpi-summary .kpi-stat .val{font-weight:700}
+
+/* Responsive */
+@media(max-width:900px){
+  .tbl-wrap{overflow-x:auto}
+  .summary-grid{grid-template-columns:repeat(2,1fr)}
+  .kpi-notes{width:180px}
+}
+@media(max-width:500px){
+  .summary-grid{grid-template-columns:1fr 1fr}
+  .header h1{font-size:14px}
+  .kpi-grid{gap:10px}
+  .kpi-notes{width:100%}
+}
+</style>
+<link rel="stylesheet" href="css/access-gate.css"/>
+</head>
+<body data-gate="admin-only">
+
+<div class="header">
+  <div class="header-left">
+    <img src="/assets/img/logo.png" alt="Trasteos Ya"/>
+    <h1>Informes de Servicios</h1>
+  </div>
+  <a href="/orden-servicio.html" style="font-size:12px;color:#1B3E8C;font-weight:600;text-decoration:none">&larr; Orden de Servicio</a>
+</div>
+
+<div class="container">
+  <!-- Summary -->
+  <div class="summary-grid">
+    <div class="sum-card clickable" onclick="setTab('todos')"><div class="label">Total servicios</div><div class="value v-blue" id="s-total">0</div></div>
+    <div class="sum-card clickable" onclick="setTab('pendientes')"><div class="label">Pendientes</div><div class="value v-orange" id="s-pend">0</div></div>
+    <div class="sum-card clickable" onclick="setTab('ejecutados')"><div class="label">Ejecutados</div><div class="value v-green" id="s-done">0</div></div>
+    <div class="sum-card"><div class="label">Valor total</div><div class="value v-blue" id="s-valor">$ 0</div><div class="sub" id="s-util"></div></div>
+  </div>
+
+  <!-- KPI Summary -->
+  <div class="kpi-summary" id="kpi-bar">
+    <div class="kpi-stat"><span>&#11088;</span> Calificaci&oacute;n promedio: <span class="val" id="kpi-avg">&mdash;</span></div>
+    <div class="kpi-stat"><span>&#9201;</span> Puntualidad: <span class="val" id="kpi-punt">&mdash;</span></div>
+    <div class="kpi-stat"><span>&#128230;</span> Sin da&ntilde;os: <span class="val" id="kpi-dam">&mdash;</span></div>
+    <div class="kpi-stat"><span>&#128522;</span> Cliente satisfecho: <span class="val" id="kpi-sat">&mdash;</span></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="setTab('todos')">Todos <span class="badge" id="b-all">0</span></button>
+    <button class="tab" onclick="setTab('pendientes')">Pendientes <span class="badge" id="b-pend">0</span></button>
+    <button class="tab" onclick="setTab('ejecutados')">Ejecutados <span class="badge" id="b-done">0</span></button>
+  </div>
+
+  <!-- Table -->
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Estado</th>
+          <th>OS</th>
+          <th>Cliente</th>
+          <th>Fecha</th>
+          <th>Ruta</th>
+          <th>Veh&iacute;culo</th>
+          <th>Valor</th>
+          <th>Costo</th>
+          <th>Utilidad</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tbl-body"></tbody>
+    </table>
+    <div class="empty-msg" id="empty-msg" style="display:none">No hay servicios registrados.<br/>Genera una Orden de Servicio y aparecer&aacute; aqu&iacute;.</div>
+  </div>
+</div>
+
+<script>
+const OS_PREFIX='ty_os_';
+const FIN_KEY='ty_os_financials';
+
+function fmtM(n){return'$ '+String(Math.abs(Math.round(n||0))).replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+function parseM(s){return parseInt(String(s||'0').replace(/\D/g,''),10)||0;}
+function fmtMiles(n){return String(Math.abs(Math.round(n||0))).replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+
+function getFinancials(){
+  try{return JSON.parse(localStorage.getItem(FIN_KEY)||'{}');}catch(_){return{};}
+}
+function saveFinancials(fin){
+  try{localStorage.setItem(FIN_KEY,JSON.stringify(fin));}catch(_){}
+}
+function getFin(key){
+  const fin=getFinancials();
+  return fin[key]||{valor:0,costo:0,rating:0,puntualidad:'',danos:'',satisfaccion:'',notas:''};
+}
+function setFin(key,field,val){
+  const fin=getFinancials();
+  if(!fin[key])fin[key]={valor:0,costo:0,rating:0,puntualidad:'',danos:'',satisfaccion:'',notas:''};
+  fin[key][field]=val;
+  saveFinancials(fin);
+  updateKPISummary();
+}
+
+function getAllOrders(){
+  try{
+    const idx=JSON.parse(localStorage.getItem('ty_os_index')||'[]');
+    const orders=[];
+    const fin=getFinancials();
+    idx.forEach(function(entry){
+      try{
+        const raw=localStorage.getItem(entry.key);
+        if(!raw)return;
+        const s=JSON.parse(raw);
+        const f=fin[entry.key]||{};
+        orders.push({
+          key:entry.key,
+          os:s.numeroOS||entry.os||'—',
+          cliente:s.cliente||'',
+          telefono:s.telefono||'',
+          fecha:s.cargueFecha||s.fecha||'',
+          cargueHora:s.cargueHora||'',
+          conductor:s.conductor||'',
+          placa:s.placa||'',
+          tipoVehiculo:s.tipoVehiculo||'',
+          ciudadOrigen:(s.recogidas&&s.recogidas[0]?s.recogidas[0].ciudad:'')||'',
+          ciudadDestino:(s.entregas&&s.entregas[0]?s.entregas[0].ciudad:'')||'',
+          dirOrigen:(s.recogidas&&s.recogidas[0]?s.recogidas[0].direccion:'')||'',
+          dirDestino:(s.entregas&&s.entregas[0]?s.entregas[0].direccion:'')||'',
+          numOperarios:s.numOperarios||0,
+          empacadores:(s.personas||[]).filter(function(p){return p.esEmp;}).length,
+          articulos:s.articulos||'',
+          empaque:s.empaque||{},
+          valor:f.valor||0,
+          costo:f.costo||0,
+          rating:f.rating||0,
+          puntualidad:f.puntualidad||'',
+          danos:f.danos||'',
+          satisfaccion:f.satisfaccion||'',
+          notas:f.notas||'',
+          saved:entry.saved||''
+        });
+      }catch(_){}
+    });
+    return orders;
+  }catch(_){return[];}
+}
+
+function isPending(fecha){
+  if(!fecha)return false;
+  var hoy=new Date();hoy.setHours(0,0,0,0);
+  var parts=(fecha||'').split('-');
+  var y=parseInt(parts[0],10),m=parseInt(parts[1],10),d=parseInt(parts[2],10);
+  if(!y)return false;
+  var f=new Date(y,(m||1)-1,d||1);f.setHours(0,0,0,0);
+  return f>=hoy;
+}
+
+var currentTab='todos';
+var expandedKPI={};
+
+function setTab(t){
+  currentTab=t;
+  var btns=document.querySelectorAll('.tabs .tab');
+  var tabs=['todos','pendientes','ejecutados'];
+  for(var i=0;i<btns.length;i++){
+    btns[i].className='tab'+(tabs[i]===t?' active':'');
+  }
+  render();
+}
+
+function toggleKPI(key){
+  expandedKPI[key]=!expandedKPI[key];
+  var row=document.getElementById('kpi-'+key);
+  if(row){
+    if(expandedKPI[key])row.classList.remove('hidden');
+    else row.classList.add('hidden');
+  }
+}
+
+function handleValor(key,el){
+  var raw=el.value.replace(/\D/g,'');
+  var num=parseInt(raw,10);
+  if(!raw||isNaN(num)){el.value='';} else {
+    var cur=el.selectionStart;var oldLen=el.value.length;
+    el.value=fmtMiles(num);
+    var diff=el.value.length-oldLen;
+    try{el.setSelectionRange(cur+diff,cur+diff);}catch(_){}
+  }
+  var fin=getFinancials();
+  if(!fin[key])fin[key]={valor:0,costo:0,rating:0,puntualidad:'',danos:'',satisfaccion:'',notas:''};
+  var vEl=document.getElementById('val-'+key);
+  var cEl=document.getElementById('cos-'+key);
+  fin[key].valor=vEl?parseM(vEl.value):0;
+  fin[key].costo=cEl?parseM(cEl.value):0;
+  saveFinancials(fin);
+  var util=fin[key].valor-fin[key].costo;
+  var uEl=document.getElementById('util-'+key);
+  if(uEl){uEl.value=(fin[key].valor||fin[key].costo)?fmtMiles(util):'';uEl.style.color=util>=0?'#15803d':'#dc2626';}
+  updateSummary();
+}
+
+function setRating(key,val){
+  setFin(key,'rating',val);
+  var container=document.getElementById('stars-'+key);
+  if(!container)return;
+  var stars=container.querySelectorAll('.star');
+  for(var i=0;i<stars.length;i++){
+    if(i<val)stars[i].classList.add('active');
+    else stars[i].classList.remove('active');
+  }
+}
+
+function handleKPISelect(key,field,el){
+  setFin(key,field,el.value);
+  el.className='kpi-sel'+(el.value==='si'?' val-si':el.value==='no'?' val-no':'');
+}
+
+function handleKPINotes(key,el){
+  setFin(key,'notas',el.value);
+}
+
+function starsHTML(key,rating){
+  var h='<span class="stars" id="stars-'+key+'">';
+  for(var i=1;i<=5;i++){
+    h+='<span class="star'+(i<=rating?' active':'')+'" onclick="event.stopPropagation();setRating(\''+key+'\','+i+')">★</span>';
+  }
+  return h+'</span>';
+}
+
+function selClass(val){return'kpi-sel'+(val==='si'?' val-si':val==='no'?' val-no':'');}
+
+function updateSummary(){
+  var orders=getAllOrders();
+  var pending=orders.filter(function(o){return isPending(o.fecha);});
+  var done=orders.filter(function(o){return !isPending(o.fecha);});
+  var totalValor=0,totalCosto=0;
+  for(var i=0;i<orders.length;i++){totalValor+=orders[i].valor;totalCosto+=orders[i].costo;}
+  var totalUtil=totalValor-totalCosto;
+  document.getElementById('s-total').textContent=orders.length;
+  document.getElementById('s-pend').textContent=pending.length;
+  document.getElementById('s-done').textContent=done.length;
+  document.getElementById('s-valor').textContent=fmtM(totalValor);
+  document.getElementById('s-util').textContent=totalValor>0?'Utilidad: '+fmtM(totalUtil)+' ('+Math.round((totalUtil/totalValor)*100)+'%)':'';
+  document.getElementById('b-all').textContent=orders.length;
+  document.getElementById('b-pend').textContent=pending.length;
+  document.getElementById('b-done').textContent=done.length;
+}
+
+function updateKPISummary(){
+  var orders=getAllOrders();
+  var rated=[],withPunt=[],withDam=[],withSat=[];
+  for(var i=0;i<orders.length;i++){
+    if(orders[i].rating>0)rated.push(orders[i]);
+    if(orders[i].puntualidad)withPunt.push(orders[i]);
+    if(orders[i].danos)withDam.push(orders[i]);
+    if(orders[i].satisfaccion)withSat.push(orders[i]);
+  }
+  var avgRating=0;
+  if(rated.length){for(var j=0;j<rated.length;j++)avgRating+=rated[j].rating;avgRating/=rated.length;}
+  document.getElementById('kpi-avg').textContent=rated.length?(avgRating.toFixed(1)+' / 5'):'—';
+  var puntSi=0;for(var k=0;k<withPunt.length;k++)if(withPunt[k].puntualidad==='si')puntSi++;
+  document.getElementById('kpi-punt').textContent=withPunt.length?Math.round(puntSi/withPunt.length*100)+'%':'—';
+  var damSi=0;for(var l=0;l<withDam.length;l++)if(withDam[l].danos==='si')damSi++;
+  document.getElementById('kpi-dam').textContent=withDam.length?Math.round(damSi/withDam.length*100)+'%':'—';
+  var satSi=0;for(var n=0;n<withSat.length;n++)if(withSat[n].satisfaccion==='si')satSi++;
+  document.getElementById('kpi-sat').textContent=withSat.length?Math.round(satSi/withSat.length*100)+'%':'—';
+}
+
+function render(){
+  var orders=getAllOrders();
+  var pending=orders.filter(function(o){return isPending(o.fecha);});
+  var done=orders.filter(function(o){return !isPending(o.fecha);});
+
+  updateSummary();
+  updateKPISummary();
+
+  var list=orders;
+  if(currentTab==='pendientes')list=pending;
+  else if(currentTab==='ejecutados')list=done;
+
+  list.sort(function(a,b){return(b.fecha||'').localeCompare(a.fecha||'');});
+
+  var tbody=document.getElementById('tbl-body');
+  var emptyMsg=document.getElementById('empty-msg');
+
+  if(!list.length){
+    tbody.innerHTML='';
+    emptyMsg.style.display='block';
+    emptyMsg.textContent=orders.length===0?'No hay servicios registrados. Genera una Orden de Servicio y aparecerá aquí.':'No hay servicios en esta categoría.';
+    return;
+  }
+  emptyMsg.style.display='none';
+
+  var html='';
+  for(var i=0;i<list.length;i++){
+    var o=list[i];
+    var pend=isPending(o.fecha);
+    var util=o.valor-o.costo;
+    var ruta=[o.ciudadOrigen,o.ciudadDestino].filter(Boolean).join(' → ')||'—';
+    var veh=[o.tipoVehiculo,o.placa].filter(Boolean).join(' · ')||'—';
+    var expanded=expandedKPI[o.key];
+    html+='<tr class="main-row" style="cursor:pointer" onclick="toggleKPI(\''+o.key+'\')">'
+      +'<td><span class="status '+(pend?'pending':'done')+'">'+(pend?'⏳ Pendiente':'✓ Ejecutado')+'</span></td>'
+      +'<td class="os-num">'+o.os+'</td>'
+      +'<td><div class="cliente-name">'+(o.cliente||'—')+'</div><div class="detail">'+(o.telefono||'')+'</div></td>'
+      +'<td><div>'+(o.fecha||'—')+'</div><div class="detail">'+(o.cargueHora||'')+'</div></td>'
+      +'<td><div>'+ruta+'</div><div class="detail" style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+(o.dirOrigen||'')+'">'+(o.dirOrigen||'')+'</div></td>'
+      +'<td><div>'+veh+'</div><div class="detail">'+(o.conductor||'—')+(o.numOperarios?' · '+o.numOperarios+' op.':'')+'</div></td>'
+      +'<td onclick="event.stopPropagation()"><input class="money-input" id="val-'+o.key+'" value="'+(o.valor?fmtMiles(o.valor):'')+'" placeholder="0" inputmode="numeric" oninput="handleValor(\''+o.key+'\',this)"/></td>'
+      +'<td onclick="event.stopPropagation()"><input class="money-input" id="cos-'+o.key+'" value="'+(o.costo?fmtMiles(o.costo):'')+'" placeholder="0" inputmode="numeric" oninput="handleValor(\''+o.key+'\',this)"/></td>'
+      +'<td><input class="money-input readonly" id="util-'+o.key+'" readonly value="'+(o.valor||o.costo?fmtMiles(util):'')+'" style="color:'+(util>=0?'#15803d':'#dc2626')+'"/></td>'
+      +'<td><a href="/orden-servicio.html" class="btn-load" onclick="event.stopPropagation();sessionStorage.setItem(\'ty_load_os\',\''+o.key+'\')">Abrir</a></td>'
+      +'</tr>';
+
+    html+='<tr class="kpi-row'+(expanded?'':' hidden')+'" id="kpi-'+o.key+'">'
+      +'<td colspan="10"><div class="kpi-grid">'
+      +'<div class="kpi-field"><span class="kpi-label">Calificación</span>'+starsHTML(o.key,o.rating)+'</div>'
+      +'<div class="kpi-field"><span class="kpi-label">Puntualidad</span>'
+        +'<select class="'+selClass(o.puntualidad)+'" onchange="handleKPISelect(\''+o.key+'\',\'puntualidad\',this)" onclick="event.stopPropagation()">'
+        +'<option value="">—</option>'
+        +'<option value="si"'+(o.puntualidad==='si'?' selected':'')+'>Sí, a tiempo</option>'
+        +'<option value="no"'+(o.puntualidad==='no'?' selected':'')+'>No, retrasado</option>'
+        +'</select></div>'
+      +'<div class="kpi-field"><span class="kpi-label">Sin daños</span>'
+        +'<select class="'+selClass(o.danos)+'" onchange="handleKPISelect(\''+o.key+'\',\'danos\',this)" onclick="event.stopPropagation()">'
+        +'<option value="">—</option>'
+        +'<option value="si"'+(o.danos==='si'?' selected':'')+'>Sí, sin daños</option>'
+        +'<option value="no"'+(o.danos==='no'?' selected':'')+'>No, con daños</option>'
+        +'</select></div>'
+      +'<div class="kpi-field"><span class="kpi-label">Cliente satisfecho</span>'
+        +'<select class="'+selClass(o.satisfaccion)+'" onchange="handleKPISelect(\''+o.key+'\',\'satisfaccion\',this)" onclick="event.stopPropagation()">'
+        +'<option value="">—</option>'
+        +'<option value="si"'+(o.satisfaccion==='si'?' selected':'')+'>Sí</option>'
+        +'<option value="no"'+(o.satisfaccion==='no'?' selected':'')+'>No</option>'
+        +'</select></div>'
+      +'<div class="kpi-field" style="flex:1;min-width:200px"><span class="kpi-label">Notas operativas</span>'
+        +'<textarea class="kpi-notes" onclick="event.stopPropagation()" oninput="handleKPINotes(\''+o.key+'\',this)" placeholder="Observaciones del servicio…">'+(o.notas||'')+'</textarea></div>'
+      +'</div></td></tr>';
+  }
+  tbody.innerHTML=html;
+}
+
+render();
+</script>
+<script src="js/access-gate.js"></script>
+</body>
+</html>
