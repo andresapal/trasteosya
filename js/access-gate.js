@@ -126,7 +126,7 @@
       '<span class="ty-op-toolbar__badge">MODO OPERADOR</span>' +
       '<a href="cotizador.html" class="ty-op-toolbar__link">Cotizador</a>' +
       '<a href="orden-servicio.html" class="ty-op-toolbar__link">Orden de servicio</a>' +
-      '<a href="index.html" class="ty-op-toolbar__link">Sitio público</a>' +
+      '<a href="kpis.html" class="ty-op-toolbar__link">KPI\'s</a>' +
       '<button type="button" class="ty-op-toolbar__logout">Salir</button>';
     document.body.appendChild(bar);
     bar.querySelector('.ty-op-toolbar__logout').onclick = function () {
