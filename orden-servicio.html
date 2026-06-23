@@ -905,8 +905,15 @@ async function backupOrden(){
       pdf_base64:pdf_base64,
       meta:{
         numeroOS:state.numeroOS,cliente:state.cliente,telefono:state.telefono,
-        fecha:state.fecha,cargueFecha:state.cargueFecha,conductor:state.conductor,
-        placa:state.placa,tipoVehiculo:state.tipoVehiculo
+        fecha:state.fecha,cargueFecha:state.cargueFecha,cargueHora:state.cargueHora,
+        conductor:state.conductor,placa:state.placa,tipoVehiculo:state.tipoVehiculo,
+        numOperarios:state.numOperarios,
+        ciudadOrigen:(state.recogidas&&state.recogidas[0]?state.recogidas[0].ciudad:'')||'',
+        ciudadDestino:(state.entregas&&state.entregas[0]?state.entregas[0].ciudad:'')||'',
+        dirOrigen:(state.recogidas&&state.recogidas[0]?state.recogidas[0].direccion:'')||'',
+        dirDestino:(state.entregas&&state.entregas[0]?state.entregas[0].direccion:'')||'',
+        empaque:state.empaque||{},
+        empacadores:(state.personas||[]).filter(function(p){return p.esEmp;}).length
       }
     };
     const ok=await _enviarDrive(payload);
@@ -969,7 +976,16 @@ async function enviarOSWhatsApp(){
       const pdf_base64=pdf.output('datauristring').split(',')[1];
       _enviarDrive({
         type:'orden',apikey:BACKUP_APIKEY,filename:filename,pdf_base64:pdf_base64,
-        meta:{numeroOS:state.numeroOS,cliente:state.cliente,telefono:state.telefono,fecha:state.fecha}
+        meta:{numeroOS:state.numeroOS,cliente:state.cliente,telefono:state.telefono,
+          fecha:state.fecha,cargueFecha:state.cargueFecha,cargueHora:state.cargueHora,
+          conductor:state.conductor,placa:state.placa,tipoVehiculo:state.tipoVehiculo,
+          numOperarios:state.numOperarios,
+          ciudadOrigen:(state.recogidas&&state.recogidas[0]?state.recogidas[0].ciudad:'')||'',
+          ciudadDestino:(state.entregas&&state.entregas[0]?state.entregas[0].ciudad:'')||'',
+          dirOrigen:(state.recogidas&&state.recogidas[0]?state.recogidas[0].direccion:'')||'',
+          dirDestino:(state.entregas&&state.entregas[0]?state.entregas[0].direccion:'')||'',
+          empaque:state.empaque||{},
+          empacadores:(state.personas||[]).filter(function(p){return p.esEmp;}).length}
       }).then(function(ok){
         if(ok===true) showToast('OS guardada en Drive ✓');
         else if(ok===false) showToast('Error backup Drive',true);

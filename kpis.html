@@ -205,9 +205,12 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 
 <script>
 var FIN_KEY='ty_os_financials';
+var BACKUP_URL='https://script.google.com/macros/s/AKfycbyiiC0VRDbAnmOtznqvgM3NxHdtjdnofPqQENWcCwRJbASHB0RgvzQ-OnEwPWXaT2NpAQ/exec';
+var BACKUP_APIKEY='TrasteosYa-2026-Backup';
 var COLORS={blue:'#1B3E8C',red:'#E30613',green:'#15803d',orange:'#d97706',teal:'#0d9488',purple:'#7c3aed',pink:'#db2777',sky:'#0284c7',lime:'#65a30d',amber:'#b45309'};
 var PALETTE=['#1B3E8C','#E30613','#0d9488','#d97706','#7c3aed','#db2777','#0284c7','#65a30d','#b45309','#6366f1','#059669','#ea580c'];
 var charts={};
+var driveOrders=[];
 
 function getFinancials(){try{return JSON.parse(localStorage.getItem(FIN_KEY)||'{}');}catch(_){return{};}}
 
@@ -260,6 +263,70 @@ function getAllOrders(){
   }catch(_){return[];}
 }
 
+function parseDriveOrder(r){
+  var cajas=parseInt(r.Emp_Cajas,10)||0;
+  var vinipel=parseInt(r.Emp_Vinipel,10)||0;
+  var burbuja=parseInt(r.Emp_Burbuja,10)||0;
+  var craft=parseInt(r.Emp_Craft,10)||0;
+  var tieneEmpaque=cajas>0||vinipel>0||burbuja>0||craft>0;
+  var tipoEmpaque='Sin empaque';
+  if(tieneEmpaque){
+    if(cajas>25||(cajas>0&&burbuja>0&&craft>0))tipoEmpaque='Full';
+    else if(cajas>0&&cajas<=25)tipoEmpaque='Semicompleto';
+    else tipoEmpaque='Básico';
+  }
+  var origC=(r.CiudadOrigen||'').toString();
+  var destC=(r.CiudadDestino||'').toString();
+  var esUrbano=origC&&destC&&origC.toUpperCase()===destC.toUpperCase();
+  var fecha=(r.CargueFecha||r.Fecha||'').toString().substring(0,10);
+  return{
+    key:'drive_'+r.NumeroOS,
+    os:r.NumeroOS||'',
+    cliente:(r.Cliente||'').trim(),
+    fecha:fecha,
+    tipoVehiculo:r.TipoVehiculo||'',
+    numOperarios:parseInt(r.NumOperarios,10)||0,
+    ciudadOrigen:origC,ciudadDestino:destC,
+    dirOrigen:(r.DirOrigen||'').toString(),dirDestino:(r.DirDestino||'').toString(),
+    empaque:{craft:craft,vinipel:vinipel,burbuja:burbuja,cajas:cajas},
+    tieneEmpaque:tieneEmpaque,tipoEmpaque:tipoEmpaque,
+    esUrbano:esUrbano,
+    valor:parseInt(r.Valor,10)||0,
+    costo:parseInt(r.Costo,10)||0,
+    personas:[],
+    empacadores:parseInt(r.Empacadores,10)||0
+  };
+}
+
+function mergeOrders(local,drive){
+  var map={};
+  for(var i=0;i<local.length;i++){map[local[i].os]=local[i];}
+  for(var j=0;j<drive.length;j++){
+    if(!map[drive[j].os]){map[drive[j].os]=drive[j];}
+    else{
+      if(drive[j].valor&&!map[drive[j].os].valor)map[drive[j].os].valor=drive[j].valor;
+      if(drive[j].costo&&!map[drive[j].os].costo)map[drive[j].os].costo=drive[j].costo;
+    }
+  }
+  var result=[];for(var k in map)result.push(map[k]);
+  return result;
+}
+
+async function fetchDriveOrders(){
+  try{
+    var url=BACKUP_URL+'?action=ordenes&apikey='+BACKUP_APIKEY;
+    var r=await fetch(url,{redirect:'follow'});
+    var data=await r.json();
+    if(data.success&&data.ordenes){
+      driveOrders=[];
+      for(var i=0;i<data.ordenes.length;i++){
+        driveOrders.push(parseDriveOrder(data.ordenes[i]));
+      }
+    }
+  }catch(e){console.warn('KPI: no se pudieron cargar datos de Drive',e);}
+  return driveOrders;
+}
+
 function isPending(fecha){
   if(!fecha)return false;
   var hoy=new Date();hoy.setHours(0,0,0,0);
@@ -291,7 +358,7 @@ function populateFilters(orders){
 }
 
 function applyFilters(){
-  var all=getAllOrders();
+  var all=mergeOrders(getAllOrders(),driveOrders);
   var desde=document.getElementById('f-desde').value;
   var hasta=document.getElementById('f-hasta').value;
   var ciudad=document.getElementById('f-ciudad').value;
@@ -561,11 +628,24 @@ function renderDashboard(orders,allOrders){
   });
 }
 
-// Init
-var allOrders=getAllOrders();
-populateFilters(allOrders);
-filteredOrders=allOrders.slice();
-renderDashboard(filteredOrders,allOrders);
+// Init: cargar localStorage + Drive
+(async function(){
+  var localOrders=getAllOrders();
+  // Render inmediato con datos locales
+  populateFilters(localOrders);
+  filteredOrders=localOrders.slice();
+  renderDashboard(filteredOrders,localOrders);
+  // Cargar datos de Drive y combinar
+  try{
+    var drive=await fetchDriveOrders();
+    if(drive.length>0){
+      var combined=mergeOrders(localOrders,drive);
+      populateFilters(combined);
+      filteredOrders=combined.slice();
+      renderDashboard(filteredOrders,combined);
+    }
+  }catch(e){}
+})();
 </script>
 <script src="js/access-gate.js"></script>
 </body>
