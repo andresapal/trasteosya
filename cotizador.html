@@ -236,21 +236,23 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
           <div class="grid2">
             <div class="field">
               <label>Origen</label>
-              <input id="nac-origen" placeholder="Ej: Bogotá" oninput="recalc()">
+              <select id="nac-origen" onchange="handleCiudadSel(this,'nac-origen')"></select>
+              <input id="nac-origen-otro" placeholder="Escribe la ciudad" style="display:none;margin-top:4px" oninput="recalc()">
             </div>
             <div class="field">
               <label>Destino</label>
-              <input id="nac-destino" placeholder="Ej: Medellín" oninput="recalc()">
+              <select id="nac-destino" onchange="handleCiudadSel(this,'nac-destino')"></select>
+              <input id="nac-destino-otro" placeholder="Escribe la ciudad" style="display:none;margin-top:4px" oninput="recalc()">
             </div>
           </div>
           <div class="grid2" style="margin-top:4px">
             <div class="field" id="field-nac-costo" style="display:none">
               <label style="color:var(--cost)">Costo</label>
-              <input id="nac-costo" type="number" min="0" placeholder="0" oninput="recalc()">
+              <input id="nac-costo" type="text" inputmode="numeric" placeholder="0" oninput="handleNumInput(this)">
             </div>
             <div class="field">
               <label style="color:var(--sale)">Valor venta</label>
-              <input id="nac-venta" type="number" min="0" placeholder="0" oninput="recalc()">
+              <input id="nac-venta" type="text" inputmode="numeric" placeholder="0" oninput="handleNumInput(this)">
             </div>
           </div>
         </div>
@@ -274,28 +276,28 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
         </div>
         <div id="emp-express-panel">
           <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Solo vinipel · Costo $80.000/rollo · Venta $130.000/rollo</p>
-          <div class="field"><label>Rollos de vinipel</label><input id="rollos" type="number" min="0" placeholder="0" oninput="recalc()"></div>
+          <div class="field"><label>Rollos de vinipel</label><input id="rollos" type="text" inputmode="numeric" placeholder="0" oninput="handleNumInput(this)"></div>
         </div>
         <div id="emp-full-panel" style="display:none">
           <div id="mat-list"></div>
           <div class="grid2" style="margin-top:10px">
-            <div class="field"><label>Empacadores (1-4)</label><input id="emp-cant" type="number" min="1" max="4" placeholder="1" oninput="recalc()"></div>
-            <div class="field"><label>Días</label><input id="emp-dias" type="number" min="1" placeholder="1" oninput="recalc()"></div>
+            <div class="field"><label>Empacadores (1-4)</label><input id="emp-cant" type="text" inputmode="numeric" placeholder="1" oninput="handleNumInput(this)"></div>
+            <div class="field"><label>Días</label><input id="emp-dias" type="text" inputmode="numeric" placeholder="1" oninput="handleNumInput(this)"></div>
           </div>
           <div class="grid2" style="margin-top:4px">
-            <div class="field" id="field-emp-cu" style="display:none"><label style="color:var(--cost)">Costo/emp/día</label><input id="emp-cu" type="number" min="0" placeholder="100000" oninput="recalc()"></div>
-            <div class="field"><label style="color:var(--sale)">Venta/emp/día</label><input id="emp-vu" type="number" min="0" placeholder="130000" oninput="recalc()"></div>
+            <div class="field" id="field-emp-cu" style="display:none"><label style="color:var(--cost)">Costo/emp/día</label><input id="emp-cu" type="text" inputmode="numeric" placeholder="100.000" oninput="handleNumInput(this)"></div>
+            <div class="field"><label style="color:var(--sale)">Venta/emp/día</label><input id="emp-vu" type="text" inputmode="numeric" placeholder="130.000" oninput="handleNumInput(this)"></div>
           </div>
           <div class="ty-cost-block" style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-top:10px">
             <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Transporte empaque <span style="font-size:10px;font-weight:400">(solo costo)</span></div>
             <div class="grid2">
-              <div class="field"><label>Cantidad</label><input id="trans-cant" type="number" min="0" placeholder="0" oninput="recalc()"></div>
-              <div class="field"><label style="color:var(--cost)">Costo c/u</label><input id="trans-cu" type="number" min="0" placeholder="0" oninput="recalc()"></div>
+              <div class="field"><label>Cantidad</label><input id="trans-cant" type="text" inputmode="numeric" placeholder="0" oninput="handleNumInput(this)"></div>
+              <div class="field"><label style="color:var(--cost)">Costo c/u</label><input id="trans-cu" type="text" inputmode="numeric" placeholder="0" oninput="handleNumInput(this)"></div>
             </div>
             <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;margin-top:8px">Cintas <span style="font-size:10px;font-weight:400">(solo costo)</span></div>
             <div class="grid2">
-              <div class="field"><label>Cantidad</label><input id="cintas-cant" type="number" min="0" placeholder="0" oninput="recalc()"></div>
-              <div class="field"><label style="color:var(--cost)">Costo c/u</label><input id="cintas-cu" type="number" min="0" placeholder="0" oninput="recalc()"></div>
+              <div class="field"><label>Cantidad</label><input id="cintas-cant" type="text" inputmode="numeric" placeholder="0" oninput="handleNumInput(this)"></div>
+              <div class="field"><label style="color:var(--cost)">Costo c/u</label><input id="cintas-cu" type="text" inputmode="numeric" placeholder="0" oninput="handleNumInput(this)"></div>
             </div>
           </div>
         </div>
@@ -329,12 +331,12 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
       </div>
       <div class="card-body">
         <div class="grid2">
-          <div class="field"><label>Operarios</label><input id="des-op" type="number" min="0" placeholder="0" oninput="recalc()"></div>
-          <div class="field"><label>Días</label><input id="des-dias" type="number" min="1" placeholder="1" oninput="recalc()"></div>
+          <div class="field"><label>Operarios</label><input id="des-op" type="text" inputmode="numeric" placeholder="0" oninput="handleNumInput(this)"></div>
+          <div class="field"><label>Días</label><input id="des-dias" type="text" inputmode="numeric" placeholder="1" oninput="handleNumInput(this)"></div>
         </div>
         <div class="grid2">
-          <div class="field" id="field-des-cu" style="display:none"><label style="color:var(--cost)">Costo/operario/día</label><input id="des-cu" type="number" min="0" value="100000" oninput="recalc()"></div>
-          <div class="field"><label style="color:var(--sale)">Venta/operario/día</label><input id="des-vu" type="number" min="0" value="120000" oninput="recalc()"></div>
+          <div class="field" id="field-des-cu" style="display:none"><label style="color:var(--cost)">Costo/operario/día</label><input id="des-cu" type="text" inputmode="numeric" value="100.000" oninput="handleNumInput(this)"></div>
+          <div class="field"><label style="color:var(--sale)">Venta/operario/día</label><input id="des-vu" type="text" inputmode="numeric" value="120.000" oninput="handleNumInput(this)"></div>
         </div>
       </div>
     </div>
@@ -377,7 +379,7 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
         </div>
       </div>
       <div class="card-body always-show">
-        <div class="field"><label>Valor del descuento</label><input id="descuento" type="number" min="0" max="500000" placeholder="0" oninput="recalc()"></div>
+        <div class="field"><label>Valor del descuento</label><input id="descuento" type="text" inputmode="numeric" placeholder="0" oninput="handleNumInput(this)"></div>
       </div>
     </div>
   </div>
@@ -525,12 +527,50 @@ const ADIC=[
 ];
 
 const COP=n=>new Intl.NumberFormat("es-CO",{style:"currency",currency:"COP",maximumFractionDigits:0}).format(Math.max(0,Math.round(n)));
-// FIX: read number from input without treating leading zeros as concatenation
+const CIUDADES_PRIO=["Bogotá","Medellín","Barranquilla","Cali","Chía","Cajicá","Zipaquirá","Madrid"];
+const CIUDADES_RESTO=["Armenia","Barrancabermeja","Bello","Bucaramanga","Buenaventura","Cartagena","Ciénaga","Cúcuta","Duitama","Envigado","Facatativá","Florencia","Floridablanca","Fusagasugá","Girardot","Girón","Ibagué","Ipiales","Itagüí","La Dorada","Maicao","Manizales","Melgar","Montería","Mosquera","Neiva","Palmira","Pasto","Pereira","Piedecuesta","Popayán","Quibdó","Riohacha","Rionegro","Sahagún","Santa Marta","Sincelejo","Soacha","Sogamoso","Soledad","Tuluá","Tunja","Turbo","Ubaté","Valledupar","Villavicencio","Yopal"];
+const CIUDADES_ALL=[...CIUDADES_PRIO,...CIUDADES_RESTO,"Otro"];
+function ciudadOpts(selVal){
+  const v=selVal||"Bogotá";
+  const isOtro=v&&!CIUDADES_PRIO.includes(v)&&!CIUDADES_RESTO.includes(v)&&v!=="Otro";
+  const sv=isOtro?"Otro":v;
+  let h='<option value="" disabled>Selecciona…</option>';
+  h+='<optgroup label="Principales">';
+  CIUDADES_PRIO.forEach(c=>{h+=`<option value="${c}"${c===sv?' selected':''}>${c}</option>`;});
+  h+='</optgroup><optgroup label="Otras ciudades">';
+  CIUDADES_RESTO.forEach(c=>{h+=`<option value="${c}"${c===sv?' selected':''}>${c}</option>`;});
+  h+=`</optgroup><option value="Otro"${sv==="Otro"?' selected':''}>Otro</option>`;
+  return h;
+}
+function handleCiudadSel(sel,inputId){
+  const txtEl=document.getElementById(inputId+'-otro');
+  if(sel.value==='Otro'){txtEl.style.display='block';txtEl.focus();}
+  else{txtEl.style.display='none';txtEl.value='';}
+  recalc();
+}
+function getCiudadVal(id){
+  const sel=document.getElementById(id);
+  if(!sel)return'';
+  if(sel.value==='Otro'){const txt=document.getElementById(id+'-otro');return txt?txt.value.trim():'';}
+  return sel.value;
+}
 function numVal(id){
   const el=document.getElementById(id);
   if(!el)return 0;
-  const v=parseFloat(el.value);
+  const v=parseFloat(el.value.replace(/\./g,''));
   return isNaN(v)||v<0?0:v;
+}
+function fmtMiles(n){return String(Math.abs(Math.round(n))).replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+function handleNumInput(el){
+  const cur=el.selectionStart;
+  const raw=el.value.replace(/\D/g,'');
+  const num=parseInt(raw,10);
+  if(!raw||isNaN(num)){el.value='';recalc();return;}
+  const oldLen=el.value.length;
+  el.value=fmtMiles(num);
+  const diff=el.value.length-oldLen;
+  try{el.setSelectionRange(cur+diff,cur+diff);}catch(_){}
+  recalc();
 }
 
 let state={showCosts:false,mods:{trasteo:false,empaque:false,inst:false,desempaque:false,bodegaje:false,adicionales:false},trasteoSize:"mediano",empTab:"express",bodSize:"m10",cobertura:"urbano",modalidad:"expreso"};
@@ -577,7 +617,7 @@ function buildMaterials(){
         <div class="mat-name">${m.l} <span style="color:var(--muted);font-size:11px">(${m.unit})</span></div>
         <div class="mat-prices" id="mat-price-${k}">${state.showCosts?`C: ${COP(m.c)} · `:""}V: ${COP(m.v)}</div>
       </div>
-      <input class="mat-input" type="number" min="0" placeholder="0" id="mat-${k}" oninput="recalc()">
+      <input class="mat-input" type="text" inputmode="numeric" placeholder="0" id="mat-${k}" oninput="handleNumInput(this)">
     </div>`).join("");
 }
 
@@ -587,7 +627,7 @@ function buildInst(){
   document.getElementById("inst-list").innerHTML=Object.entries(INST).map(([k,i])=>
     `<div class="inst-item">
       <div class="inst-name">${i.l}</div>
-      <input class="inst-input" type="number" min="0" placeholder="0" id="inst-${k}" oninput="recalc()">
+      <input class="inst-input" type="text" inputmode="numeric" placeholder="0" id="inst-${k}" oninput="handleNumInput(this)">
     </div>`).join("");
 }
 
@@ -598,9 +638,9 @@ function buildAdicionales(){
     `<div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;margin-bottom:8px">
       <div style="font-size:13px;font-weight:600;margin-bottom:8px">${a.l}</div>
       <div class="grid2">
-        <div class="field"><label>Cantidad</label><input type="number" min="0" placeholder="0" id="adic-${a.k}-cant" oninput="recalc()"></div>
-        <div class="field"><label style="color:var(--sale)">Venta unit.</label><input type="number" min="0" placeholder="0" id="adic-${a.k}-venta" oninput="recalc()"></div>
-        <div class="field"><label style="color:var(--cost)">Costo unit.</label><input type="number" min="0" placeholder="0" id="adic-${a.k}-costo" oninput="recalc()"></div>
+        <div class="field"><label>Cantidad</label><input type="text" inputmode="numeric" placeholder="0" id="adic-${a.k}-cant" oninput="handleNumInput(this)"></div>
+        <div class="field"><label style="color:var(--sale)">Venta unit.</label><input type="text" inputmode="numeric" placeholder="0" id="adic-${a.k}-venta" oninput="handleNumInput(this)"></div>
+        <div class="field"><label style="color:var(--cost)">Costo unit.</label><input type="text" inputmode="numeric" placeholder="0" id="adic-${a.k}-costo" oninput="handleNumInput(this)"></div>
       </div>
     </div>`).join("");
 }
@@ -681,8 +721,8 @@ function getLines(){
       // Nacional: valores manuales
       const venta=numVal("nac-venta");
       const costo=numVal("nac-costo");
-      const origen=document.getElementById("nac-origen")?.value.trim()||"Bogotá";
-      const destino=document.getElementById("nac-destino")?.value.trim()||"destino";
+      const origen=getCiudadVal("nac-origen")||"Bogotá";
+      const destino=getCiudadVal("nac-destino")||"destino";
       const mod=state.modalidad==="expreso"?"Expreso":"Compartido";
       if(venta>0||costo>0){
         lines.push({cat:"trasteo",l:`Servicio Nacional ${mod}`,detail:`${origen} → ${destino}`,c:costo,v:venta,qty:1,cu:costo,vu:venta});
@@ -955,6 +995,25 @@ function sendWA(){
   window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`,"_blank","noopener,noreferrer");
 }
 
+// ============ BACKUP A GOOGLE DRIVE ============
+const BACKUP_URL='https://script.google.com/macros/s/AKfycbyiiC0VRDbAnmOtznqvgM3NxHdtjdnofPqQENWcCwRJbASHB0RgvzQ-OnEwPWXaT2NpAQ/exec';
+const BACKUP_APIKEY='TrasteosYa-2026-Backup';
+async function _backupCotDrive(doc,filename,tipo){
+  try{
+    const pdf_base64=doc.output('datauristring').split(',')[1];
+    const cliente=document.getElementById("cliente").value.trim();
+    const fecha=document.getElementById("fecha").value;
+    const r=await fetch(BACKUP_URL,{method:'POST',body:JSON.stringify({
+      type:'cotizacion',apikey:BACKUP_APIKEY,filename:filename,pdf_base64:pdf_base64,
+      meta:{tipo:tipo,cliente:cliente,fecha:fecha}
+    }),redirect:'follow'});
+    const t=await r.text();
+    try{const j=JSON.parse(t);if(j.success)console.log('Cotización guardada en Drive');}catch(_){}
+  }catch(e){
+    console.warn('Backup Drive cotizador:',e.message);
+  }
+}
+
 // ============ PDF HELPERS ============
 function safeName(s){return(s||"sin-cliente").replace(/[^a-z0-9\-_]+/gi,"_").slice(0,40);}
 function fmtSigned(n){return n<0?`-${COP(Math.abs(n))}`:COP(n);}
@@ -1043,7 +1102,9 @@ function pdfCliente(){
     doc.text("Total",left,y);doc.text(COP(total),right,y,{align:"right"});y+=12;
     doc.setFont("helvetica","italic");doc.setFontSize(9);doc.setTextColor(150);
     doc.text("Gracias por confiar en Trasteos Ya.   ·   trasteosya.online",left,y);
-    downloadPDF(doc,`cotizacion_${safeName(cliente)}.pdf`);
+    const fn=`cotizacion_${safeName(cliente)}.pdf`;
+    downloadPDF(doc,fn);
+    _backupCotDrive(doc,fn,'cliente');
   });
 }
 
@@ -1149,7 +1210,9 @@ function pdfInterno(){
       columnStyles:{0:{fontStyle:"bold",cellWidth:80},1:{halign:"right",fontStyle:"bold",cellWidth:50}},
       margin:{left:150}
     });
-    downloadPDF(doc,`cotizacion_interna_${safeName(cliente)}.pdf`);
+    const fn=`cotizacion_interna_${safeName(cliente)}.pdf`;
+    downloadPDF(doc,fn);
+    _backupCotDrive(doc,fn,'interno');
   });
 }
 
@@ -1174,7 +1237,9 @@ function pdfMateriales(){
     else{
       doc.autoTable({startY:y,head:[["Material","Cantidad"]],body:rows,theme:"striped",headStyles:{fillColor:[0,61,165],halign:"center",fontStyle:"bold"},columnStyles:{0:{halign:"left",cellWidth:130},1:{halign:"center",cellWidth:50}},bodyStyles:{fontSize:11,cellPadding:4}});
     }
-    downloadPDF(doc,`materiales_${safeName(cliente)}.pdf`);
+    const fn=`materiales_${safeName(cliente)}.pdf`;
+    downloadPDF(doc,fn);
+    _backupCotDrive(doc,fn,'materiales');
   });
 }
 
@@ -1273,6 +1338,8 @@ function showMobilePDF(){}
 function closeMobilePDF(){}
 
 // ============ INIT ============
+document.getElementById("nac-origen").innerHTML=ciudadOpts("Bogotá");
+document.getElementById("nac-destino").innerHTML=ciudadOpts("Medellín");
 buildStaticUI();
 recalc();
 </script>

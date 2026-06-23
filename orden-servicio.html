@@ -84,9 +84,11 @@ input[readonly]{background:#f8f9fa;color:#6b7280;cursor:default;border-color:#e9
 <div class="main-header">
   <img id="hLogo" alt="Trasteos Ya"/>
   <div class="header-actions">
+    <button class="btn" onclick="cargarOSModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> Cargar OS</button>
     <button class="btn" onclick="handleNueva()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg> Nueva OS</button>
     <button class="btn" onclick="handleDuplicar()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Duplicar</button>
     <button class="btn btn-primary" onclick="generarPdf()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> PDF</button>
+    <button class="btn" onclick="pdfEmpaque()" style="background:#0d9488;border-color:#0d9488;color:#fff" title="PDF solo con resumen de empaque"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l10 6.5v7L12 22 2 15.5v-7L12 2z"/><path d="M12 22V9"/><path d="M2 8.5l10 6.5 10-6.5"/></svg> Empaque</button>
     <button class="btn" onclick="pedirResena()" style="background:#16A34A;border-color:#16A34A;color:#fff" title="Enviar pedido de reseña al cliente por WhatsApp"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Reseña</button>
   </div>
 </div>
@@ -288,6 +290,7 @@ input[readonly]{background:#f8f9fa;color:#6b7280;cursor:default;border-color:#e9
   <div style="display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;padding-top:4px">
     <button class="btn" onclick="setVista('preview')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Vista previa</button>
     <button class="btn btn-primary" onclick="generarPdf()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Generar PDF</button>
+    <button class="btn" onclick="pdfEmpaque()" style="background:#0d9488;border-color:#0d9488;color:#fff" title="PDF solo con resumen de empaque"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l10 6.5v7L12 22 2 15.5v-7L12 2z"/><path d="M12 22V9"/><path d="M2 8.5l10 6.5 10-6.5"/></svg> Empaque</button>
     <button class="btn" onclick="pedirResena()" style="background:#16A34A;border-color:#16A34A;color:#fff" title="Enviar pedido de reseña al cliente por WhatsApp"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Reseña</button>
   </div>
 </div>
@@ -308,12 +311,12 @@ const LOGO_SRC="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0
 const MESES=["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
 const MESES_L=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 const DIAS=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
-const CIUDADES=["BOGOTA","CHIA","CAJICA","MEDELLIN","CALI","BARRANQUILLA","CARTAGENA","ARMENIA","BARRANCABERMEJA","BELLO","BUCARAMANGA","BUENAVENTURA","CIENAGA","CUCUTA","DUITAMA","ENVIGADO","FACATATIVA","FLORENCIA","FLORIDABLANCA","FUSAGASUGA","GIRARDOT","GIRON","IBAGUE","IPIALES","ITAGUI","LA DORADA","MAICAO","MANIZALES","MELGAR","MONTERIA","MADRID","MOSQUERA","NEIVA","PALMIRA","PASTO","PEREIRA","PIEDECUESTA","POPAYAN","QUIBDO","RIOHACHA","RIONEGRO","SAHAGUN","SANTA MARTA","SINCELEJO","SOACHA","SOGAMOSO","SOLEDAD","TULUA","TUNJA","TURBO","UBATE","VALLEDUPAR","VILLAVICENCIO","YOPAL","ZIPAQUIRA","OTRO"];
+const CIUDADES=["BOGOTA","MEDELLIN","BARRANQUILLA","CALI","CHIA","CAJICA","ZIPAQUIRA","MADRID","ARMENIA","BARRANCABERMEJA","BELLO","BUCARAMANGA","BUENAVENTURA","CARTAGENA","CIENAGA","CUCUTA","DUITAMA","ENVIGADO","FACATATIVA","FLORENCIA","FLORIDABLANCA","FUSAGASUGA","GIRARDOT","GIRON","IBAGUE","IPIALES","ITAGUI","LA DORADA","MAICAO","MANIZALES","MELGAR","MONTERIA","MOSQUERA","NEIVA","PALMIRA","PASTO","PEREIRA","PIEDECUESTA","POPAYAN","QUIBDO","RIOHACHA","RIONEGRO","SAHAGUN","SANTA MARTA","SINCELEJO","SOACHA","SOGAMOSO","SOLEDAD","TULUA","TUNJA","TURBO","UBATE","VALLEDUPAR","VILLAVICENCIO","YOPAL","OTRO"];
 
 const up=el=>{el.value=el.value.toUpperCase();return el.value;};
-const genOS=f=>{const[y,m,d]=f.split("-").map(Number);return`OSTY${String(y%100).padStart(2,"0")}${MESES[(m||1)-1]}${String(d).padStart(2,"0")}`;};
+const genOS=(f,cli)=>{const[y,m,d]=f.split("-").map(Number);const base=`OSTY${String(y%100).padStart(2,"0")}${MESES[(m||1)-1]}${String(d).padStart(2,"0")}`;if(!cli||!cli.trim())return base;const nombre=cli.trim().replace(/[^a-zA-ZáéíóúñÁÉÍÓÚÑ\s]/g,'').replace(/\s+/g,' ').trim();return base+' '+nombre;};
 // El número OS se genera desde cargueFecha (fecha del servicio)
-const genOSdisplay=(s)=>genOS(s.cargueFecha||s.fecha);;
+const genOSdisplay=(s)=>genOS(s.cargueFecha||s.fecha,s.cliente);
 const fechaLarga=f=>{if(!f)return"";const[y,m,d]=f.split("-").map(Number);const dt=new Date(Date.UTC(y,(m||1)-1,d||1));return`${DIAS[dt.getUTCDay()]} ${d} de ${MESES_L[(m||1)-1]} de ${y}`;};
 const sumarH=(hhmm,h)=>{if(!hhmm||!/^\d{2}:\d{2}$/.test(hhmm))return"";const[hh,mm]=hhmm.split(":").map(Number);const t=(hh*60+mm+Math.round(h*60))%(24*60);return`${String(Math.floor(t/60)).padStart(2,"0")}:${String(t%60).padStart(2,"0")}`;};
 const fmtCed=s=>{const n=s.replace(/\D/g,"");return n.replace(/\B(?=(\d{3})+(?!\d))/g,".");};
@@ -371,6 +374,7 @@ const syncContacto=()=>{
   state.recogidas.forEach(p=>{p.contacto1=state.cliente;p.telefono1=state.telefono;});
   state.entregas.forEach(p=>{p.contacto1=state.cliente;p.telefono1=state.telefono;});
   renderParadas();
+  if(autoNum)regenOS();
   updateOSDisplay();
 };
 
@@ -387,7 +391,7 @@ const recalcParadas=()=>{
   renderParadas();
 };
 
-const regenOS=()=>{state.numeroOS=genOS(state.cargueFecha||state.fecha);autoNum=true;updateOSDisplay();};
+const regenOS=()=>{state.numeroOS=genOS(state.cargueFecha||state.fecha,state.cliente);autoNum=true;updateOSDisplay();};
 
 // OPERARIOS
 function renderOps(){
@@ -752,8 +756,86 @@ function renderPreview(){
   document.getElementById("pvContent").innerHTML=pvHTML;
 }
 
+// ============ PDF RESUMEN DE EMPAQUE ============
+function pdfEmpaque(){
+  if(typeof window.jspdf==='undefined'){showToast('Espera, librería cargando...',true);setTimeout(pdfEmpaque,1000);return;}
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF();
+  const s=state;
+  const cliente=s.cliente||'—';
+  const fecha=s.cargueFecha||s.fecha||'';
+  const fl=fechaLarga(fecha);
+
+  try{doc.addImage(LOGO_SRC,'JPEG',14,8,40,13);}catch(_){doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(27,62,140);doc.text('Trasteos Ya',14,16);}
+  doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(30,30,30);
+  doc.text('Resumen de Empaque',200,12,{align:'right'});
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(100);
+  doc.text(`OS: ${s.numeroOS||'—'}`,200,18,{align:'right'});
+  doc.text(`Cliente: ${cliente}`,200,24,{align:'right'});
+  doc.text(`Fecha: ${fl||fecha}`,200,30,{align:'right'});
+  doc.setDrawColor(200);doc.line(14,34,200,34);
+  let y=42;
+
+  const materiales=[
+    ['Papel craft',s.empaque?.craft||0],
+    ['Vinipel',s.empaque?.vinipel||0],
+    ['Burbuja',s.empaque?.burbuja||0],
+    ['Cajas',s.empaque?.cajas||0]
+  ];
+  const rows=materiales.filter(m=>m[1]>0).map(m=>[m[0],String(m[1])]);
+  if(!rows.length){
+    doc.setFontSize(11);doc.setTextColor(100);
+    doc.text('No se especificaron materiales de empaque.',14,y);
+  }else{
+    doc.autoTable({
+      startY:y,
+      head:[['Material','Cantidad']],
+      body:rows,
+      theme:'striped',
+      headStyles:{fillColor:[27,62,140],halign:'center',fontStyle:'bold',fontSize:10},
+      columnStyles:{0:{halign:'left',cellWidth:120},1:{halign:'center',cellWidth:50}},
+      bodyStyles:{fontSize:11,cellPadding:5}
+    });
+    y=doc.lastAutoTable.finalY+10;
+  }
+
+  const emps=s.personas?.filter(p=>p.esEmp)||[];
+  if(emps.length){
+    doc.autoTable({
+      startY:y,
+      head:[['#','Cédula','Empacador']],
+      body:emps.map((e,i)=>[String(i+1),e.cedula||'',e.nombre||'']),
+      theme:'striped',
+      headStyles:{fillColor:[75,85,99],fontStyle:'bold',fontSize:10},
+      bodyStyles:{fontSize:10,cellPadding:4},
+      columnStyles:{0:{halign:'center',cellWidth:15},1:{cellWidth:45}}
+    });
+    y=doc.lastAutoTable.finalY+10;
+  }
+
+  if(s.articulos){
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(27,62,140);
+    doc.text('ARTÍCULOS A EMPACAR',14,y);y+=6;
+    doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(50);
+    const lines=doc.splitTextToSize(s.articulos,180);
+    doc.text(lines,14,y);
+  }
+
+  doc.setFontSize(8);doc.setTextColor(150);
+  doc.text('Trasteos Ya · trasteosya.online',105,285,{align:'center'});
+
+  const fn=`empaque_${(s.numeroOS||'OSTY')}.pdf`;
+  const blob=doc.output('blob');
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=fn;
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},1000);
+  showToast('PDF de empaque descargado');
+}
+
 const generarPdf=()=>{
   if(!state.cliente.trim()){showToast("Falta el nombre del cliente.",true);return;}
+  guardarOS();
   setVista("preview");showToast("Usa Imprimir → Guardar como PDF");
   // Backup automatico a Drive (no bloquea)
   setTimeout(()=>backupOrden(),800);
@@ -766,25 +848,35 @@ const generarPdf=()=>{
 const BACKUP_URL='https://script.google.com/macros/s/AKfycbyiiC0VRDbAnmOtznqvgM3NxHdtjdnofPqQENWcCwRJbASHB0RgvzQ-OnEwPWXaT2NpAQ/exec';
 const BACKUP_APIKEY='TrasteosYa-2026-Backup';
 let _backupOrdenLast='';
+async function _enviarDrive(payload){
+  try{
+    const r=await fetch(BACKUP_URL,{method:'POST',body:JSON.stringify(payload),redirect:'follow'});
+    const t=await r.text();
+    try{return JSON.parse(t).success===true;}catch(_){return r.ok;}
+  }catch(_){
+    await fetch(BACKUP_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)});
+    return null;
+  }
+}
 async function backupOrden(){
   try{
     const sigKey=(state.numeroOS||'')+'|'+(state.cliente||'')+'|'+(state.fecha||'');
-    if(sigKey===_backupOrdenLast) return; // evitar duplicados en la misma sesion
+    if(sigKey===_backupOrdenLast) return;
     if(typeof html2canvas==='undefined'||typeof window.jspdf==='undefined'){
       console.warn('Backup: libs no listas, reintento en 1s');
       setTimeout(backupOrden,1000); return;
     }
     const previewEl=document.querySelector('.preview-outer');
-    if(!previewEl) return;
-    // Esconder toolbar antes de capturar
+    if(!previewEl){showToast('Abre Vista Previa para backup',true);return;}
     const tb=previewEl.querySelector('.preview-toolbar');
     const prevDisplay=tb?tb.style.display:'';
     if(tb) tb.style.display='none';
 
-    const canvas=await html2canvas(previewEl,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false});
+    const mob=window.innerWidth<768;
+    const canvas=await html2canvas(previewEl,{scale:mob?1.5:2,backgroundColor:'#ffffff',useCORS:true,logging:false});
     if(tb) tb.style.display=prevDisplay;
 
-    const imgData=canvas.toDataURL('image/jpeg',0.92);
+    const imgData=canvas.toDataURL('image/jpeg',mob?0.85:0.92);
     const {jsPDF}=window.jspdf;
     const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
     const pageW=pdf.internal.pageSize.getWidth();
@@ -800,8 +892,7 @@ async function backupOrden(){
       heightLeft-=pageH;
     }
     const pdf_base64=pdf.output('datauristring').split(',')[1];
-    const clienteShort=(state.cliente||'cliente').slice(0,40).replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ\s-]/g,'').trim().replace(/\s+/g,'-');
-    const filename=`${state.numeroOS||'OSTY'}-${clienteShort}.pdf`;
+    const filename=`${state.numeroOS||'OSTY'}.pdf`;
 
     const payload={
       type:'orden',
@@ -814,11 +905,14 @@ async function backupOrden(){
         placa:state.placa,tipoVehiculo:state.tipoVehiculo
       }
     };
-    await fetch(BACKUP_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)});
+    const ok=await _enviarDrive(payload);
     _backupOrdenLast=sigKey;
-    showToast('OS guardada en Drive ✓');
+    if(ok===true) showToast('OS guardada en Drive ✓');
+    else if(ok===false) showToast('Error guardando en Drive — reintenta',true);
+    else showToast('OS enviada a Drive');
   }catch(e){
     console.error('backupOrden error',e);
+    showToast('Error backup: '+(e.message||'revisa conexion'),true);
   }
 }
 
@@ -832,6 +926,7 @@ async function enviarOSWhatsApp(){
   try{
     if(!state.cliente.trim()){showToast('Falta el nombre del cliente',true);return;}
     if(!state.telefono.trim()){showToast('Falta el WhatsApp del cliente',true);return;}
+    guardarOS();
     if(typeof html2canvas==='undefined'||typeof window.jspdf==='undefined'){
       showToast('Espera, librerias cargando...',true);
       setTimeout(enviarOSWhatsApp,1200); return;
@@ -863,16 +958,18 @@ async function enviarOSWhatsApp(){
       heightLeft-=pageH;
     }
 
-    const clienteShort=(state.cliente||'cliente').slice(0,40).replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ\s-]/g,'').trim().replace(/\s+/g,'-');
-    const filename=`${state.numeroOS||'OSTY'}-${clienteShort}.pdf`;
+    const filename=`${state.numeroOS||'OSTY'}.pdf`;
 
-    // Backup a Drive (silencioso)
+    // Backup a Drive
     try{
       const pdf_base64=pdf.output('datauristring').split(',')[1];
-      fetch(BACKUP_URL,{method:'POST',mode:'no-cors',body:JSON.stringify({
+      _enviarDrive({
         type:'orden',apikey:BACKUP_APIKEY,filename:filename,pdf_base64:pdf_base64,
         meta:{numeroOS:state.numeroOS,cliente:state.cliente,telefono:state.telefono,fecha:state.fecha}
-      })});
+      }).then(function(ok){
+        if(ok===true) showToast('OS guardada en Drive ✓');
+        else if(ok===false) showToast('Error backup Drive',true);
+      });
     }catch(_){}
 
     // Formatear telefono para wa.me (Colombia +57)
@@ -930,11 +1027,88 @@ const printWithColors=()=>{
     </div>`;
   document.body.appendChild(aviso);
 };
+// ============ GUARDAR / CARGAR ÓRDENES ============
+const OS_PREFIX='ty_os_';
+function guardarOS(){
+  try{
+    const key=OS_PREFIX+(state.numeroOS||'temp');
+    const data={...state,_saved:new Date().toISOString()};
+    localStorage.setItem(key,JSON.stringify(data));
+    const idx=JSON.parse(localStorage.getItem('ty_os_index')||'[]');
+    const entry={key:key,os:state.numeroOS,cliente:state.cliente,fecha:state.cargueFecha||state.fecha,saved:data._saved};
+    const existing=idx.findIndex(e=>e.key===key);
+    if(existing>=0)idx[existing]=entry;else idx.unshift(entry);
+    if(idx.length>50)idx.length=50;
+    localStorage.setItem('ty_os_index',JSON.stringify(idx));
+  }catch(e){console.warn('Error guardando OS:',e);}
+}
+function listarOS(){
+  try{return JSON.parse(localStorage.getItem('ty_os_index')||'[]');}catch(_){return[];}
+}
+function cargarOSdesdeStorage(key){
+  try{
+    const raw=localStorage.getItem(key);
+    if(!raw){showToast('No se encontró la orden',true);return;}
+    const saved=JSON.parse(raw);
+    delete saved._saved;
+    Object.assign(state,saved);
+    document.getElementById("cliente").value=state.cliente||"";
+    document.getElementById("telefono").value=state.telefono||"";
+    document.getElementById("fecha").value=state.fecha||"";
+    document.getElementById("cargueFecha").value=state.cargueFecha||"";
+    document.getElementById("cargueHora").value=state.cargueHora||"";
+    document.getElementById("conductor").value=state.conductor||"";
+    document.getElementById("conductorCedula").value=state.conductorCedula||"";
+    document.getElementById("conductorCelular").value=state.conductorCelular||"";
+    document.getElementById("placa").value=state.placa||"";
+    document.getElementById("numOperarios").value=state.numOperarios||0;
+    document.getElementById("tipoVehiculo").value=state.tipoVehiculo||"";
+    document.getElementById("articulos").value=state.articulos||"";
+    document.getElementById("craft").value=state.empaque?.craft||0;
+    document.getElementById("vinipel").value=state.empaque?.vinipel||0;
+    document.getElementById("burbuja").value=state.empaque?.burbuja||0;
+    document.getElementById("cajas").value=state.empaque?.cajas||0;
+    if(state.fotoVehiculo){const fp=document.getElementById("fotoPreview");fp.src=state.fotoVehiculo;fp.style.display="block";document.getElementById("btnQF").style.display="inline-flex";}
+    autoNum=false;
+    updateOSDisplay();renderOps();renderParadas();initSigs();
+    showToast('OS cargada: '+state.numeroOS);
+  }catch(e){showToast('Error cargando orden',true);console.error(e);}
+}
+function cargarOSModal(){
+  const lista=listarOS();
+  if(!lista.length){showToast('No hay órdenes guardadas',true);return;}
+  const existing=document.getElementById('os-load-modal');
+  if(existing)existing.remove();
+  const modal=document.createElement('div');
+  modal.id='os-load-modal';
+  modal.style.cssText='position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px';
+  let rows=lista.map(e=>{
+    const f=e.fecha||'';
+    const s=e.saved?new Date(e.saved).toLocaleDateString('es-CO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+    return`<div onclick="cargarOSdesdeStorage('${e.key}');document.getElementById('os-load-modal').remove()" style="padding:12px 16px;border-bottom:1px solid #eee;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .15s" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
+      <div><div style="font-weight:600;font-size:13px;color:#1B3E8C">${e.os||'—'}</div><div style="font-size:12px;color:#666">${e.cliente||'Sin cliente'} · ${f}</div></div>
+      <div style="font-size:11px;color:#999">${s}</div>
+    </div>`;
+  }).join('');
+  modal.innerHTML=`<div style="background:#fff;border-radius:14px;width:100%;max-width:500px;max-height:80vh;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.2)">
+    <div style="padding:16px 20px;border-bottom:1px solid #e2e5ea;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:700;font-size:15px;color:#1B3E8C">Cargar orden anterior</div>
+      <button onclick="document.getElementById('os-load-modal').remove()" style="border:none;background:none;font-size:20px;cursor:pointer;color:#999;padding:4px">✕</button>
+    </div>
+    <div style="max-height:60vh;overflow-y:auto">${rows}</div>
+    <div style="padding:10px 20px;border-top:1px solid #e2e5ea;text-align:right">
+      <button onclick="if(confirm('¿Borrar todas las órdenes guardadas?')){localStorage.removeItem('ty_os_index');Object.keys(localStorage).filter(k=>k.startsWith('${OS_PREFIX}')).forEach(k=>localStorage.removeItem(k));document.getElementById('os-load-modal').remove();showToast('Historial borrado')}" style="border:1px solid #fecaca;background:#fff;color:#dc2626;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer">Borrar historial</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+}
+
 const handleNueva=()=>{if(!confirm("¿Nueva OS? Se perderá lo no guardado."))return;location.reload();};
 const handleDuplicar=()=>{
   state.cliente="";state.telefono="";
   ["firmaCliente1","firmaCliente2","firmaConductor","firmaBodega"].forEach(k=>state[k]="");
-  state.numeroOS=genOS(state.fecha);
+  state.numeroOS=genOS(state.fecha,"");
   document.getElementById("cliente").value="";
   document.getElementById("telefono").value="";
   document.getElementById("numeroOS").value=state.numeroOS;
