@@ -111,6 +111,11 @@ body.is-operator .drawer .drawer-actions {
     scrollbar-width: none;
   }
   .ty-op-toolbar::-webkit-scrollbar { display: none; }
+  .ty-op-toolbar--hidden {
+    transform: translateY(calc(100% + 20px)) !important;
+    opacity: 0;
+    pointer-events: none;
+  }
   .ty-op-toolbar__badge {
     padding: 4px 8px !important;
     font-size: 9px !important;
@@ -193,6 +198,36 @@ body.is-operator .drawer .drawer-actions {
   white-space: nowrap;
 }
 .ty-op-toolbar__logout:hover { background: #E30613; }
+
+/* Reseña button in toolbar */
+.ty-op-toolbar__resena {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Hidden state — slide down + fade */
+.ty-op-toolbar--hidden {
+  transform: translateX(-50%) translateY(calc(100% + 20px));
+  opacity: 0;
+  pointer-events: none;
+}
+.ty-op-toolbar {
+  transition: transform 0.35s cubic-bezier(0.32, 1, 0.6, 1), opacity 0.25s ease;
+}
+
+/* Trigger zone at bottom edge */
+.ty-op-trigger {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 18px;
+  z-index: 997;
+  /* invisible but catches hover/touch */
+}
 
 /* ---------- Modal PIN ---------- */
 .ty-gate-modal {
