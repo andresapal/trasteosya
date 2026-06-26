@@ -2,26 +2,26 @@
    TRASTEOS YA — Access Gate · estilos
    ============================================ */
 
-/* ---------- Boton candado (esquina sup derecha) ---------- */
+/* ---------- Boton candado (esquina sup derecha, fuera del header) ---------- */
 .ty-lock-btn {
   position: fixed;
-  top: 12px;
-  right: 16px;
-  width: 36px;
-  height: 36px;
+  top: 58px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  border: 1px solid rgba(0,0,0,0.12);
+  border: 1px solid rgba(0,0,0,0.10);
   background: rgba(255,255,255,0.85);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  font-size: 16px;
+  font-size: 13px;
   line-height: 1;
   cursor: pointer;
-  z-index: 999;
+  z-index: 199;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.55;
+  opacity: 0.45;
   transition: all 0.2s ease;
   padding: 0;
 }
@@ -67,17 +67,17 @@ body.is-operator .drawer .drawer-actions {
    - Toolbar mas compacto y arrastrable
    ============================================ */
 @media (max-width: 640px) {
-  /* Candado SIEMPRE visible, top-LEFT discreto (lejos del toggle "Mostrar costos") */
+  /* Candado debajo del header, derecha, discreto */
   .ty-lock-btn {
-    top: 10px !important;
-    left: 8px !important;
-    right: auto !important;
+    top: 54px !important;
+    right: 8px !important;
+    left: auto !important;
     bottom: auto !important;
-    width: 34px !important;
-    height: 34px !important;
-    font-size: 14px !important;
-    opacity: 0.85 !important;
-    z-index: 1100 !important; /* arriba del header sticky */
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 12px !important;
+    opacity: 0.4 !important;
+    z-index: 199 !important;
   }
 
   /* En el cotizador la mobile-bar (Total + WA + PDF) esta fixed bottom: 0.
@@ -115,11 +115,6 @@ body.is-operator .drawer .drawer-actions {
     transform: translateY(calc(100% + 20px)) !important;
     opacity: 0;
     pointer-events: none;
-  }
-  .ty-op-toolbar__badge {
-    padding: 4px 8px !important;
-    font-size: 9px !important;
-    letter-spacing: 0.04em !important;
   }
   .ty-op-toolbar__link {
     padding: 5px 9px !important;
