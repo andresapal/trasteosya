@@ -61,7 +61,7 @@ input[readonly]{background:#f8f9fa;color:#6b7280;cursor:default;border-color:#e9
 .td-sub{background:#f0f2f7;font-weight:700;white-space:nowrap}
 .td-emp{background:#4b5563;color:#fff;font-weight:700}
 @media print{
-  .main-header,.tab-bar,.preview-toolbar,.ty-lock-btn,.ty-op-toolbar,.ty-gate-modal{display:none!important}
+  .main-header,.tab-bar,.preview-toolbar,.ty-lock-btn,.ty-op-toolbar,.ty-gate-modal,.os-route-map{display:none!important}
   .preview-outer{padding:0;max-width:100%}
   .pv{border:none;border-radius:0;padding:0;background:transparent}
   body{background:#fff;margin:0}
@@ -259,6 +259,27 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
       </div>
       <p style="font-size:11px;color:#9ca3af;margin-bottom:10px">Hora entrega = hora cargue +4 h. Fecha entrega editable para destinos nacionales.</p>
       <div id="entContainer"></div>
+    </div>
+  </div>
+
+  <!-- Mapa de ruta (no se imprime en PDF) -->
+  <div class="card os-route-map" id="routeMapCard">
+    <div class="card-header" onclick="toggle('s-map')">
+      <div style="display:flex;align-items:center"><div class="card-icon" style="background:#DBEAFE"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></div><span class="card-title">Mapa de ruta</span></div>
+      <label class="toggle-sw" onclick="event.stopPropagation()">
+        <input type="checkbox" checked onchange="toggleFromSwitch('s-map',this)">
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+    <div id="s-map" class="card-body">
+      <div id="routeMapContainer" style="width:100%;height:320px;border-radius:10px;overflow:hidden;background:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:13px">
+        Ingresa las direcciones de recogida y entrega para ver la ruta
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn" id="btnUpdateMap" onclick="updateRouteMap()" style="font-size:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg> Actualizar mapa</button>
+        <button class="btn" id="btnShareRoute" onclick="shareRoute()" style="font-size:12px;background:#16a34a;border-color:#16a34a;color:#fff"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Enviar ruta al conductor</button>
+        <a id="linkGoogleMaps" href="#" target="_blank" rel="noopener" style="font-size:12px;color:#1B3E8C;text-decoration:none;display:none;align-items:center;gap:4px;padding:6px 12px;border:1px solid rgba(27,62,140,.15);border-radius:8px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Abrir en Google Maps</a>
+      </div>
     </div>
   </div>
 
@@ -775,6 +796,31 @@ function renderPreview(){
 </div>`;
 
   document.getElementById("pvContent").innerHTML=pvHTML;
+}
+
+// ============ MAPA DE RUTA ============
+const GMAPS_KEY='AIzaSyDi9_zgprc277akzYB895fHEWk90QSM5cg';
+function _getRouteAddresses(){
+  const r=state.recogidas[0],e=state.entregas[0];
+  const orig=((r.direccion||'')+', '+(r.ciudad||'BOGOTA')+', Colombia').trim();
+  const dest=((e.direccion||'')+', '+(e.ciudad||'BOGOTA')+', Colombia').trim();
+  return{orig,dest,valid:!!(r.direccion&&e.direccion)};
+}
+function updateRouteMap(){
+  const a=_getRouteAddresses();
+  const c=document.getElementById('routeMapContainer');
+  if(!a.valid){c.innerHTML='<span style="color:#9ca3af;font-size:13px">Ingresa las direcciones de recogida y entrega para ver la ruta</span>';return;}
+  c.innerHTML='<iframe width="100%" height="100%" frameborder="0" style="border:0;border-radius:10px" referrerpolicy="no-referrer-when-downgrade" allowfullscreen src="https://www.google.com/maps/embed/v1/directions?key='+GMAPS_KEY+'&origin='+encodeURIComponent(a.orig)+'&destination='+encodeURIComponent(a.dest)+'&mode=driving"></iframe>';
+  const link=document.getElementById('linkGoogleMaps');
+  link.href='https://www.google.com/maps/dir/'+encodeURIComponent(a.orig)+'/'+encodeURIComponent(a.dest);
+  link.style.display='inline-flex';
+}
+function shareRoute(){
+  const a=_getRouteAddresses();
+  if(!a.valid){showToast('Primero ingresa las direcciones de recogida y entrega',true);return;}
+  const url='https://www.google.com/maps/dir/'+encodeURIComponent(a.orig)+'/'+encodeURIComponent(a.dest);
+  const msg='🚚 *Ruta del servicio*\n\n📍 *Recogida:* '+a.orig+'\n📍 *Entrega:* '+a.dest+'\n\n🗺️ Ver ruta en Google Maps:\n'+url+'\n\n— Trasteos Ya';
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer');
 }
 
 // ============ PDF RESUMEN DE EMPAQUE ============

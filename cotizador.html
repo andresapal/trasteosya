@@ -993,6 +993,64 @@ function sendWA(){
   }
   msg+=`\n\n${OBSERVACIONES}`;
   window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`,"_blank","noopener,noreferrer");
+  // Notificar al operador
+  _notificarCotizacion(lines,subV,dcto,total);
+}
+
+// ============ NOTIFICACIONES AL OPERADOR ============
+const _NOTIFY={
+  TG_TOKEN:'8815751812:AAEGlCiQAZKSamRUfD5r0lmzjLTRAaFcdqw',
+  TG_CHAT:'1081707115',
+  CMB_PHONE:'573143095194',
+  CMB_KEY:'9452184',
+  W3F_KEY:'4955ca45-48c4-4ef2-9c0b-da17741a1d2c',
+  EMAIL_TO:'aaparicio.trasteosyabackup1@gmail.com'
+};
+function _notificarCotizacion(lines,subV,dcto,total){
+  const cliente=document.getElementById("cliente").value.trim()||'-';
+  const tel=document.getElementById("telefono").value.trim()||'-';
+  const fecha=document.getElementById("fecha").value||'-';
+  let resumen='';
+  lines.forEach(function(l){if(!l.noV&&l.v>0)resumen+=`• ${l.l}: ${COP(l.v)}\n`;});
+  const totalFmt=COP(total||subV);
+  // Telegram
+  try{
+    const tg=[
+      '🔔 *Cotización enviada · Cotizador Interactivo*','',
+      '👤 *Cliente:* '+cliente,
+      '📱 *Tel:* '+tel,
+      '📅 *Fecha:* '+fecha,'',
+      '📋 *Detalle:*',resumen,
+      dcto>0?('Descuento: -'+COP(dcto)+'\n*Total: '+totalFmt+'*'):('*Total: '+totalFmt+'*'),'',
+      '⏰ '+new Date().toLocaleString('es-CO'),
+      '🌐 trasteosya.online'
+    ];
+    fetch('https://api.telegram.org/bot'+_NOTIFY.TG_TOKEN+'/sendMessage',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:_NOTIFY.TG_CHAT,text:tg.join('\n'),parse_mode:'Markdown'})
+    }).catch(function(){});
+  }catch(e){}
+  // WhatsApp CallMeBot
+  try{
+    const wa='🔔 Cotización enviada\n👤 '+cliente+'\n📱 '+tel+'\n📅 '+fecha+'\n💰 Total: '+totalFmt+'\n⏰ '+new Date().toLocaleString('es-CO');
+    fetch('https://api.callmebot.com/whatsapp.php?phone='+_NOTIFY.CMB_PHONE+'&text='+encodeURIComponent(wa)+'&apikey='+_NOTIFY.CMB_KEY,{method:'GET',mode:'no-cors'}).catch(function(){});
+  }catch(e){}
+  // Email via Web3Forms
+  try{
+    const fd=new FormData();
+    fd.set('access_key',_NOTIFY.W3F_KEY);
+    fd.set('subject','🔔 Cotización interactiva · '+cliente);
+    fd.set('from_name','Cotizador Trasteos Ya');
+    fd.set('replyto',_NOTIFY.EMAIL_TO);
+    fd.set('Origen','Cotizador interactivo');
+    fd.set('Cliente',cliente);
+    fd.set('Telefono',tel);
+    fd.set('Fecha',fecha);
+    fd.set('Detalle',resumen.replace(/\n/g,', '));
+    fd.set('Total',totalFmt);
+    fd.set('botcheck','');
+    fetch('https://api.web3forms.com/submit',{method:'POST',body:fd}).catch(function(){});
+  }catch(e){}
 }
 
 // ============ BACKUP A GOOGLE DRIVE ============
