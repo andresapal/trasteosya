@@ -27,6 +27,7 @@ label{font-size:11px;font-weight:600;color:#6b7280;letter-spacing:.3px;text-tran
 input,select,textarea{width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid #e2e5ea;font-size:13px;background:#fff;color:#1a1a2e;font-family:inherit;transition:border-color .2s}
 input:focus,select:focus,textarea:focus{outline:none;border-color:#1B3E8C;box-shadow:0 0 0 3px rgba(27,62,140,.08)}
 input[readonly]{background:#f8f9fa;color:#6b7280;cursor:default;border-color:#e9ecef}
+.pac-container{z-index:10000!important;font-family:inherit;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.15);margin-top:2px}
 .input-hint{font-size:10px;color:#9ca3af;margin-top:2px}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
 .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
@@ -97,6 +98,7 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
 <!-- Librerias para backup automatico a Drive (captura preview -> PDF) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDi9_zgprc277akzYB895fHEWk90QSM5cg&libraries=places&loading=async" defer></script>
 </head>
 <body data-gate="admin-only">
 <div id="toast" class="toast"></div>
@@ -161,8 +163,8 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
     </div>
     <div id="s-cli" class="card-body">
       <div class="grid2">
-        <div class="fgroup"><label>Cliente / Contacto *</label><input id="cliente" placeholder="NOMBRE DEL CLIENTE" oninput="st('cliente',up(this));syncContacto()"/></div>
-        <div class="fgroup"><label>Teléfono cliente</label><input id="telefono" placeholder="3XX XXX XXXX" oninput="st('telefono',this.value);syncContacto()"/></div>
+        <div class="fgroup"><label>Cliente / Contacto *</label><input id="cliente" placeholder="NOMBRE DEL CLIENTE" autocomplete="name" style="text-transform:uppercase" oninput="st('cliente',up(this));syncContacto()"/></div>
+        <div class="fgroup"><label>Teléfono cliente</label><input id="telefono" type="tel" placeholder="3XX XXX XXXX" autocomplete="tel" oninput="st('telefono',this.value);syncContacto()"/></div>
       </div>
       <hr class="sep"/>
       <p style="font-size:11px;color:#9ca3af;margin-bottom:10px">Datos TY — predeterminados</p>
@@ -186,7 +188,7 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
     </div>
     <div id="s-veh" class="card-body">
       <div class="grid3">
-        <div class="fgroup"><label>Conductor</label><input id="conductor" placeholder="NOMBRE CONDUCTOR" oninput="st('conductor',up(this))"/></div>
+        <div class="fgroup"><label>Conductor</label><input id="conductor" placeholder="NOMBRE CONDUCTOR" autocomplete="name" style="text-transform:uppercase" oninput="st('conductor',up(this))"/></div>
         <div class="fgroup"><label>Cédula conductor</label><input id="conductorCedula" placeholder="0.000.000.000" oninput="st('conductorCedula',fmtCed(this.value));this.value=state.conductorCedula"/></div>
         <div class="fgroup"><label>Celular conductor</label><input id="conductorCelular" placeholder="300 XXX XXX" oninput="st('conductorCelular',this.value)"/></div>
         <div class="fgroup"><label>Placa</label><input id="placa" placeholder="ABC-123" oninput="st('placa',up(this))"/></div>
@@ -354,7 +356,7 @@ const MESES_L=["enero","febrero","marzo","abril","mayo","junio","julio","agosto"
 const DIAS=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
 const CIUDADES=["BOGOTA","MEDELLIN","BARRANQUILLA","CALI","CHIA","CAJICA","ZIPAQUIRA","MADRID","ARMENIA","BARRANCABERMEJA","BELLO","BUCARAMANGA","BUENAVENTURA","CARTAGENA","CIENAGA","CUCUTA","DUITAMA","ENVIGADO","FACATATIVA","FLORENCIA","FLORIDABLANCA","FUSAGASUGA","GIRARDOT","GIRON","IBAGUE","IPIALES","ITAGUI","LA DORADA","MAICAO","MANIZALES","MELGAR","MONTERIA","MOSQUERA","NEIVA","PALMIRA","PASTO","PEREIRA","PIEDECUESTA","POPAYAN","QUIBDO","RIOHACHA","RIONEGRO","SAHAGUN","SANTA MARTA","SINCELEJO","SOACHA","SOGAMOSO","SOLEDAD","TULUA","TUNJA","TURBO","UBATE","VALLEDUPAR","VILLAVICENCIO","YOPAL","OTRO"];
 
-const up=el=>{el.value=el.value.toUpperCase();return el.value;};
+const up=el=>el.value.toUpperCase();
 const genOS=(f,cli)=>{const[y,m,d]=f.split("-").map(Number);const base=`OSTY${String(y%100).padStart(2,"0")}${MESES[(m||1)-1]}${String(d).padStart(2,"0")}`;if(!cli||!cli.trim())return base;const nombre=cli.trim().replace(/[^a-zA-ZáéíóúñÁÉÍÓÚÑ\s]/g,'').replace(/\s+/g,' ').trim();return base+' '+nombre;};
 // El número OS se genera desde cargueFecha (fecha del servicio)
 const genOSdisplay=(s)=>genOS(s.cargueFecha||s.fecha,s.cliente);
@@ -411,13 +413,40 @@ const updateOSDisplay=()=>{
   const cl=document.getElementById("osClienteDisplay");
   if(cl) cl.textContent=state.cliente?state.cliente:"";
 };
+let _cotSearchTimer=null;
 const syncContacto=()=>{
   state.recogidas.forEach(p=>{p.contacto1=state.cliente;p.telefono1=state.telefono;});
   state.entregas.forEach(p=>{p.contacto1=state.cliente;p.telefono1=state.telefono;});
   renderParadas();
   if(autoNum)regenOS();
   updateOSDisplay();
+  clearTimeout(_cotSearchTimer);
+  _cotSearchTimer=setTimeout(buscarCotPorCliente,800);
 };
+function buscarCotPorCliente(){
+  const nombre=(state.cliente||'').trim().toUpperCase();
+  if(nombre.length<4)return;
+  try{
+    const cache=JSON.parse(localStorage.getItem('ty_cot_cache')||'[]');
+    const match=cache.find(function(e){return e.cliente===nombre;});
+    if(!match||!match.empaque)return;
+    const emp=match.empaque;
+    if(!emp.craft&&!emp.vinipel&&!emp.burbuja&&!emp.cajas)return;
+    const fecha=match.fecha||'';
+    const msg='Se encontró una cotización de empaque para "'+nombre+'"'+(fecha?' ('+fecha+')':'')+'\n\nCraft: '+emp.craft+' · Vinipel: '+emp.vinipel+' · Burbuja: '+emp.burbuja+' · Cajas: '+emp.cajas+'\n\n¿Cargar estos datos de empaque?';
+    if(!confirm(msg))return;
+    state.empaque={craft:emp.craft,vinipel:emp.vinipel,burbuja:emp.burbuja,cajas:emp.cajas};
+    document.getElementById('craft').value=emp.craft;
+    document.getElementById('vinipel').value=emp.vinipel;
+    document.getElementById('burbuja').value=emp.burbuja;
+    document.getElementById('cajas').value=emp.cajas;
+    if(match.telefono&&!state.telefono){
+      state.telefono=match.telefono;
+      document.getElementById('telefono').value=match.telefono;
+    }
+    showToast('Empaque cargado desde cotización');
+  }catch(e){}
+}
 
 // CORREGIDO: fecha entrega siempre sigue a fecha recogida salvo que el usuario la haya cambiado manualmente
 const recalcParadas=()=>{
@@ -479,12 +508,12 @@ const renderParada=(p,i,kind,multi)=>{
         ${isEnt?'<div class="input-hint">Editar para destinos nacionales</div>':""}
       </div>
       <div class="fgroup"><label>Hora ${isEnt?"Est.":""}</label><input type="time" value="${p.hora}" oninput="updP('${kind}','${p.id}','hora',this.value)"/></div>
-      <div class="fgroup col-full"><label>Dirección</label><textarea rows="2" style="text-transform:uppercase;resize:vertical" oninput="updP('${kind}','${p.id}','direccion',this.value.toUpperCase())">${p.direccion}</textarea></div>
-      <div class="fgroup"><label>Contacto 1</label><input value="${p.contacto1}" style="text-transform:uppercase" oninput="updP('${kind}','${p.id}','contacto1',this.value.toUpperCase())"/></div>
-      <div class="fgroup"><label>Teléfono 1</label><input value="${p.telefono1}" oninput="updP('${kind}','${p.id}','telefono1',this.value)"/></div>
-      <div class="fgroup"><label>Email</label><input value="${p.email}" oninput="updP('${kind}','${p.id}','email',this.value)"/></div>
-      <div class="fgroup"><label>Contacto 2</label><input value="${p.contacto2}" style="text-transform:uppercase" oninput="updP('${kind}','${p.id}','contacto2',this.value.toUpperCase())"/></div>
-      <div class="fgroup"><label>Teléfono 2</label><input value="${p.telefono2}" oninput="updP('${kind}','${p.id}','telefono2',this.value)"/></div>
+      <div class="fgroup col-full"><label>${isEnt?'Dirección Destino':'Dirección Origen'}</label><input id="dir-${kind}-${p.id}" class="places-ac" data-kind="${kind}" data-pid="${p.id}" value="${p.direccion}" style="text-transform:uppercase" autocomplete="off" placeholder="${isEnt?'Escribe dirección destino...':'Escribe dirección origen...'}" oninput="updP('${kind}','${p.id}','direccion',this.value.toUpperCase())"/></div>
+      <div class="fgroup"><label>Contacto 1</label><input value="${p.contacto1}" style="text-transform:uppercase" autocomplete="name" oninput="updP('${kind}','${p.id}','contacto1',this.value.toUpperCase())"/></div>
+      <div class="fgroup"><label>Teléfono 1</label><input value="${p.telefono1}" type="tel" autocomplete="tel" oninput="updP('${kind}','${p.id}','telefono1',this.value)"/></div>
+      <div class="fgroup"><label>Email</label><input value="${p.email}" type="email" autocomplete="email" oninput="updP('${kind}','${p.id}','email',this.value)"/></div>
+      <div class="fgroup"><label>Contacto 2</label><input value="${p.contacto2}" style="text-transform:uppercase" autocomplete="name" oninput="updP('${kind}','${p.id}','contacto2',this.value.toUpperCase())"/></div>
+      <div class="fgroup"><label>Teléfono 2</label><input value="${p.telefono2}" type="tel" autocomplete="tel" oninput="updP('${kind}','${p.id}','telefono2',this.value)"/></div>
     </div>
     ${multi?`<div style="text-align:right;margin-top:8px"><button class="btn-sm btn-danger-sm" onclick="delP('${kind}','${p.id}')">✕ Quitar</button></div>`:""}
   </div>`;
@@ -493,6 +522,7 @@ const renderParada=(p,i,kind,multi)=>{
 const renderParadas=()=>{
   document.getElementById("recContainer").innerHTML=state.recogidas.map((p,i)=>renderParada(p,i,"rec",state.recogidas.length>1)).join("");
   document.getElementById("entContainer").innerHTML=state.entregas.map((p,i)=>renderParada(p,i,"ent",state.entregas.length>1)).join("");
+  setTimeout(applyPlacesAC,100);
 };
 const updP=(kind,id,field,val)=>{
   const arr=kind==="rec"?"recogidas":"entregas";
@@ -823,6 +853,31 @@ function shareRoute(){
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer');
 }
 
+// ============ GOOGLE PLACES AUTOCOMPLETE ============
+function applyPlacesAC(){
+  if(!window.google||!window.google.maps||!window.google.maps.places)return;
+  document.querySelectorAll('.places-ac').forEach(function(el){
+    if(el._acDone)return;
+    el._acDone=true;
+    var ac=new google.maps.places.Autocomplete(el,{
+      componentRestrictions:{country:'co'},
+      fields:['formatted_address','geometry'],
+      types:['address']
+    });
+    ac.addListener('place_changed',function(){
+      var place=ac.getPlace();
+      if(!place||!place.formatted_address)return;
+      var addr=place.formatted_address.toUpperCase();
+      el.value=addr;
+      el.style.textTransform='uppercase';
+      var kind=el.dataset.kind;
+      var pid=el.dataset.pid;
+      updP(kind,pid,'direccion',addr);
+      updateRouteMap();
+    });
+  });
+}
+
 // ============ PDF RESUMEN DE EMPAQUE ============
 function pdfEmpaque(){
   if(typeof window.jspdf==='undefined'){showToast('Espera, librería cargando...',true);setTimeout(pdfEmpaque,1000);return;}
@@ -1124,7 +1179,19 @@ function guardarOS(){
     if(existing>=0)idx[existing]=entry;else idx.unshift(entry);
     if(idx.length>50)idx.length=50;
     localStorage.setItem('ty_os_index',JSON.stringify(idx));
+    exportarOSjson(data);
   }catch(e){console.warn('Error guardando OS:',e);}
+}
+function exportarOSjson(data){
+  try{
+    const nombre='OS-'+(state.numeroOS||'temp').replace(/[^a-zA-Z0-9-]/g,'')+'.json';
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=nombre;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }catch(e){}
 }
 function listarOS(){
   try{return JSON.parse(localStorage.getItem('ty_os_index')||'[]');}catch(_){return[];}
@@ -1159,33 +1226,46 @@ function cargarOSdesdeStorage(key){
   }catch(e){showToast('Error cargando orden',true);console.error(e);}
 }
 function cargarOSModal(){
-  const lista=listarOS();
-  if(!lista.length){showToast('No hay órdenes guardadas',true);return;}
-  const existing=document.getElementById('os-load-modal');
-  if(existing)existing.remove();
-  const modal=document.createElement('div');
-  modal.id='os-load-modal';
-  modal.style.cssText='position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px';
-  let rows=lista.map(e=>{
-    const f=e.fecha||'';
-    const s=e.saved?new Date(e.saved).toLocaleDateString('es-CO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
-    return`<div onclick="cargarOSdesdeStorage('${e.key}');document.getElementById('os-load-modal').remove()" style="padding:12px 16px;border-bottom:1px solid #eee;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .15s" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
-      <div><div style="font-weight:600;font-size:13px;color:#1B3E8C">${e.os||'—'}</div><div style="font-size:12px;color:#666">${e.cliente||'Sin cliente'} · ${f}</div></div>
-      <div style="font-size:11px;color:#999">${s}</div>
-    </div>`;
-  }).join('');
-  modal.innerHTML=`<div style="background:#fff;border-radius:14px;width:100%;max-width:500px;max-height:80vh;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.2)">
-    <div style="padding:16px 20px;border-bottom:1px solid #e2e5ea;display:flex;justify-content:space-between;align-items:center">
-      <div style="font-weight:700;font-size:15px;color:#1B3E8C">Cargar orden anterior</div>
-      <button onclick="document.getElementById('os-load-modal').remove()" style="border:none;background:none;font-size:20px;cursor:pointer;color:#999;padding:4px">✕</button>
-    </div>
-    <div style="max-height:60vh;overflow-y:auto">${rows}</div>
-    <div style="padding:10px 20px;border-top:1px solid #e2e5ea;text-align:right">
-      <button onclick="if(confirm('¿Borrar todas las órdenes guardadas?')){localStorage.removeItem('ty_os_index');Object.keys(localStorage).filter(k=>k.startsWith('${OS_PREFIX}')).forEach(k=>localStorage.removeItem(k));document.getElementById('os-load-modal').remove();showToast('Historial borrado')}" style="border:1px solid #fecaca;background:#fff;color:#dc2626;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer">Borrar historial</button>
-    </div>
-  </div>`;
-  document.body.appendChild(modal);
-  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+  const inp=document.createElement('input');
+  inp.type='file';
+  inp.accept='.json,application/json';
+  inp.style.display='none';
+  inp.onchange=function(){
+    const f=inp.files[0];
+    if(!f)return;
+    const reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        const saved=JSON.parse(e.target.result);
+        delete saved._saved;
+        Object.assign(state,saved);
+        document.getElementById("cliente").value=state.cliente||"";
+        document.getElementById("telefono").value=state.telefono||"";
+        document.getElementById("fecha").value=state.fecha||"";
+        document.getElementById("cargueFecha").value=state.cargueFecha||"";
+        document.getElementById("cargueHora").value=state.cargueHora||"";
+        document.getElementById("conductor").value=state.conductor||"";
+        document.getElementById("conductorCedula").value=state.conductorCedula||"";
+        document.getElementById("conductorCelular").value=state.conductorCelular||"";
+        document.getElementById("placa").value=state.placa||"";
+        document.getElementById("numOperarios").value=state.numOperarios||0;
+        document.getElementById("tipoVehiculo").value=state.tipoVehiculo||"";
+        document.getElementById("articulos").value=state.articulos||"";
+        document.getElementById("craft").value=state.empaque?.craft||0;
+        document.getElementById("vinipel").value=state.empaque?.vinipel||0;
+        document.getElementById("burbuja").value=state.empaque?.burbuja||0;
+        document.getElementById("cajas").value=state.empaque?.cajas||0;
+        if(state.fotoVehiculo){const fp=document.getElementById("fotoPreview");fp.src=state.fotoVehiculo;fp.style.display="block";document.getElementById("btnQF").style.display="inline-flex";}
+        autoNum=false;
+        updateOSDisplay();renderOps();renderParadas();initSigs();
+        showToast('OS cargada: '+(state.numeroOS||f.name));
+      }catch(err){showToast('Archivo no válido. Usa un archivo .json de OS',true);console.error(err);}
+    };
+    reader.readAsText(f);
+    inp.remove();
+  };
+  document.body.appendChild(inp);
+  inp.click();
 }
 
 const handleNueva=()=>{if(!confirm("¿Nueva OS? Se perderá lo no guardado."))return;location.reload();};
