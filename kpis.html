@@ -36,11 +36,12 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 
 /* KPI Cards — premium glass */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px}
-.kpi-card{background:var(--ty-card);backdrop-filter:blur(12px);border-radius:var(--radius);border:1px solid var(--ty-border);padding:20px 22px;box-shadow:0 2px 12px rgba(27,62,140,.06),inset 0 1px 0 rgba(255,255,255,.8);position:relative;overflow:hidden;animation:kpi-fade-in .6s ease both}
-.kpi-card:nth-child(1){animation-delay:.05s}.kpi-card:nth-child(2){animation-delay:.12s}.kpi-card:nth-child(3){animation-delay:.19s}.kpi-card:nth-child(4){animation-delay:.26s}.kpi-card:nth-child(5){animation-delay:.33s}
-@keyframes kpi-fade-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.kpi-card{background:var(--ty-card);backdrop-filter:blur(12px);border-radius:var(--radius);border:1px solid var(--ty-border);padding:20px 22px;box-shadow:0 2px 12px rgba(27,62,140,.06),inset 0 1px 0 rgba(255,255,255,.8);position:relative;overflow:hidden;opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
+.kpi-card.in-view{opacity:1;transform:translateY(0)}
+.kpi-card:nth-child(2){transition-delay:.07s}.kpi-card:nth-child(3){transition-delay:.14s}.kpi-card:nth-child(4){transition-delay:.21s}.kpi-card:nth-child(5){transition-delay:.28s}
 .kpi-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;border-radius:4px 0 0 4px}
-.kpi-card::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:var(--shine);animation:kpi-shine 3s ease-in-out infinite;pointer-events:none}
+.kpi-card::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:var(--shine);pointer-events:none}
+.kpi-card.in-view::after{animation:kpi-shine 3s ease-in-out .3s 1;pointer-events:none}
 @keyframes kpi-shine{0%,100%{left:-100%}50%{left:100%}}
 .kpi-card.c-blue::before{background:linear-gradient(180deg,#1B3E8C,#4a7cf5)}
 .kpi-card.c-green::before{background:linear-gradient(180deg,#15803d,#34d399)}
@@ -57,7 +58,8 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
 .chart-full{grid-column:1/-1}
 .chart-third{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
-.chart-box{background:var(--ty-card);backdrop-filter:blur(12px);border-radius:var(--radius);border:1px solid var(--ty-border);padding:20px 22px;box-shadow:0 2px 12px rgba(27,62,140,.05),inset 0 1px 0 rgba(255,255,255,.8);animation:kpi-fade-in .5s ease both}
+.chart-box{background:var(--ty-card);backdrop-filter:blur(12px);border-radius:var(--radius);border:1px solid var(--ty-border);padding:20px 22px;box-shadow:0 2px 12px rgba(27,62,140,.05),inset 0 1px 0 rgba(255,255,255,.8);opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.chart-box.in-view{opacity:1;transform:translateY(0)}
 .chart-box h3{font-size:13px;font-weight:700;color:var(--ty-dark);margin-bottom:14px;display:flex;align-items:center;gap:6px}
 .chart-box h3 .tag{font-size:10px;background:rgba(27,62,140,.06);padding:3px 10px;border-radius:10px;color:var(--ty-muted);font-weight:600}
 
@@ -93,14 +95,25 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 @media(max-width:900px){
   .chart-grid,.chart-third{grid-template-columns:1fr}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
-  .filters{flex-direction:column}
 }
-@media(max-width:500px){
-  .kpi-grid{grid-template-columns:1fr}
-  .header h1{font-size:14px}
+@media(max-width:640px){
+  .filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}
+  .filter-group select,.filter-group input{width:100%;font-size:13px;padding:8px 10px}
+  .filter-group label{font-size:9px}
+  .btn-filter,.btn-clear{width:100%;height:36px;font-size:13px}
+  .kpi-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .kpi-card{padding:14px 16px}
+  .kpi-card .kpi-value{font-size:24px}
+  .kpi-card .kpi-label{font-size:9px}
+  .kpi-card .kpi-sub{font-size:10px}
+  .header{padding:8px 14px}
+  .header img{height:36px}
+  .header h1{font-size:14px;margin-left:8px}
+  .header-nav a{font-size:11px;padding:5px 10px}
+  .container{padding:12px 10px 80px}
 }
 </style>
-<link rel="stylesheet" href="css/access-gate.css?v=2"/>
+<link rel="stylesheet" href="css/access-gate.css?v=3"/>
 </head>
 <body data-gate="admin-only">
 
@@ -516,7 +529,6 @@ function renderDashboard(orders,allOrders){
     +'<div class="kpi-card c-teal"><div class="kpi-label">Con empaque</div><div class="kpi-value"><span class="kpi-counter" data-target="'+conEmpaque+'">0</span></div><div class="kpi-sub">'+(total?Math.round(conEmpaque/total*100):0)+'% de los servicios</div></div>'
     +'<div class="kpi-card c-red"><div class="kpi-label">Promedio operarios</div><div class="kpi-value"><span class="kpi-counter" data-target="'+avgOps+'" data-decimal="1">0</span></div><div class="kpi-sub">por servicio</div></div>';
   document.getElementById('kpi-cards').innerHTML=cardsHTML;
-  animateCounters();
 
   // === Funnel ===
   var totalCot=allOrders.length;
@@ -541,7 +553,6 @@ function renderDashboard(orders,allOrders){
       +'</div>';
   }
   document.getElementById('funnel').innerHTML=funnelHTML;
-  animateFunnelBars();
 
   // === Servicios por mes (line) ===
   var monthVals=monthKeys.map(function(k){return months[k]||0;});
@@ -696,38 +707,84 @@ function renderDashboard(orders,allOrders){
     data:{labels:dailyLabels,datasets:[{label:'Servicios',data:last30.map(function(k){return dailyCount[k];}),borderColor:COLORS.red,backgroundColor:'rgba(227,6,19,.06)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#fff',pointBorderColor:COLORS.red,pointBorderWidth:2,borderWidth:2.5}]},
     options:{responsive:true,animation:lineAnim,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}
   });
+
+  // Re-observe new elements for viewport animation
+  if(window._kpiObserve) setTimeout(window._kpiObserve,50);
 }
 
-// Counter animation: numbers accelerate from 0 to target
+// Counter animation: numbers accelerate from 0 to target (triggered by IO)
+function animateCounter(el){
+  if(el.dataset.animated)return;
+  el.dataset.animated='1';
+  var target=parseFloat(el.dataset.target)||0;
+  var decimals=parseInt(el.dataset.decimal)||0;
+  var prefix=el.dataset.prefix||'';
+  var isMoney=el.dataset.format==='money';
+  var duration=1200;
+  var start=performance.now();
+  function step(now){
+    var t=Math.min((now-start)/duration,1);
+    var ease=1-Math.pow(1-t,3);
+    var val=ease*target;
+    if(isMoney)el.textContent=prefix+String(Math.round(val)).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+    else if(decimals)el.textContent=prefix+val.toFixed(decimals);
+    else el.textContent=prefix+Math.round(val);
+    if(t<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
 function animateCounters(){
-  document.querySelectorAll('.kpi-counter').forEach(function(el){
-    var target=parseFloat(el.dataset.target)||0;
-    var decimals=parseInt(el.dataset.decimal)||0;
-    var prefix=el.dataset.prefix||'';
-    var isMoney=el.dataset.format==='money';
-    var duration=1200;
-    var start=performance.now();
-    function step(now){
-      var t=Math.min((now-start)/duration,1);
-      var ease=1-Math.pow(1-t,3); // easeOutCubic
-      var val=ease*target;
-      if(isMoney)el.textContent=prefix+String(Math.round(val)).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
-      else if(decimals)el.textContent=prefix+val.toFixed(decimals);
-      else el.textContent=prefix+Math.round(val);
-      if(t<1)requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  });
+  document.querySelectorAll('.kpi-counter').forEach(animateCounter);
 }
 
-// Funnel bar animation: start at 0 width
+// Funnel bar animation: start at 0 width (triggered by IO)
 function animateFunnelBars(){
   document.querySelectorAll('.funnel-bar').forEach(function(bar,i){
+    if(bar.dataset.animated)return;
+    bar.dataset.animated='1';
     var targetW=bar.style.width;
     bar.style.width='0%';
     setTimeout(function(){bar.style.width=targetW;},100+i*150);
   });
 }
+
+// IntersectionObserver: animate elements when they enter viewport
+(function(){
+  function onVisible(el){
+    el.classList.add('in-view');
+    el.querySelectorAll('.kpi-counter').forEach(animateCounter);
+    if(el.id==='funnel-box') setTimeout(animateFunnelBars,200);
+  }
+  var hasIO=typeof IntersectionObserver!=='undefined';
+  var io;
+  if(hasIO){
+    io=window._kpiIO=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(!e.isIntersecting)return;
+        onVisible(e.target);
+        io.unobserve(e.target);
+      });
+    },{threshold:0.12,rootMargin:'0px'});
+  }
+  window._kpiObserve=function(){
+    var els=document.querySelectorAll('.kpi-card,.chart-box');
+    if(io){
+      els.forEach(function(el){
+        if(!el.classList.contains('in-view'))io.observe(el);
+      });
+      // Fallback: if IO hasn't fired after 2s (sandbox/iframe), force-show
+      setTimeout(function(){
+        els.forEach(function(el){
+          if(!el.classList.contains('in-view'))onVisible(el);
+        });
+      },2000);
+    }else{
+      els.forEach(onVisible);
+    }
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',window._kpiObserve);
+  else setTimeout(window._kpiObserve,100);
+})();
 
 // Init: cargar servicios.json + localStorage + Drive
 (async function(){
@@ -752,6 +809,6 @@ function animateFunnelBars(){
 })();
 </script>
 <script src="js/swipe-nav.js"></script>
-<script src="js/access-gate.js?v=2"></script>
+<script src="js/access-gate.js?v=3"></script>
 </body>
 </html>
