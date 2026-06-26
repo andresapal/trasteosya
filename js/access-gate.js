@@ -121,12 +121,13 @@
     if (!isOperator()) return;
     if (document.querySelector('.ty-op-toolbar')) return;
     const bar = document.createElement('div');
-    bar.className = 'ty-op-toolbar';
+    bar.className = 'ty-op-toolbar ty-op-toolbar--hidden';
     bar.innerHTML =
-      '<span class="ty-op-toolbar__badge">MODO OPERADOR</span>' +
       '<a href="cotizador.html" class="ty-op-toolbar__link">Cotizador</a>' +
       '<a href="orden-servicio.html" class="ty-op-toolbar__link">Orden de servicio</a>' +
       '<a href="kpis.html" class="ty-op-toolbar__link">KPI\'s</a>' +
+      '<a href="servicios.html" class="ty-op-toolbar__link">Servicios</a>' +
+      '<button type="button" class="ty-op-toolbar__link ty-op-toolbar__resena" onclick="if(typeof pedirResena===\'function\')pedirResena();else alert(\'Abre una Orden de Servicio primero\')">Reseña</button>' +
       '<button type="button" class="ty-op-toolbar__logout">Salir</button>';
     document.body.appendChild(bar);
     bar.querySelector('.ty-op-toolbar__logout').onclick = function () {
@@ -135,6 +136,31 @@
         location.reload();
       }
     };
+
+    // Trigger zone: show toolbar when cursor/finger near bottom edge
+    const trigger = document.createElement('div');
+    trigger.className = 'ty-op-trigger';
+    document.body.appendChild(trigger);
+    trigger.addEventListener('mouseenter', function () { bar.classList.remove('ty-op-toolbar--hidden'); });
+    bar.addEventListener('mouseleave', function (e) {
+      if (!bar.contains(e.relatedTarget) && e.relatedTarget !== trigger) {
+        bar.classList.add('ty-op-toolbar--hidden');
+      }
+    });
+    // Mobile: tap trigger zone to toggle
+    trigger.addEventListener('touchstart', function (e) {
+      e.preventDefault();
+      bar.classList.toggle('ty-op-toolbar--hidden');
+    }, { passive: false });
+    // Also show/hide on swipe up from bottom
+    let touchStartY = 0;
+    document.addEventListener('touchstart', function (e) { touchStartY = e.touches[0].clientY; }, { passive: true });
+    document.addEventListener('touchend', function (e) {
+      const dy = touchStartY - e.changedTouches[0].clientY;
+      const fromBottom = window.innerHeight - touchStartY;
+      if (dy > 40 && fromBottom < 80) bar.classList.remove('ty-op-toolbar--hidden');
+      else if (dy < -40 && !bar.contains(e.target)) bar.classList.add('ty-op-toolbar--hidden');
+    }, { passive: true });
   }
 
   // ============ INIT ============
