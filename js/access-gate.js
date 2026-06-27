@@ -104,9 +104,9 @@
     }
     btn.onclick = function () {
       if (isOperator()) {
-        if (confirm('¿Cerrar sesión operador? Volverás al modo público.')) {
+        if (confirm('¿Cerrar sesión operador? Volverás al inicio.')) {
           setOperator(false);
-          location.reload();
+          location.href = 'index.html';
         }
       } else {
         showPinModal();
