@@ -62,8 +62,7 @@ input[readonly]{background:#f8f9fa;color:#6b7280;cursor:default;border-color:#e9
 .td-sub{background:#f0f2f7;font-weight:700;white-space:nowrap}
 .td-emp{background:#4b5563;color:#fff;font-weight:700}
 @media print{
-  .main-header,.tab-bar,.preview-toolbar,.ty-lock-btn,.ty-op-toolbar,.ty-gate-modal,.os-route-map,.os-bottom-panel{display:none!important}
-  div[style*="position:fixed"][style*="border-radius:10px"]{display:none!important}
+  .main-header,.tab-bar,.preview-toolbar,.ty-lock-btn,.ty-op-toolbar,.ty-gate-modal,.os-route-map,.os-bottom-panel,.swipe-nav-dots,.ty-op-trigger{display:none!important}
   .preview-outer{padding:0;max-width:100%}
   .pv{border:none;border-radius:0;padding:0;background:transparent}
   body{background:#fff;margin:0}
@@ -715,8 +714,9 @@ function renderPreview(){
 #osty-carta .gap{margin-bottom:3px}
 @page{size:letter portrait;margin:12mm 12mm 12mm 12mm}
 @media print{
-  body,html{margin:0;padding:0;background:#fff}
+  body,html{margin:0;padding:0;background:#fff;min-height:0}
   #osty-carta{width:186mm;margin:0 auto;padding:0}
+  #view-form,.swipe-nav-dots,.ty-lock-btn,.ty-op-toolbar,.ty-op-trigger{display:none!important}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
 </style>
