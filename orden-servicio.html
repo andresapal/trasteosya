@@ -62,7 +62,8 @@ input[readonly]{background:#f8f9fa;color:#6b7280;cursor:default;border-color:#e9
 .td-sub{background:#f0f2f7;font-weight:700;white-space:nowrap}
 .td-emp{background:#4b5563;color:#fff;font-weight:700}
 @media print{
-  .main-header,.tab-bar,.preview-toolbar,.ty-lock-btn,.ty-op-toolbar,.ty-gate-modal,.os-route-map{display:none!important}
+  .main-header,.tab-bar,.preview-toolbar,.ty-lock-btn,.ty-op-toolbar,.ty-gate-modal,.os-route-map,.os-bottom-panel{display:none!important}
+  div[style*="position:fixed"][style*="border-radius:10px"]{display:none!important}
   .preview-outer{padding:0;max-width:100%}
   .pv{border:none;border-radius:0;padding:0;background:transparent}
   body{background:#fff;margin:0}
@@ -344,6 +345,7 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
     <div class="preview-toolbar">
       <button class="btn" onclick="setVista('form')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Editar</button>
       <button class="btn btn-primary" onclick="printWithColors()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Imprimir / PDF</button>
+      <button class="btn" onclick="pdfEmpaque()" style="background:#0d9488;border-color:#0d9488;color:#fff"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l10 6.5v7L12 22 2 15.5v-7L12 2z"/><path d="M12 22V9"/><path d="M2 8.5l10 6.5 10-6.5"/></svg> PDF Empaque</button>
       <button class="btn" style="background:#25D366;color:#fff" onclick="enviarOSWhatsApp()"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1 2.9 1.2 3.1c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.5-.3Z"/><path d="M20 4.9A10 10 0 0 0 12 2 10 10 0 0 0 3.1 17l-1.1 4.1 4.2-1.1A10 10 0 0 0 12 22a10 10 0 0 0 8-15.1Z"/></svg> Enviar al cliente</button>
     </div>
     <div class="pv" id="pvContent"></div>
@@ -572,7 +574,7 @@ const setVista=v=>{
   document.getElementById("view-preview").style.display=v==="preview"?"block":"none";
   document.getElementById("tab-form").className="tab"+(v==="form"?" active":"");
   document.getElementById("tab-prev").className="tab"+(v==="preview"?" active":"");
-  if(v==="preview")renderPreview();
+  if(v==="preview"){renderPreview();window.scrollTo(0,0);}
 };
 
 // helpers PDF
@@ -1343,35 +1345,12 @@ window.onload=()=>{
   };
 })();
 </script>
-<!-- Bottom action panel: PDF / Empaque -->
-<div class="os-bottom-panel" id="os-bottom-panel">
-  <div class="os-bottom-drawer" id="os-bottom-drawer">
-    <button class="btn btn-primary" onclick="generarPdf()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Descargar PDF</button>
-    <button class="btn" onclick="pdfEmpaque()" style="background:#0d9488;border-color:#0d9488;color:#fff"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l10 6.5v7L12 22 2 15.5v-7L12 2z"/><path d="M12 22V9"/><path d="M2 8.5l10 6.5 10-6.5"/></svg> PDF Empaque</button>
-  </div>
-  <div class="os-bottom-bar" onclick="document.getElementById('os-bottom-panel').classList.toggle('expanded')">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    <span class="os-bar-label">PDF · toca para ver opciones</span>
-    <svg class="os-bar-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform .25s"><polyline points="18 15 12 9 6 15"/></svg>
-  </div>
-</div>
 <script>
 // Close dropdown on outside click
 document.addEventListener('click',function(e){
   var dd=document.getElementById('os-dropdown');
   if(dd&&!dd.contains(e.target))dd.classList.remove('open');
 });
-// Ensure bottom panel doesn't overlap with operator toolbar
-(function(){
-  var obs=new MutationObserver(function(){
-    var panel=document.getElementById('os-bottom-panel');
-    var toolbar=document.querySelector('.ty-op-toolbar');
-    if(panel&&toolbar&&!toolbar.classList.contains('ty-op-toolbar--hidden')){
-      panel.style.bottom='60px';
-    }else if(panel){panel.style.bottom='0';}
-  });
-  obs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
-})();
 </script>
 <script src="js/swipe-nav.js"></script>
 <script src="js/access-gate.js?v=3"></script></body>
