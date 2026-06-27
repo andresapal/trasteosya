@@ -34,9 +34,9 @@
   }
 
   document.addEventListener('DOMContentLoaded',function(){
-    var hasBottomBar=!!document.querySelector('.os-bottom-panel');
     var nav=document.createElement('div');
-    nav.style.cssText='position:fixed;bottom:'+(hasBottomBar?'52px':'4px')+';left:50%;transform:translateX(-50%);z-index:196;display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:10px;background:rgba(0,0,0,.06)';
+    nav.className='swipe-nav-dots';
+    nav.style.cssText='position:fixed;bottom:4px;left:50%;transform:translateX(-50%);z-index:196;display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:10px;background:rgba(0,0,0,.06)';
 
     if(currentIdx>0){
       var prev=document.createElement('div');
