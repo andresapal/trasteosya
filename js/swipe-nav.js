@@ -3,7 +3,8 @@
   var pages=[
     {path:'/cotizador.html',label:'Cotizador'},
     {path:'/orden-servicio.html',label:'Orden de Servicio'},
-    {path:'/kpis.html',label:'KPIs'},
+    {path:'/kpis.html',label:'KPI General'},
+    {path:'/kpi-empresa.html',label:'KPI Empresa'},
     {path:'/servicios.html',label:'Servicios'}
   ];
 

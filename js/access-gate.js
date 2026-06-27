@@ -163,7 +163,8 @@
     bar.innerHTML =
       '<a href="cotizador.html" class="ty-op-toolbar__link">Cotizador</a>' +
       '<a href="orden-servicio.html" class="ty-op-toolbar__link">Orden de servicio</a>' +
-      '<a href="kpis.html" class="ty-op-toolbar__link">KPI\'s</a>' +
+      '<a href="kpis.html" class="ty-op-toolbar__link">KPI General</a>' +
+      '<a href="kpi-empresa.html" class="ty-op-toolbar__link">KPI Empresa</a>' +
       '<a href="servicios.html" class="ty-op-toolbar__link">Servicios</a>' +
       '<button type="button" class="ty-op-toolbar__link ty-op-toolbar__resena" onclick="resenaStandalone()">Reseña</button>' +
       '<button type="button" class="ty-op-toolbar__logout">Salir</button>';
