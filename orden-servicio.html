@@ -1192,7 +1192,6 @@ function guardarOS(){
     if(existing>=0)idx[existing]=entry;else idx.unshift(entry);
     if(idx.length>50)idx.length=50;
     localStorage.setItem('ty_os_index',JSON.stringify(idx));
-    exportarOSjson(data);
   }catch(e){console.warn('Error guardando OS:',e);}
 }
 function exportarOSjson(data){
