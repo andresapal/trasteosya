@@ -121,6 +121,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  overscroll-behavior-x: none;
   font-feature-settings: 'ss01', 'cv11';
 }
 
