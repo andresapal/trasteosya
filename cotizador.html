@@ -208,7 +208,7 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
       </div>
       <div class="card-body always-show">
         <div class="grid2">
-          <div class="field"><label>Nombre del cliente</label><input id="cliente" placeholder="Ej: Juan Pérez" oninput="recalc()"></div>
+          <div class="field"><label>Nombre del cliente</label><input id="cliente" placeholder="Ej: JUAN PÉREZ" style="text-transform:uppercase" autocomplete="name" oninput="this.value=this.value.toUpperCase();recalc()" onchange="this.value=this.value.toUpperCase();recalc()"></div>
           <div class="field"><label>Fecha</label><input id="fecha" type="date" oninput="recalc()"></div>
         </div>
         <div class="field"><label>Teléfono (para WhatsApp)</label><input id="telefono" placeholder="573001234567" oninput="recalc()"></div>

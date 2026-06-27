@@ -98,6 +98,7 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
 <!-- Librerias para backup automatico a Drive (captura preview -> PDF) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" defer></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDi9_zgprc277akzYB895fHEWk90QSM5cg&libraries=places&loading=async" defer></script>
 </head>
 <body data-gate="admin-only">
@@ -163,8 +164,8 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
     </div>
     <div id="s-cli" class="card-body">
       <div class="grid2">
-        <div class="fgroup"><label>Cliente / Contacto *</label><input id="cliente" placeholder="NOMBRE DEL CLIENTE" autocomplete="name" style="text-transform:uppercase" oninput="st('cliente',up(this));syncContacto()"/></div>
-        <div class="fgroup"><label>Teléfono cliente</label><input id="telefono" type="tel" placeholder="3XX XXX XXXX" autocomplete="tel" oninput="st('telefono',this.value);syncContacto()"/></div>
+        <div class="fgroup"><label>Cliente / Contacto *</label><input id="cliente" placeholder="NOMBRE DEL CLIENTE" autocomplete="name" style="text-transform:uppercase" oninput="st('cliente',up(this));syncContacto()" onchange="st('cliente',up(this));syncContacto()"/></div>
+        <div class="fgroup"><label>Teléfono cliente</label><input id="telefono" type="tel" placeholder="3XX XXX XXXX" autocomplete="tel" oninput="st('telefono',this.value);syncContacto()" onchange="st('telefono',this.value);syncContacto()"/></div>
       </div>
       <hr class="sep"/>
       <p style="font-size:11px;color:#9ca3af;margin-bottom:10px">Datos TY — predeterminados</p>
@@ -188,9 +189,9 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
     </div>
     <div id="s-veh" class="card-body">
       <div class="grid3">
-        <div class="fgroup"><label>Conductor</label><input id="conductor" placeholder="NOMBRE CONDUCTOR" autocomplete="name" style="text-transform:uppercase" oninput="st('conductor',up(this))"/></div>
-        <div class="fgroup"><label>Cédula conductor</label><input id="conductorCedula" placeholder="0.000.000.000" oninput="st('conductorCedula',fmtCed(this.value));this.value=state.conductorCedula"/></div>
-        <div class="fgroup"><label>Celular conductor</label><input id="conductorCelular" placeholder="300 XXX XXX" oninput="st('conductorCelular',this.value)"/></div>
+        <div class="fgroup"><label>Conductor</label><input id="conductor" placeholder="NOMBRE CONDUCTOR" autocomplete="name" style="text-transform:uppercase" oninput="st('conductor',up(this))" onchange="st('conductor',up(this))"/></div>
+        <div class="fgroup"><label>Cédula conductor</label><input id="conductorCedula" inputmode="numeric" placeholder="0.000.000.000" oninput="st('conductorCedula',fmtCed(this.value));this.value=state.conductorCedula"/></div>
+        <div class="fgroup"><label>Celular conductor</label><input id="conductorCelular" type="tel" placeholder="300 XXX XXX" autocomplete="tel" oninput="st('conductorCelular',this.value)" onchange="st('conductorCelular',this.value)"/></div>
         <div class="fgroup"><label>Placa</label><input id="placa" placeholder="ABC-123" oninput="st('placa',up(this))"/></div>
         <div class="fgroup"><label># Operarios</label><input type="number" id="numOperarios" min="0" value="0" oninput="st('numOperarios',+this.value||0)"/></div>
         <div class="fgroup"><label>Tipo vehículo</label>
@@ -356,7 +357,7 @@ const MESES_L=["enero","febrero","marzo","abril","mayo","junio","julio","agosto"
 const DIAS=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
 const CIUDADES=["BOGOTA","MEDELLIN","BARRANQUILLA","CALI","CHIA","CAJICA","ZIPAQUIRA","MADRID","ARMENIA","BARRANCABERMEJA","BELLO","BUCARAMANGA","BUENAVENTURA","CARTAGENA","CIENAGA","CUCUTA","DUITAMA","ENVIGADO","FACATATIVA","FLORENCIA","FLORIDABLANCA","FUSAGASUGA","GIRARDOT","GIRON","IBAGUE","IPIALES","ITAGUI","LA DORADA","MAICAO","MANIZALES","MELGAR","MONTERIA","MOSQUERA","NEIVA","PALMIRA","PASTO","PEREIRA","PIEDECUESTA","POPAYAN","QUIBDO","RIOHACHA","RIONEGRO","SAHAGUN","SANTA MARTA","SINCELEJO","SOACHA","SOGAMOSO","SOLEDAD","TULUA","TUNJA","TURBO","UBATE","VALLEDUPAR","VILLAVICENCIO","YOPAL","OTRO"];
 
-const up=el=>el.value.toUpperCase();
+const up=el=>{const v=el.value.toUpperCase();el.value=v;return v;};
 const genOS=(f,cli)=>{const[y,m,d]=f.split("-").map(Number);const base=`OSTY${String(y%100).padStart(2,"0")}${MESES[(m||1)-1]}${String(d).padStart(2,"0")}`;if(!cli||!cli.trim())return base;const nombre=cli.trim().replace(/[^a-zA-ZáéíóúñÁÉÍÓÚÑ\s]/g,'').replace(/\s+/g,' ').trim();return base+' '+nombre;};
 // El número OS se genera desde cargueFecha (fecha del servicio)
 const genOSdisplay=(s)=>genOS(s.cargueFecha||s.fecha,s.cliente);
@@ -509,11 +510,11 @@ const renderParada=(p,i,kind,multi)=>{
       </div>
       <div class="fgroup"><label>Hora ${isEnt?"Est.":""}</label><input type="time" value="${p.hora}" oninput="updP('${kind}','${p.id}','hora',this.value)"/></div>
       <div class="fgroup col-full"><label>${isEnt?'Dirección Destino':'Dirección Origen'}</label><input id="dir-${kind}-${p.id}" class="places-ac" data-kind="${kind}" data-pid="${p.id}" value="${p.direccion}" style="text-transform:uppercase" autocomplete="off" placeholder="${isEnt?'Escribe dirección destino...':'Escribe dirección origen...'}" oninput="updP('${kind}','${p.id}','direccion',this.value.toUpperCase())"/></div>
-      <div class="fgroup"><label>Contacto 1</label><input value="${p.contacto1}" style="text-transform:uppercase" autocomplete="name" oninput="updP('${kind}','${p.id}','contacto1',this.value.toUpperCase())"/></div>
-      <div class="fgroup"><label>Teléfono 1</label><input value="${p.telefono1}" type="tel" autocomplete="tel" oninput="updP('${kind}','${p.id}','telefono1',this.value)"/></div>
-      <div class="fgroup"><label>Email</label><input value="${p.email}" type="email" autocomplete="email" oninput="updP('${kind}','${p.id}','email',this.value)"/></div>
-      <div class="fgroup"><label>Contacto 2</label><input value="${p.contacto2}" style="text-transform:uppercase" autocomplete="name" oninput="updP('${kind}','${p.id}','contacto2',this.value.toUpperCase())"/></div>
-      <div class="fgroup"><label>Teléfono 2</label><input value="${p.telefono2}" type="tel" autocomplete="tel" oninput="updP('${kind}','${p.id}','telefono2',this.value)"/></div>
+      <div class="fgroup"><label>Contacto 1</label><input value="${p.contacto1}" style="text-transform:uppercase" autocomplete="name" oninput="updP('${kind}','${p.id}','contacto1',up(this))" onchange="updP('${kind}','${p.id}','contacto1',up(this))"/></div>
+      <div class="fgroup"><label>Teléfono 1</label><input value="${p.telefono1}" type="tel" autocomplete="tel" oninput="updP('${kind}','${p.id}','telefono1',this.value)" onchange="updP('${kind}','${p.id}','telefono1',this.value)"/></div>
+      <div class="fgroup"><label>Email</label><input value="${p.email}" type="email" autocomplete="email" oninput="updP('${kind}','${p.id}','email',this.value)" onchange="updP('${kind}','${p.id}','email',this.value)"/></div>
+      <div class="fgroup"><label>Contacto 2</label><input value="${p.contacto2}" style="text-transform:uppercase" autocomplete="name" oninput="updP('${kind}','${p.id}','contacto2',up(this))" onchange="updP('${kind}','${p.id}','contacto2',up(this))"/></div>
+      <div class="fgroup"><label>Teléfono 2</label><input value="${p.telefono2}" type="tel" autocomplete="tel" oninput="updP('${kind}','${p.id}','telefono2',this.value)" onchange="updP('${kind}','${p.id}','telefono2',this.value)"/></div>
     </div>
     ${multi?`<div style="text-align:right;margin-top:8px"><button class="btn-sm btn-danger-sm" onclick="delP('${kind}','${p.id}')">✕ Quitar</button></div>`:""}
   </div>`;
@@ -836,11 +837,23 @@ function _getRouteAddresses(){
   const dest=((e.direccion||'')+', '+(e.ciudad||'BOGOTA')+', Colombia').trim();
   return{orig,dest,valid:!!(r.direccion&&e.direccion)};
 }
+var _routeMap=null,_routeRenderer=null;
 function updateRouteMap(){
   const a=_getRouteAddresses();
   const c=document.getElementById('routeMapContainer');
-  if(!a.valid){c.innerHTML='<span style="color:#9ca3af;font-size:13px">Ingresa las direcciones de recogida y entrega para ver la ruta</span>';return;}
-  c.innerHTML='<iframe width="100%" height="100%" frameborder="0" style="border:0;border-radius:10px" referrerpolicy="no-referrer-when-downgrade" allowfullscreen src="https://www.google.com/maps/embed/v1/directions?key='+GMAPS_KEY+'&origin='+encodeURIComponent(a.orig)+'&destination='+encodeURIComponent(a.dest)+'&mode=driving"></iframe>';
+  if(!a.valid){c.innerHTML='<span style="color:#9ca3af;font-size:13px">Ingresa las direcciones de recogida y entrega para ver la ruta</span>';_routeMap=null;return;}
+  if(!window.google||!window.google.maps){c.innerHTML='<span style="color:#9ca3af;font-size:13px">Cargando Google Maps...</span>';setTimeout(updateRouteMap,1000);return;}
+  if(!_routeMap){
+    c.innerHTML='';
+    _routeMap=new google.maps.Map(c,{zoom:12,center:{lat:4.711,lng:-74.072},mapTypeControl:false,streetViewControl:false,fullscreenControl:false});
+    _routeRenderer=new google.maps.DirectionsRenderer({suppressMarkers:false});
+    _routeRenderer.setMap(_routeMap);
+  }
+  var svc=new google.maps.DirectionsService();
+  svc.route({origin:a.orig,destination:a.dest,travelMode:'DRIVING'},function(result,status){
+    if(status==='OK'){_routeRenderer.setDirections(result);}
+    else{c.innerHTML='<span style="color:#e74c3c;font-size:13px">No se pudo calcular la ruta. Verifica las direcciones.</span>';_routeMap=null;}
+  });
   const link=document.getElementById('linkGoogleMaps');
   link.href='https://www.google.com/maps/dir/'+encodeURIComponent(a.orig)+'/'+encodeURIComponent(a.dest);
   link.style.display='inline-flex';
@@ -1228,7 +1241,6 @@ function cargarOSdesdeStorage(key){
 function cargarOSModal(){
   const inp=document.createElement('input');
   inp.type='file';
-  inp.accept='.json,application/json';
   inp.style.display='none';
   inp.onchange=function(){
     const f=inp.files[0];
