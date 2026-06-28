@@ -8,6 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/img/logo.svg"/>
 <link rel="alternate icon" type="image/png" href="/assets/img/logo.png"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--ty-blue:#1B3E8C;--ty-red:#E30613;--ty-dark:#1a1a2e;--ty-bg:#f0f2f5;--ty-card:rgba(255,255,255,.92);--ty-border:rgba(226,229,234,.6);--ty-muted:#6b7280;--ty-green:#15803d;--ty-orange:#d97706;--ty-teal:#0d9488;--radius:16px;--glass:rgba(255,255,255,.55);--shine:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%)}
@@ -58,7 +59,9 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
 .chart-full{grid-column:1/-1}
 .chart-third{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
-.chart-box{background:var(--ty-card);backdrop-filter:blur(12px);border-radius:var(--radius);border:1px solid var(--ty-border);padding:20px 22px;box-shadow:0 2px 12px rgba(27,62,140,.05),inset 0 1px 0 rgba(255,255,255,.8);opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.chart-box{background:var(--ty-card);backdrop-filter:blur(12px);border-radius:var(--radius);border:1px solid var(--ty-border);padding:20px 22px;box-shadow:0 2px 12px rgba(27,62,140,.05),inset 0 1px 0 rgba(255,255,255,.8);opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease,box-shadow .3s ease,border-color .3s ease}
+.chart-box:hover{box-shadow:0 4px 24px rgba(27,62,140,.14);border-color:rgba(27,62,140,.2)}
+.chart-box.chart-glow{box-shadow:0 6px 32px rgba(27,62,140,.22),0 0 0 2px rgba(27,62,140,.08);border-color:rgba(27,62,140,.3);transform:translateY(-1px)}
 .chart-box.in-view{opacity:1;transform:translateY(0)}
 .chart-box h3{font-size:13px;font-weight:700;color:var(--ty-dark);margin-bottom:14px;display:flex;align-items:center;gap:6px}
 .chart-box h3 .tag{font-size:10px;background:rgba(27,62,140,.06);padding:3px 10px;border-radius:10px;color:var(--ty-muted);font-weight:600}
@@ -231,6 +234,57 @@ var PALETTE=['#1B3E8C','#E30613','#0d9488','#d97706','#7c3aed','#db2777','#0284c
 var charts={};
 var driveOrders=[];
 var fileOrders=[];
+
+/* Chart.js enhancements */
+Chart.register(ChartDataLabels);
+Chart.defaults.set('plugins.datalabels',{display:false});
+Chart.defaults.animation.duration=1000;
+Chart.defaults.animation.easing='easeOutQuart';
+Chart.defaults.hover.animationDuration=200;
+Chart.defaults.plugins.tooltip.backgroundColor='rgba(26,26,46,.92)';
+Chart.defaults.plugins.tooltip.titleFont={size:12,weight:'700'};
+Chart.defaults.plugins.tooltip.bodyFont={size:11};
+Chart.defaults.plugins.tooltip.padding=10;
+Chart.defaults.plugins.tooltip.cornerRadius=10;
+Chart.defaults.plugins.tooltip.displayColors=true;
+Chart.defaults.plugins.tooltip.boxPadding=4;
+Chart.defaults.elements.bar.hoverBorderWidth=2;
+Chart.defaults.elements.bar.hoverBorderColor='rgba(255,255,255,.7)';
+Chart.defaults.elements.arc.hoverBorderWidth=3;
+Chart.defaults.elements.arc.hoverBorderColor='#fff';
+Chart.defaults.elements.point.hoverRadius=7;
+Chart.defaults.elements.point.hoverBorderWidth=3;
+Chart.defaults.elements.point.hoverBorderColor='#fff';
+Chart.defaults.elements.line.borderWidth=2.5;
+Chart.register({
+  id:'glowHover',
+  afterEvent:function(chart,args){
+    var box=chart.canvas.closest('.chart-box');
+    if(!box)return;
+    var evt=args.event;
+    if(evt.type==='mousemove'){
+      var els=chart.getElementsAtEventForMode(args.event,chart.options.interaction.mode||'nearest',{intersect:chart.options.interaction.intersect!==false},false);
+      if(els&&els.length>0){box.classList.add('chart-glow');}
+      else{box.classList.remove('chart-glow');}
+    }
+    if(evt.type==='mouseout'){box.classList.remove('chart-glow');}
+  }
+});
+var doughnutLabels={
+  display:function(ctx){var total=ctx.dataset.data.reduce(function(a,b){return a+b;},0);return total>0&&ctx.dataset.data[ctx.dataIndex]>0;},
+  color:'#fff',font:{weight:'700',size:13},
+  textShadowColor:'rgba(0,0,0,.35)',textShadowBlur:4,
+  formatter:function(val,ctx){
+    var total=ctx.dataset.data.reduce(function(a,b){return a+b;},0);if(!total)return '';
+    var pct=Math.round(val/total*100);if(pct<5)return '';
+    var ch=ctx.chart;if(!ch._dlStart)ch._dlStart=Date.now();
+    var dur=(ch.options.animation&&ch.options.animation.duration)||1400;
+    var t=Math.min((Date.now()-ch._dlStart)/dur,1);
+    t=1-Math.pow(1-t,3);
+    return Math.round(pct*t)+'%';
+  },
+  anchor:'center',align:'center'
+};
 
 function getFinancials(){try{return JSON.parse(localStorage.getItem(FIN_KEY)||'{}');}catch(_){return{};}}
 
@@ -586,7 +640,7 @@ function renderDashboard(orders,allOrders){
   charts.vehiculo=new Chart(document.getElementById('ch-vehiculo'),{
     type:'doughnut',
     data:{labels:vehTop.map(function(v){return v.key;}),datasets:[{data:vehTop.map(function(v){return v.val;}),backgroundColor:PALETTE.slice(0,vehTop.length),borderWidth:2,borderColor:'#fff',hoverOffset:6}]},
-    options:{responsive:true,animation:{duration:1200,easing:'easeOutQuart'},plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}}}}
+    options:{responsive:true,animation:{duration:1400,easing:'easeOutQuart',animateRotate:true,animateScale:true},plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}},datalabels:doughnutLabels}}
   });
 
   // === Urbano vs Nacional (doughnut) ===
@@ -595,7 +649,7 @@ function renderDashboard(orders,allOrders){
   charts.urbano=new Chart(document.getElementById('ch-urbano'),{
     type:'doughnut',
     data:{labels:['Urbano','Nacional'],datasets:[{data:[urbano,nacional],backgroundColor:[COLORS.blue,COLORS.orange],borderWidth:2,borderColor:'#fff',hoverOffset:6}]},
-    options:{responsive:true,animation:{duration:1200,easing:'easeOutQuart'},plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}}}}
+    options:{responsive:true,animation:{duration:1400,easing:'easeOutQuart',animateRotate:true,animateScale:true},plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}},datalabels:doughnutLabels}}
   });
 
   // === Tipo empaque (doughnut) ===
@@ -609,7 +663,7 @@ function renderDashboard(orders,allOrders){
   charts.empaque=new Chart(document.getElementById('ch-empaque'),{
     type:'doughnut',
     data:{labels:empDataF.map(function(e){return e.l;}),datasets:[{data:empDataF.map(function(e){return e.v;}),backgroundColor:empDataF.map(function(e){return e.c;}),borderWidth:2,borderColor:'#fff',hoverOffset:6}]},
-    options:{responsive:true,animation:{duration:1200,easing:'easeOutQuart'},plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}}}}
+    options:{responsive:true,animation:{duration:1400,easing:'easeOutQuart',animateRotate:true,animateScale:true},plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}},datalabels:doughnutLabels}}
   });
 
   // === Operarios por servicio (bar distribution) ===
@@ -651,7 +705,7 @@ function renderDashboard(orders,allOrders){
   charts.clientes=new Chart(document.getElementById('ch-clientes'),{
     type:'doughnut',
     data:{labels:['Nuevos ('+newCount+' clientes, '+newServ+' serv.)','Recurrentes ('+recurCount+' clientes, '+recurServ+' serv.)'],datasets:[{data:[newServ,recurServ],backgroundColor:[COLORS.blue,COLORS.green],borderWidth:2,borderColor:'#fff',hoverOffset:6}]},
-    options:{responsive:true,animation:{duration:1200,easing:'easeOutQuart'},plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}}}}
+    options:{responsive:true,animation:{duration:1400,easing:'easeOutQuart',animateRotate:true,animateScale:true},plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}},datalabels:doughnutLabels}}
   });
 
   // === Top 10 Clientes (table) ===
