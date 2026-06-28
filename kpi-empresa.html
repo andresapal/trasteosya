@@ -8,6 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="/assets/img/logo.svg"/>
 <link rel="alternate icon" type="image/png" href="/assets/img/logo.png"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -73,10 +74,14 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 
 /* Chart containers */
 .chart-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px;margin-bottom:16px}
-.chart-box{background:var(--ty-card);backdrop-filter:blur(12px);border-radius:var(--radius);border:1px solid var(--ty-border);padding:18px 20px;box-shadow:0 2px 12px rgba(27,62,140,.06)}
+.chart-box{background:var(--ty-card);backdrop-filter:blur(12px);border-radius:var(--radius);border:1px solid var(--ty-border);padding:18px 20px;box-shadow:0 2px 12px rgba(27,62,140,.06);transition:box-shadow .3s ease,border-color .3s ease,transform .25s ease}
+.chart-box:hover{box-shadow:0 4px 24px rgba(27,62,140,.14);border-color:rgba(27,62,140,.2)}
+.chart-box.chart-glow{box-shadow:0 6px 32px rgba(27,62,140,.22),0 0 0 2px rgba(27,62,140,.08);border-color:rgba(27,62,140,.3);transform:translateY(-1px)}
 .chart-title{font-size:13px;font-weight:700;color:var(--ty-dark);margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .chart-title .tag{font-size:9px;font-weight:600;padding:2px 8px;border-radius:10px;background:rgba(27,62,140,.06);color:var(--ty-blue)}
 .chart-canvas{position:relative;width:100%;max-height:280px}
+.chart-canvas canvas{transition:filter .2s ease}
+.chart-box:hover .chart-canvas canvas{filter:brightness(1.02)}
 .chart-box.full{grid-column:1/-1}
 
 /* Funnel */
@@ -93,7 +98,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 .rank-table tr:hover td{background:rgba(27,62,140,.02)}
 .rank-num{font-weight:800;color:var(--ty-blue);font-size:14px}
 .rank-bar{height:6px;border-radius:3px;background:rgba(27,62,140,.08)}
-.rank-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--ty-blue),#4a7cf5);transition:width .6s ease}
+.rank-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--ty-blue),#4a7cf5);transition:width .8s ease-out}
 
 /* Growth cards */
 .growth-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px}
@@ -123,6 +128,13 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
   .period-custom{margin-left:0;width:100%;margin-top:4px}
   .growth-grid{grid-template-columns:repeat(2,1fr)}
 }
+
+/* Maps */
+.map-wrap{width:100%;height:380px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--ty-border);background:#e8edf5}
+@media(max-width:600px){.map-wrap{height:280px}}
+.map-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:var(--ty-muted)}
+.map-legend span{display:flex;align-items:center;gap:4px}
+.map-legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
 
 /* Print */
 @media print{
@@ -371,9 +383,74 @@ function filterByPeriod(orders,range){
 
 function destroyCharts(){for(var k in charts){if(charts[k]){charts[k].destroy();delete charts[k];}}}
 
+/* Chart.js global defaults */
+Chart.register(ChartDataLabels);
+Chart.defaults.set('plugins.datalabels',{display:false});
+Chart.defaults.animation.duration=1000;
+Chart.defaults.animation.easing='easeOutQuart';
+Chart.defaults.interaction.mode='nearest';
+Chart.defaults.interaction.intersect=true;
+Chart.defaults.hover.animationDuration=200;
+Chart.defaults.plugins.tooltip.animation={duration:150,easing:'easeOutCubic'};
+Chart.defaults.plugins.tooltip.backgroundColor='rgba(26,26,46,.92)';
+Chart.defaults.plugins.tooltip.titleFont={size:12,weight:'700'};
+Chart.defaults.plugins.tooltip.bodyFont={size:11};
+Chart.defaults.plugins.tooltip.padding=10;
+Chart.defaults.plugins.tooltip.cornerRadius=10;
+Chart.defaults.plugins.tooltip.displayColors=true;
+Chart.defaults.plugins.tooltip.boxPadding=4;
+Chart.defaults.elements.bar.hoverBorderWidth=2;
+Chart.defaults.elements.bar.hoverBorderColor='rgba(255,255,255,.7)';
+Chart.defaults.elements.arc.hoverBorderWidth=3;
+Chart.defaults.elements.arc.hoverBorderColor='#fff';
+Chart.defaults.elements.point.hoverRadius=7;
+Chart.defaults.elements.point.hoverBorderWidth=3;
+Chart.defaults.elements.point.hoverBorderColor='#fff';
+Chart.defaults.elements.line.borderWidth=2.5;
+
 /* Chart animation presets */
-var lineAnim={x:{type:'number',easing:'easeOutQuart',duration:1200,from:NaN,delay:function(ctx){return ctx.dataIndex*120;}}};
-var barAnim={y:{type:'number',easing:'easeOutCubic',duration:800,from:function(ctx){return ctx.chart.scales.y.getPixelForValue(0);},delay:function(ctx){return ctx.dataIndex*80;}}};
+var lineAnim={
+  x:{type:'number',easing:'easeOutQuart',duration:1400,from:NaN,delay:function(ctx){return ctx.dataIndex*100;}},
+  y:{type:'number',easing:'easeOutQuart',duration:1400,from:function(ctx){return ctx.chart.scales.y?ctx.chart.scales.y.getPixelForValue(0):0;},delay:function(ctx){return ctx.dataIndex*100;}}
+};
+var barAnim={
+  y:{type:'number',easing:'easeOutCubic',duration:900,from:function(ctx){return ctx.chart.scales.y?ctx.chart.scales.y.getPixelForValue(0):0;},delay:function(ctx){return ctx.dataIndex*60;}},
+  x:{type:'number',easing:'easeOutCubic',duration:900,from:function(ctx){return ctx.chart.scales.x?ctx.chart.scales.x.getPixelForValue(0):0;},delay:function(ctx){return ctx.dataIndex*60;}}
+};
+var doughnutAnim={duration:1400,easing:'easeOutQuart',animateRotate:true,animateScale:true};
+var doughnutLabels={
+  datalabels:{
+    display:function(ctx){var total=ctx.dataset.data.reduce(function(a,b){return a+b;},0);return total>0&&ctx.dataset.data[ctx.dataIndex]>0;},
+    color:'#fff',
+    font:{weight:'700',size:13},
+    textShadowColor:'rgba(0,0,0,.35)',textShadowBlur:4,
+    formatter:function(val,ctx){
+      var total=ctx.dataset.data.reduce(function(a,b){return a+b;},0);if(!total)return '';
+      var pct=Math.round(val/total*100);if(pct<5)return '';
+      var ch=ctx.chart;if(!ch._dlStart)ch._dlStart=Date.now();
+      var dur=(ch.options.animation&&ch.options.animation.duration)||1400;
+      var t=Math.min((Date.now()-ch._dlStart)/dur,1);
+      t=1-Math.pow(1-t,3);
+      return Math.round(pct*t)+'%';
+    },
+    anchor:'center',align:'center'
+  }
+};
+
+Chart.register({
+  id:'glowHover',
+  afterEvent:function(chart,args){
+    var box=chart.canvas.closest('.chart-box');
+    if(!box)return;
+    var evt=args.event;
+    if(evt.type==='mousemove'){
+      var els=chart.getElementsAtEventForMode(args.event,chart.options.interaction.mode||'nearest',{intersect:chart.options.interaction.intersect!==false},false);
+      if(els&&els.length>0){box.classList.add('chart-glow');}
+      else{box.classList.remove('chart-glow');}
+    }
+    if(evt.type==='mouseout'){box.classList.remove('chart-glow');}
+  }
+});
 
 /* Counter animation */
 function animateCounters(){
@@ -404,6 +481,21 @@ function observeCards(){
   },{threshold:0.1});
   document.querySelectorAll('.kpi-card').forEach(function(c){obs.observe(c);});
   setTimeout(animateCounters,300);
+  animateRankBars();
+}
+function animateRankBars(){
+  var bars=document.querySelectorAll('.rank-bar-fill');
+  bars.forEach(function(b){
+    var target=b.style.width;
+    b.style.width='0';
+    setTimeout(function(){b.style.width=target;},80);
+  });
+  var funnels=document.querySelectorAll('.funnel-bar');
+  funnels.forEach(function(f){
+    var target=f.style.width;
+    f.style.width='0';
+    setTimeout(function(){f.style.width=target;},80);
+  });
 }
 
 /* ============================================
@@ -518,7 +610,7 @@ function renderIngresos(orders,allOrders,prevOrders){
   charts.tipo=new Chart(document.getElementById('ch-tipo'),{
     type:'doughnut',
     data:{labels:['Urbano','Nacional'],datasets:[{data:[urbano,total-urbano],backgroundColor:[COLORS.blue,COLORS.orange],borderWidth:2,borderColor:'#fff',hoverOffset:6}]},
-    options:{responsive:true,animation:{duration:1200,easing:'easeOutQuart'},plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}}}}
+    options:{responsive:true,animation:doughnutAnim,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}},datalabels:doughnutLabels.datalabels}}
   });
 
   // 3. Revenue by category (from cotization cache)
@@ -570,7 +662,7 @@ function renderIngresos(orders,allOrders,prevOrders){
   charts.clientes=new Chart(document.getElementById('ch-clientes'),{
     type:'doughnut',
     data:{labels:['Nuevos ('+newClients+')','Recurrentes ('+recurClients+')'],datasets:[{data:[newClients,recurClients],backgroundColor:[COLORS.sky,COLORS.green],borderWidth:2,borderColor:'#fff',hoverOffset:6}]},
-    options:{responsive:true,animation:{duration:1200,easing:'easeOutQuart'},plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}}}}
+    options:{responsive:true,animation:doughnutAnim,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}},datalabels:doughnutLabels.datalabels}}
   });
 
   observeCards();
@@ -648,7 +740,7 @@ function renderEmpaque(orders,allOrders){
   charts.empTipo=new Chart(document.getElementById('ch-emp-tipo'),{
     type:'doughnut',
     data:{labels:empDataF.map(function(e){return e.l;}),datasets:[{data:empDataF.map(function(e){return e.v;}),backgroundColor:empDataF.map(function(e){return e.c;}),borderWidth:2,borderColor:'#fff',hoverOffset:6}]},
-    options:{responsive:true,animation:{duration:1200,easing:'easeOutQuart'},plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}}}}
+    options:{responsive:true,animation:doughnutAnim,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}},datalabels:doughnutLabels.datalabels}}
   });
 
   // Material trend by month
@@ -681,7 +773,7 @@ function renderEmpaque(orders,allOrders){
   charts.empAdopt=new Chart(document.getElementById('ch-emp-adopt'),{
     type:'line',
     data:{labels:mKeys.map(monthLabel),datasets:[{label:'% con empaque',data:adoptData,borderColor:COLORS.teal,backgroundColor:'rgba(13,148,136,.12)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:COLORS.teal}]},
-    options:{responsive:true,animation:{duration:1200},plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,ticks:{callback:function(v){return v+'%';}},grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}
+    options:{responsive:true,animation:lineAnim,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,ticks:{callback:function(v){return v+'%';}},grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}
   });
 
   // Cotizaciones con empaque detail
@@ -782,7 +874,7 @@ function renderOperacion(orders,allOrders){
   charts.vehiculos=new Chart(document.getElementById('ch-vehiculos'),{
     type:'doughnut',
     data:{labels:vehTop.map(function(v){return v.key;}),datasets:[{data:vehTop.map(function(v){return v.val;}),backgroundColor:PALETTE.slice(0,vehTop.length),borderWidth:2,borderColor:'#fff',hoverOffset:6}]},
-    options:{responsive:true,animation:{duration:1200,easing:'easeOutQuart'},plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}}}}
+    options:{responsive:true,animation:doughnutAnim,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}},datalabels:doughnutLabels.datalabels}}
   });
 
   // Operators distribution
@@ -851,7 +943,7 @@ function renderOperacion(orders,allOrders){
   charts.opsTrend=new Chart(document.getElementById('ch-ops-trend'),{
     type:'line',
     data:{labels:smKeys.map(monthLabel),datasets:[{label:'Promedio ops',data:opsAvg,borderColor:COLORS.teal,backgroundColor:'rgba(13,148,136,.12)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:COLORS.teal}]},
-    options:{responsive:true,animation:{duration:1200},plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}
+    options:{responsive:true,animation:lineAnim,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}
   });
 
   // Cotizador cache: instalaciones, adicionales, bodegaje, desempaque
@@ -898,8 +990,70 @@ function renderOperacion(orders,allOrders){
 }
 
 /* ============================================
-   MODULE: GEOINTELIGENCIA (Fase 3 placeholder)
+   MODULE: GEOINTELIGENCIA (Fase 3 — Leaflet)
    ============================================ */
+
+var COORDS={
+  'BOGOTÁ':[4.6097,-74.0818],'BOGOTA':[4.6097,-74.0818],'MEDELLÍN':[6.2518,-75.5636],'MEDELLIN':[6.2518,-75.5636],
+  'CALI':[3.4516,-76.5320],'BARRANQUILLA':[10.9685,-74.7813],'CARTAGENA':[10.3910,-75.5144],
+  'BUCARAMANGA':[7.1254,-73.1198],'CÚCUTA':[7.8939,-72.5078],'CUCUTA':[7.8939,-72.5078],
+  'PEREIRA':[4.8133,-75.6961],'MANIZALES':[5.0689,-75.5174],'IBAGUÉ':[4.4389,-75.2322],'IBAGUE':[4.4389,-75.2322],
+  'SANTA MARTA':[11.2408,-74.1990],'VILLAVICENCIO':[4.1420,-73.6266],'PASTO':[1.2136,-77.2811],
+  'NEIVA':[2.9273,-75.2819],'ARMENIA':[4.5339,-75.6811],'POPAYÁN':[2.4419,-76.6064],'POPAYAN':[2.4419,-76.6064],
+  'TUNJA':[5.5353,-73.3678],'MONTERÍA':[8.7479,-75.8814],'MONTERIA':[8.7479,-75.8814],
+  'SINCELEJO':[9.3047,-75.3978],'VALLEDUPAR':[10.4631,-73.2532],'RIOHACHA':[11.5444,-72.9072],
+  'QUIBDÓ':[5.6919,-76.6583],'QUIBDO':[5.6919,-76.6583],'FLORENCIA':[1.6144,-75.6062],
+  'YOPAL':[5.3378,-72.3959],'MOCOA':[1.1494,-76.6519],'LETICIA':[-4.2153,-69.9406],
+  'CHÍA':[4.8637,-74.0540],'CHIA':[4.8637,-74.0540],'CAJICÁ':[4.9189,-74.0283],'CAJICA':[4.9189,-74.0283],
+  'ZIPAQUIRÁ':[5.0224,-73.9936],'ZIPAQUIRA':[5.0224,-73.9936],'SOACHA':[4.5793,-74.2216],
+  'GIRARDOT':[4.3025,-74.8021],'FUSAGASUGÁ':[4.3439,-74.3639],'FUSAGASUGA':[4.3439,-74.3639],
+  'DUITAMA':[5.8267,-73.0333],'SOGAMOSO':[5.7145,-72.9336],'BARRANCABERMEJA':[7.0653,-73.8547],
+  'BUENAVENTURA':[3.8801,-77.0311],'PALMIRA':[3.5395,-76.3036],'TULUÁ':[4.0847,-76.1986],'TULUA':[4.0847,-76.1986],
+  'ENVIGADO':[6.1714,-75.5867],'ITAGÜÍ':[6.1847,-75.5991],'ITAGUI':[6.1847,-75.5991],
+  'BELLO':[6.3383,-75.5564],'RIONEGRO':[6.1553,-75.3742],'MOSQUERA':[4.7086,-74.2328],
+  'MADRID':[4.7325,-74.2654],'FACATATIVÁ':[4.8160,-74.3549],'FACATATIVA':[4.8160,-74.3549],
+  'MELGAR':[4.2046,-74.6416],'FLORIDABLANCA':[7.0639,-73.0898],'PIEDECUESTA':[6.9897,-73.0510],
+  'GIRÓN':[7.0686,-73.1694],'GIRON':[7.0686,-73.1694],'SOLEDAD':[10.9181,-74.7650]
+};
+
+var LOCALIDADES_BOG=[
+  'USAQUÉN','USAQUEN','CHAPINERO','SANTA FE','SAN CRISTÓBAL','SAN CRISTOBAL','USME','TUNJUELITO',
+  'BOSA','KENNEDY','FONTIBÓN','FONTIBON','ENGATIVÁ','ENGATIVA','SUBA','BARRIOS UNIDOS',
+  'TEUSAQUILLO','LOS MÁRTIRES','LOS MARTIRES','ANTONIO NARIÑO','ANTONIO NARINO','PUENTE ARANDA',
+  'CANDELARIA','RAFAEL URIBE','RAFAEL URIBE URIBE','CIUDAD BOLÍVAR','CIUDAD BOLIVAR','SUMAPAZ',
+  'CHICÓ','CHICO','ROSALES','CEDRITOS','NIZA','COLINA','COUNTRY','ANTIGUO COUNTRY',
+  'QUINTA CAMACHO','NOGAL','LA CABRERA','VIRREY','SANTA BÁRBARA','SANTA BARBARA',
+  'MODELIA','HAYUELOS','NORMANDÍA','NORMANDIA','SALITRE','GALERÍAS','GALERIAS',
+  'POLO','ALHAMBRA','PASADENA','SPRING','PONTEVEDRA','BATÁN','BATAN','MULTICENTRO',
+  'MAZURÉN','MAZUREN','SANTA ANA','BELLA SUIZA','CONTADOR','VERBENAL','TOBERÍN','TOBERIN',
+  'SAN PATRICIO','EL REFUGIO','LOS LAGARTOS','FLORESTA','MINUTO DE DIOS','BOYACÁ','BOYACA',
+  'AMÉRICAS','AMERICAS','TINTAL','CASTILLA','MARSELLA','RESTREPO','VENECIA',
+  'CENTRO','LA SOLEDAD','PALERMO','PARKWAY','LA MACARENA','ZONA G','ZONA T','ZONA ROSA',
+  'CALLE 100','CALLE 80','CALLE 72','CALLE 53','CALLE 26','AUTOPISTA NORTE','AUTONORTE',
+  'SÉPTIMA','SEPTIMA','CARACAS','BOYACÁ REAL','CIUDAD JARDÍN','CIUDAD JARDIN'
+];
+
+var _leafletLoaded=false;
+function loadLeaflet(cb){
+  if(_leafletLoaded){cb();return;}
+  var css=document.createElement('link');
+  css.rel='stylesheet';css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  document.head.appendChild(css);
+  var js=document.createElement('script');
+  js.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  js.onload=function(){_leafletLoaded=true;cb();};
+  document.head.appendChild(js);
+}
+
+function extractLocalidad(addr){
+  if(!addr)return null;
+  var up=addr.toUpperCase();
+  for(var i=0;i<LOCALIDADES_BOG.length;i++){
+    if(up.indexOf(LOCALIDADES_BOG[i])>=0)return LOCALIDADES_BOG[i];
+  }
+  return null;
+}
+
 function renderGeo(orders){
   var container=document.getElementById('mod-content');
   var ciudades=countBy(orders,function(o){return o.ciudadOrigen?o.ciudadOrigen.toUpperCase():'';});
@@ -918,48 +1072,211 @@ function renderGeo(orders){
   });
   var numRutas=Object.keys(rutas).length;
 
+  var deptos={};
+  orders.forEach(function(o){
+    if(o.departamento)deptos[o.departamento.toUpperCase()]=(deptos[o.departamento.toUpperCase()]||0)+1;
+  });
+  var numDeptos=Object.keys(deptos).length||'--';
+
   var html='<div class="kpi-grid">'
     +'<div class="kpi-card c-blue"><div class="kpi-label">Ciudades atendidas</div><div class="kpi-value"><span class="kpi-counter" data-target="'+numCiudades+'">0</span></div><div class="kpi-sub">En el periodo seleccionado</div></div>'
-    +'<div class="kpi-card c-green"><div class="kpi-label">Ciudad principal</div><div class="kpi-value">'+(topCiudad.length?topCiudad[0].key:'--')+'</div><div class="kpi-sub">'+(topCiudad.length?topCiudad[0].val+' menciones':'')+'</div></div>'
-    +'<div class="kpi-card c-orange"><div class="kpi-label">Rutas únicas</div><div class="kpi-value"><span class="kpi-counter" data-target="'+numRutas+'">0</span></div><div class="kpi-sub">Combinaciones origen → destino</div></div>'
-    +'<div class="kpi-card c-teal"><div class="kpi-label">Mapa interactivo</div><div class="kpi-value">--</div><div class="kpi-sub"><span class="skeleton-msg">Próximamente con Leaflet.js</span></div></div>'
+    +'<div class="kpi-card c-green"><div class="kpi-label">Ciudad principal</div><div class="kpi-value">'+(topCiudad.length?topCiudad[0].key:'--')+'</div><div class="kpi-sub">'+(topCiudad.length?topCiudad[0].val+' servicios':'')+'</div></div>'
+    +'<div class="kpi-card c-orange"><div class="kpi-label">Rutas unicas</div><div class="kpi-value"><span class="kpi-counter" data-target="'+numRutas+'">0</span></div><div class="kpi-sub">Combinaciones origen - destino</div></div>'
+    +'<div class="kpi-card c-teal"><div class="kpi-label">Departamentos</div><div class="kpi-value">'+(typeof numDeptos==='number'?'<span class="kpi-counter" data-target="'+numDeptos+'">0</span>':numDeptos)+'</div><div class="kpi-sub">Con al menos 1 servicio</div></div>'
+    +'</div>';
+
+  // Maps
+  html+='<div class="chart-row">'
+    +'<div class="chart-box"><div class="chart-title">Mapa nacional <span class="tag">Volumen por ciudad</span></div><div id="map-colombia" class="map-wrap"></div>'
+    +'<div class="map-legend"><span><i style="background:'+COLORS.blue+'"></i> Origen</span><span><i style="background:'+COLORS.orange+'"></i> Destino</span><span><i style="background:'+COLORS.green+'"></i> Ambos</span></div></div>'
+    +'<div class="chart-box"><div class="chart-title">Zonas Bogota <span class="tag">Localidades</span></div><div id="map-bogota" class="map-wrap"></div>'
+    +'<div class="map-legend"><span><i style="background:'+COLORS.blue+'"></i> Origen</span><span><i style="background:'+COLORS.orange+'"></i> Destino</span></div></div>'
     +'</div>';
 
   // Routes ranking
   var rutasTop=topN(rutas,15);
-  html+='<div class="chart-row"><div class="chart-box full"><div class="chart-title">Top rutas <span class="tag">Origen → Destino</span></div>';
-  var maxRuta=rutasTop.length?rutasTop[0].val:1;
-  html+='<table class="rank-table"><thead><tr><th>#</th><th>Ruta</th><th>Servicios</th><th></th></tr></thead><tbody>';
-  rutasTop.forEach(function(r,i){
-    html+='<tr><td class="rank-num">'+(i+1)+'</td><td>'+r.key+'</td><td><strong>'+r.val+'</strong></td><td style="width:35%"><div class="rank-bar"><div class="rank-bar-fill" style="width:'+Math.round(r.val/maxRuta*100)+'%"></div></div></td></tr>';
-  });
-  html+='</tbody></table></div></div>';
+  html+='<div class="chart-row"><div class="chart-box full"><div class="chart-title">Top rutas <span class="tag">Origen - Destino</span></div>';
+  if(rutasTop.length){
+    var maxRuta=rutasTop[0].val;
+    html+='<table class="rank-table"><thead><tr><th>#</th><th>Ruta</th><th>Servicios</th><th></th></tr></thead><tbody>';
+    rutasTop.forEach(function(r,i){
+      html+='<tr><td class="rank-num">'+(i+1)+'</td><td>'+r.key+'</td><td><strong>'+r.val+'</strong></td><td style="width:35%"><div class="rank-bar"><div class="rank-bar-fill" style="width:'+Math.round(r.val/maxRuta*100)+'%"></div></div></td></tr>';
+    });
+    html+='</tbody></table>';
+  }else{
+    html+='<div class="empty-state"><p>Sin datos de rutas</p></div>';
+  }
+  html+='</div></div>';
 
-  // City charts
+  // Localidades Bogota ranking
+  var locOrig={},locDest={};
+  orders.forEach(function(o){
+    if(o.ciudadOrigen&&o.ciudadOrigen.toUpperCase().indexOf('BOGOT')>=0){
+      var loc=extractLocalidad(o.direccionOrigen);
+      if(loc)locOrig[loc]=(locOrig[loc]||0)+1;
+    }
+    if(o.ciudadDestino&&o.ciudadDestino.toUpperCase().indexOf('BOGOT')>=0){
+      var loc2=extractLocalidad(o.direccionDestino);
+      if(loc2)locDest[loc2]=(locDest[loc2]||0)+1;
+    }
+  });
+  var allLoc={};
+  for(var lk in locOrig)allLoc[lk]=(allLoc[lk]||0)+locOrig[lk];
+  for(var lk2 in locDest)allLoc[lk2]=(allLoc[lk2]||0)+locDest[lk2];
+
   html+='<div class="chart-row">'
-    +'<div class="chart-box"><div class="chart-title">Ranking ciudades origen</div><div class="chart-canvas"><canvas id="ch-geo-orig"></canvas></div></div>'
-    +'<div class="chart-box"><div class="chart-title">Ranking ciudades destino</div><div class="chart-canvas"><canvas id="ch-geo-dest"></canvas></div></div>'
+    +'<div class="chart-box"><div class="chart-title">Localidades Bogota <span class="tag">Origen + Destino</span></div><div id="rank-localidades"></div></div>'
+    +'<div class="chart-box"><div class="chart-title">Ranking ciudades</div><div class="chart-canvas"><canvas id="ch-geo-ciudades"></canvas></div></div>'
     +'</div>';
 
   container.innerHTML=html;
 
-  // City origin chart
-  var origTop=topN(ciudades,10);
-  charts.geoOrig=new Chart(document.getElementById('ch-geo-orig'),{
+  // Localidades table
+  var locArr=topN(allLoc,15);
+  var locEl=document.getElementById('rank-localidades');
+  if(locArr.length){
+    var maxLoc=locArr[0].val;
+    var lh='<table class="rank-table"><thead><tr><th>#</th><th>Localidad / Zona</th><th>Servicios</th><th></th></tr></thead><tbody>';
+    locArr.forEach(function(l,i){
+      lh+='<tr><td class="rank-num">'+(i+1)+'</td><td>'+l.key+'</td><td><strong>'+l.val+'</strong></td><td style="width:35%"><div class="rank-bar"><div class="rank-bar-fill" style="width:'+Math.round(l.val/maxLoc*100)+'%"></div></div></td></tr>';
+    });
+    lh+='</tbody></table>';
+    locEl.innerHTML=lh;
+  }else{
+    locEl.innerHTML='<div class="empty-state"><p>Sin datos de localidades</p><p class="kpi-sub">Se detectan de las direcciones de origen/destino</p></div>';
+  }
+
+  // Cities combined chart
+  var allCTop=topN(allCiudades,12);
+  charts.geoCiudades=new Chart(document.getElementById('ch-geo-ciudades'),{
     type:'bar',
-    data:{labels:origTop.map(function(v){return v.key;}),datasets:[{data:origTop.map(function(v){return v.val;}),backgroundColor:COLORS.blue,borderRadius:8,borderSkipped:false}]},
+    data:{labels:allCTop.map(function(v){return v.key;}),datasets:[{data:allCTop.map(function(v){return v.val;}),backgroundColor:PALETTE.slice(0,allCTop.length),borderRadius:8,borderSkipped:false}]},
     options:{indexAxis:'y',responsive:true,animation:barAnim,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}},y:{grid:{display:false}}}}
   });
 
-  // City destination chart
-  var destTop=topN(ciudadesDest,10);
-  charts.geoDest=new Chart(document.getElementById('ch-geo-dest'),{
-    type:'bar',
-    data:{labels:destTop.map(function(v){return v.key;}),datasets:[{data:destTop.map(function(v){return v.val;}),backgroundColor:COLORS.orange,borderRadius:8,borderSkipped:false}]},
-    options:{indexAxis:'y',responsive:true,animation:barAnim,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}},y:{grid:{display:false}}}}
+  // Load Leaflet and render maps
+  loadLeaflet(function(){
+    renderMapColombia(orders,ciudades,ciudadesDest);
+    renderMapBogota(orders,locOrig,locDest);
   });
 
   observeCards();
+}
+
+function renderMapColombia(orders,ciudadesOrig,ciudadesDest){
+  var el=document.getElementById('map-colombia');
+  if(!el||!window.L)return;
+  var map=L.map(el,{scrollWheelZoom:false}).setView([5.0,-74.0],5.5);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+    attribution:'CartoDB',maxZoom:18
+  }).addTo(map);
+
+  var allC={};
+  for(var co in ciudadesOrig){if(co)allC[co]={orig:ciudadesOrig[co]||0,dest:0};}
+  for(var cd in ciudadesDest){if(cd){if(!allC[cd])allC[cd]={orig:0,dest:0};allC[cd].dest=ciudadesDest[cd]||0;}}
+
+  var maxVol=1;
+  for(var ck in allC){var vol=allC[ck].orig+allC[ck].dest;if(vol>maxVol)maxVol=vol;}
+
+  for(var city in allC){
+    var coord=COORDS[city];
+    if(!coord)continue;
+    var d=allC[city];
+    var vol2=d.orig+d.dest;
+    var radius=Math.max(6,Math.min(30,Math.sqrt(vol2/maxVol)*30));
+    var color=d.orig>0&&d.dest>0?COLORS.green:(d.orig>0?COLORS.blue:COLORS.orange);
+    L.circleMarker(coord,{radius:radius,color:color,fillColor:color,fillOpacity:.55,weight:2}).addTo(map)
+      .bindPopup('<strong>'+city+'</strong><br>Origen: '+d.orig+'<br>Destino: '+d.dest);
+  }
+
+  // Route lines for top 5 routes
+  var rutaCount={};
+  orders.forEach(function(o){
+    if(o.ciudadOrigen&&o.ciudadDestino){
+      var rk=o.ciudadOrigen.toUpperCase()+'|'+o.ciudadDestino.toUpperCase();
+      rutaCount[rk]=(rutaCount[rk]||0)+1;
+    }
+  });
+  var rutaTop=topN(rutaCount,5);
+  var maxR=rutaTop.length?rutaTop[0].val:1;
+  rutaTop.forEach(function(r){
+    var parts=r.key.split('|');
+    var c1=COORDS[parts[0]],c2=COORDS[parts[1]];
+    if(c1&&c2){
+      L.polyline([c1,c2],{color:COLORS.orange,weight:Math.max(1,Math.round(r.val/maxR*5)),opacity:.5,dashArray:'8 4'}).addTo(map)
+        .bindPopup(parts[0]+' → '+parts[1]+': '+r.val+' servicios');
+    }
+  });
+
+  setTimeout(function(){map.invalidateSize();},200);
+}
+
+function renderMapBogota(orders,locOrig,locDest){
+  var el=document.getElementById('map-bogota');
+  if(!el||!window.L)return;
+  var map=L.map(el,{scrollWheelZoom:false}).setView([4.65,-74.08],11.5);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{
+    attribution:'CartoDB',maxZoom:18
+  }).addTo(map);
+
+  var LOC_COORDS={
+    'USAQUÉN':[4.7325,-74.0305],'USAQUEN':[4.7325,-74.0305],'CHAPINERO':[4.6467,-74.0589],
+    'SANTA FE':[4.5972,-74.0756],'SUBA':[4.7419,-74.0939],'ENGATIVÁ':[4.6956,-74.1139],'ENGATIVA':[4.6956,-74.1139],
+    'FONTIBÓN':[4.6744,-74.1467],'FONTIBON':[4.6744,-74.1467],'KENNEDY':[4.6308,-74.1561],
+    'BOSA':[4.6028,-74.1803],'TEUSAQUILLO':[4.6428,-74.0881],'BARRIOS UNIDOS':[4.6700,-74.0731],
+    'PUENTE ARANDA':[4.6108,-74.1039],'ANTONIO NARIÑO':[4.5883,-74.0903],'ANTONIO NARINO':[4.5883,-74.0903],
+    'RAFAEL URIBE':[4.5703,-74.0958],'RAFAEL URIBE URIBE':[4.5703,-74.0958],
+    'SAN CRISTÓBAL':[4.5633,-74.0811],'SAN CRISTOBAL':[4.5633,-74.0811],
+    'TUNJUELITO':[4.5772,-74.1283],'USME':[4.4828,-74.1139],
+    'CIUDAD BOLÍVAR':[4.5247,-74.1611],'CIUDAD BOLIVAR':[4.5247,-74.1611],
+    'LOS MÁRTIRES':[4.6036,-74.0914],'LOS MARTIRES':[4.6036,-74.0914],
+    'CANDELARIA':[4.5942,-74.0733],'SUMAPAZ':[4.2872,-74.1339],
+    'CHICÓ':[4.6672,-74.0481],'CHICO':[4.6672,-74.0481],'ROSALES':[4.6550,-74.0500],
+    'CEDRITOS':[4.7225,-74.0492],'NIZA':[4.7119,-74.0697],'COLINA':[4.7281,-74.0631],
+    'COUNTRY':[4.6733,-74.0556],'ANTIGUO COUNTRY':[4.6683,-74.0567],
+    'SANTA BÁRBARA':[4.6933,-74.0422],'SANTA BARBARA':[4.6933,-74.0422],
+    'MODELIA':[4.6697,-74.1228],'SALITRE':[4.6578,-74.1064],
+    'GALERÍAS':[4.6481,-74.0694],'GALERIAS':[4.6481,-74.0694],
+    'POLO':[4.6800,-74.0614],'PASADENA':[4.6847,-74.0664],
+    'MAZURÉN':[4.7303,-74.0536],'MAZUREN':[4.7303,-74.0536],
+    'BELLA SUIZA':[4.6969,-74.0389],'CONTADOR':[4.7092,-74.0475],
+    'VERBENAL':[4.7550,-74.0353],'TOBERÍN':[4.7433,-74.0447],'TOBERIN':[4.7433,-74.0447],
+    'FLORESTA':[4.6614,-74.1108],'CASTILLA':[4.6503,-74.1469],
+    'RESTREPO':[4.5872,-74.0861],'VENECIA':[4.5783,-74.1175],
+    'CENTRO':[4.6017,-74.0758],'PALERMO':[4.6450,-74.0647],
+    'ZONA G':[4.6611,-74.0550],'ZONA T':[4.6664,-74.0531],'ZONA ROSA':[4.6678,-74.0528],
+    'CALLE 100':[4.6856,-74.0444],'CALLE 80':[4.6722,-74.0714],'CALLE 72':[4.6611,-74.0653],
+    'AMÉRICAS':[4.6267,-74.1433],'AMERICAS':[4.6267,-74.1433],'TINTAL':[4.6322,-74.1728],
+    'HAYUELOS':[4.6656,-74.1361],'SPRING':[4.7008,-74.0533],'PONTEVEDRA':[4.6781,-74.0611],
+    'EL REFUGIO':[4.6800,-74.0414],'LA CABRERA':[4.6636,-74.0481],
+    'LA MACARENA':[4.6133,-74.0661],'PARKWAY':[4.6297,-74.0708],'LA SOLEDAD':[4.6367,-74.0733]
+  };
+
+  var allLoc={};
+  for(var lo in locOrig){allLoc[lo]={orig:locOrig[lo]||0,dest:0};}
+  for(var ld in locDest){if(!allLoc[ld])allLoc[ld]={orig:0,dest:0};allLoc[ld].dest=locDest[ld]||0;}
+
+  var maxLV=1;
+  for(var lk in allLoc){var lv=allLoc[lk].orig+allLoc[lk].dest;if(lv>maxLV)maxLV=lv;}
+
+  var hasMarkers=false;
+  for(var loc in allLoc){
+    var lc=LOC_COORDS[loc];
+    if(!lc)continue;
+    hasMarkers=true;
+    var ld2=allLoc[loc];
+    var lv2=ld2.orig+ld2.dest;
+    var lr=Math.max(5,Math.min(25,Math.sqrt(lv2/maxLV)*25));
+    var lcolor=ld2.orig>0&&ld2.dest>0?COLORS.teal:(ld2.orig>0?COLORS.blue:COLORS.orange);
+    L.circleMarker(lc,{radius:lr,color:lcolor,fillColor:lcolor,fillOpacity:.5,weight:2}).addTo(map)
+      .bindPopup('<strong>'+loc+'</strong><br>Origen: '+ld2.orig+'<br>Destino: '+ld2.dest);
+  }
+
+  if(!hasMarkers){
+    L.marker([4.65,-74.08]).addTo(map).bindPopup('Sin datos de localidades aún').openPopup();
+  }
+
+  setTimeout(function(){map.invalidateSize();},200);
 }
 
 /* ============================================
