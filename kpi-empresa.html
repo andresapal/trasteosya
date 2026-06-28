@@ -630,6 +630,12 @@ function renderEmpaque(orders,allOrders){
     +'<div class="chart-box"><div class="chart-title">Materiales por mes</div><div class="chart-canvas"><canvas id="ch-emp-trend"></canvas></div></div>'
     +'</div>';
 
+  // Adoption rate trend
+  html+='<div class="chart-row">'
+    +'<div class="chart-box"><div class="chart-title">Tasa de adopción de empaque <span class="tag">% servicios con empaque por mes</span></div><div class="chart-canvas"><canvas id="ch-emp-adopt"></canvas></div></div>'
+    +'<div class="chart-box"><div class="chart-title">Cotizaciones con empaque <span class="tag">Del cotizador</span></div><div id="cot-empaque-detail"></div></div>'
+    +'</div>';
+
   container.innerHTML=html;
 
   // Empaque type doughnut
@@ -664,6 +670,52 @@ function renderEmpaque(orders,allOrders){
     ]},
     options:{responsive:true,animation:barAnim,plugins:{legend:{position:'bottom',labels:{font:{size:11},usePointStyle:true,pointStyle:'circle'}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:'rgba(0,0,0,.04)'}}}}
   });
+
+  // Adoption rate by month
+  var adoptData=[];
+  mKeys.forEach(function(mk){
+    var mOrders=orders.filter(function(o){return monthKey(o.fecha)===mk;});
+    var mEmp=mOrders.filter(function(o){return o.tieneEmpaque;}).length;
+    adoptData.push(mOrders.length?Math.round(mEmp/mOrders.length*100):0);
+  });
+  charts.empAdopt=new Chart(document.getElementById('ch-emp-adopt'),{
+    type:'line',
+    data:{labels:mKeys.map(monthLabel),datasets:[{label:'% con empaque',data:adoptData,borderColor:COLORS.teal,backgroundColor:'rgba(13,148,136,.12)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:COLORS.teal}]},
+    options:{responsive:true,animation:{duration:1200},plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,ticks:{callback:function(v){return v+'%';}},grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}
+  });
+
+  // Cotizaciones con empaque detail
+  var cotCache=getCotCache();
+  var cotEmpItems={};
+  cotCache.forEach(function(cot){
+    if(!cot.items)return;
+    cot.items.forEach(function(it){
+      if(it.cat==='empaque'){
+        var name=it.l.replace(/\s*×\s*\d+/,'').trim();
+        if(!cotEmpItems[name])cotEmpItems[name]={qty:0,venta:0,count:0};
+        cotEmpItems[name].qty+=(it.qty||0);
+        cotEmpItems[name].venta+=(it.v||0);
+        cotEmpItems[name].count++;
+      }
+    });
+  });
+  var cotEmpTop=topN(cotEmpItems.qty?cotEmpItems:{},10);
+  var cotEmpArr=[];
+  for(var ek in cotEmpItems)cotEmpArr.push({name:ek,qty:cotEmpItems[ek].qty,venta:cotEmpItems[ek].venta,count:cotEmpItems[ek].count});
+  cotEmpArr.sort(function(a,b){return b.venta-a.venta;});
+  var cotEmpHTML='';
+  if(cotEmpArr.length){
+    var maxCotEmp=cotEmpArr[0].venta||1;
+    cotEmpHTML='<table class="rank-table"><thead><tr><th>Material</th><th>Uds</th><th>Venta</th><th></th></tr></thead><tbody>';
+    cotEmpArr.slice(0,8).forEach(function(e){
+      cotEmpHTML+='<tr><td>'+e.name+'</td><td>'+e.qty+'</td><td>'+fmtM(e.venta)+'</td><td style="width:30%"><div class="rank-bar"><div class="rank-bar-fill" style="width:'+Math.round(e.venta/maxCotEmp*100)+'%;background:'+COLORS.teal+'"></div></div></td></tr>';
+    });
+    cotEmpHTML+='</tbody></table>';
+    cotEmpHTML+='<div class="kpi-sub" style="margin-top:8px;text-align:center">'+cotCache.length+' cotizaciones en cache</div>';
+  }else{
+    cotEmpHTML='<div class="empty-state"><p>Sin cotizaciones en cache</p><p class="kpi-sub">Se llenan al usar el cotizador</p></div>';
+  }
+  document.getElementById('cot-empaque-detail').innerHTML=cotEmpHTML;
 
   observeCards();
 }
@@ -702,6 +754,24 @@ function renderOperacion(orders,allOrders){
   html+='<div class="chart-row">'
     +'<div class="chart-box"><div class="chart-title">Top zonas origen</div><div class="chart-canvas"><canvas id="ch-zonas-orig"></canvas></div></div>'
     +'<div class="chart-box"><div class="chart-title">Top zonas destino</div><div class="chart-canvas"><canvas id="ch-zonas-dest"></canvas></div></div>'
+    +'</div>';
+
+  // Servicios por mes trend
+  html+='<div class="chart-row">'
+    +'<div class="chart-box"><div class="chart-title">Servicios por mes <span class="tag">Urbano vs Nacional</span></div><div class="chart-canvas"><canvas id="ch-serv-trend"></canvas></div></div>'
+    +'<div class="chart-box"><div class="chart-title">Operarios por mes <span class="tag">Promedio</span></div><div class="chart-canvas"><canvas id="ch-ops-trend"></canvas></div></div>'
+    +'</div>';
+
+  // Instalaciones (from cotizador cache)
+  html+='<div class="chart-row">'
+    +'<div class="chart-box"><div class="chart-title">Desglose de instalaciones <span class="tag">Cotizaciones</span></div><div id="rank-instalaciones"></div></div>'
+    +'<div class="chart-box"><div class="chart-title">Manipulaciones especiales <span class="tag">Cotizaciones</span></div><div id="rank-adicionales"></div></div>'
+    +'</div>';
+
+  // Bodegaje from cotizador cache
+  html+='<div class="chart-row">'
+    +'<div class="chart-box"><div class="chart-title">Bodegaje cotizado <span class="tag">Cotizaciones</span></div><div id="rank-bodegaje"></div></div>'
+    +'<div class="chart-box"><div class="chart-title">Desempaque cotizado <span class="tag">Cotizaciones</span></div><div id="rank-desempaque"></div></div>'
     +'</div>';
 
   container.innerHTML=html;
@@ -751,6 +821,77 @@ function renderOperacion(orders,allOrders){
     type:'bar',
     data:{labels:destTop.map(function(v){return v.key;}),datasets:[{data:destTop.map(function(v){return v.val;}),backgroundColor:COLORS.orange,borderRadius:8,borderSkipped:false}]},
     options:{indexAxis:'y',responsive:true,animation:barAnim,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}},y:{grid:{display:false}}}}
+  });
+
+  // Servicios por mes: urbano vs nacional
+  var sMonths=countBy(orders,function(o){return monthKey(o.fecha);});
+  var smKeys=Object.keys(sMonths).sort();
+  var smUrb=[],smNac=[];
+  smKeys.forEach(function(mk){
+    var mOrd=orders.filter(function(o){return monthKey(o.fecha)===mk;});
+    smUrb.push(mOrd.filter(function(o){return o.esUrbano;}).length);
+    smNac.push(mOrd.filter(function(o){return !o.esUrbano;}).length);
+  });
+  charts.servTrend=new Chart(document.getElementById('ch-serv-trend'),{
+    type:'bar',
+    data:{labels:smKeys.map(monthLabel),datasets:[
+      {label:'Urbano',data:smUrb,backgroundColor:COLORS.blue,borderRadius:4,borderSkipped:false},
+      {label:'Nacional',data:smNac,backgroundColor:COLORS.orange,borderRadius:4,borderSkipped:false}
+    ]},
+    options:{responsive:true,animation:barAnim,plugins:{legend:{position:'bottom',labels:{font:{size:11},usePointStyle:true,pointStyle:'circle'}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(0,0,0,.04)'}}}}
+  });
+
+  // Operarios promedio por mes
+  var opsAvg=[];
+  smKeys.forEach(function(mk){
+    var mOrd=orders.filter(function(o){return monthKey(o.fecha)===mk;});
+    var sOps=sumBy(mOrd,function(o){return o.numOperarios;});
+    opsAvg.push(mOrd.length?Math.round(sOps/mOrd.length*10)/10:0);
+  });
+  charts.opsTrend=new Chart(document.getElementById('ch-ops-trend'),{
+    type:'line',
+    data:{labels:smKeys.map(monthLabel),datasets:[{label:'Promedio ops',data:opsAvg,borderColor:COLORS.teal,backgroundColor:'rgba(13,148,136,.12)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:COLORS.teal}]},
+    options:{responsive:true,animation:{duration:1200},plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}
+  });
+
+  // Cotizador cache: instalaciones, adicionales, bodegaje, desempaque
+  var cotCache=getCotCache();
+  var catSections=[
+    {cat:'instalaciones',elId:'rank-instalaciones'},
+    {cat:'adicionales',elId:'rank-adicionales'},
+    {cat:'bodegaje',elId:'rank-bodegaje'},
+    {cat:'desempaque',elId:'rank-desempaque'}
+  ];
+  catSections.forEach(function(sec){
+    var items={};
+    cotCache.forEach(function(cot){
+      if(!cot.items)return;
+      cot.items.forEach(function(it){
+        if(it.cat===sec.cat){
+          var name=it.l.replace(/\s*[×x]\s*\d+/i,'').trim();
+          if(!items[name])items[name]={qty:0,venta:0,count:0};
+          items[name].qty+=(it.qty||0);
+          items[name].venta+=(it.v||0);
+          items[name].count++;
+        }
+      });
+    });
+    var arr=[];
+    for(var ik in items)arr.push({name:ik,qty:items[ik].qty,venta:items[ik].venta,count:items[ik].count});
+    arr.sort(function(a,b){return b.count-a.count;});
+    var el=document.getElementById(sec.elId);
+    if(!el)return;
+    if(arr.length){
+      var maxV=arr[0].count||1;
+      var h='<table class="rank-table"><thead><tr><th>Concepto</th><th>Veces</th><th>Uds</th><th>Venta</th><th></th></tr></thead><tbody>';
+      arr.slice(0,8).forEach(function(it){
+        h+='<tr><td>'+it.name+'</td><td><strong>'+it.count+'</strong></td><td>'+it.qty+'</td><td>'+fmtM(it.venta)+'</td><td style="width:25%"><div class="rank-bar"><div class="rank-bar-fill" style="width:'+Math.round(it.count/maxV*100)+'%"></div></div></td></tr>';
+      });
+      h+='</tbody></table>';
+      el.innerHTML=h;
+    }else{
+      el.innerHTML='<div class="empty-state"><p>Sin datos</p><p class="kpi-sub">Se llenan al cotizar con el cotizador</p></div>';
+    }
   });
 
   observeCards();
