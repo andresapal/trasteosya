@@ -194,6 +194,34 @@ body.is-operator .drawer .drawer-actions {
 }
 .ty-op-toolbar__logout:hover { background: #E30613; }
 
+/* Dark mode toggle in toolbar */
+.ty-op-toolbar__dark {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.85);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  flex-shrink: 0;
+}
+.ty-op-toolbar__dark:hover {
+  background: rgba(255,255,255,0.16);
+  border-color: rgba(93,168,255,0.5);
+  transform: scale(1.1);
+}
+body.ty-dark .ty-op-toolbar__dark {
+  background: rgba(93,168,255,0.2);
+  border-color: rgba(93,168,255,0.5);
+  color: #93b4f5;
+}
+
 /* Reseña button in toolbar */
 .ty-op-toolbar__resena {
   background: none;
@@ -362,6 +390,159 @@ body.is-operator .drawer .drawer-actions {
   box-shadow: 0 6px 20px rgba(227,6,19,0.55);
   transform: translateY(-1px);
 }
+
+/* ============================================
+   MODO OSCURO (solo operador)
+   ============================================ */
+body.ty-dark {
+  --ty-bg: #0f1117;
+  --ty-card: rgba(30, 32, 44, .95);
+  --ty-border: rgba(255, 255, 255, .08);
+  --ty-dark: #e8eaed;
+  --ty-muted: #9ca3af;
+  background: linear-gradient(135deg, #0f1117 0%, #161822 40%, #1a1c28 100%) !important;
+  color: #e8eaed;
+}
+body.ty-dark .header,
+body.ty-dark .kpi-header {
+  background: rgba(22, 24, 34, .92) !important;
+  border-bottom-color: rgba(255, 255, 255, .06) !important;
+  box-shadow: 0 1px 20px rgba(0, 0, 0, .3) !important;
+}
+body.ty-dark .header h1,
+body.ty-dark .kpi-header h1 { color: #93b4f5 !important; }
+body.ty-dark .header-nav a {
+  color: #93b4f5 !important;
+  border-color: rgba(147, 180, 245, .2) !important;
+  background: rgba(147, 180, 245, .06) !important;
+}
+body.ty-dark .header-nav a:hover {
+  background: #1B3E8C !important;
+  color: #fff !important;
+}
+
+/* Cards, chart boxes, filters */
+body.ty-dark .kpi-card,
+body.ty-dark .chart-box,
+body.ty-dark .filters,
+body.ty-dark .period-bar,
+body.ty-dark .growth-card {
+  background: rgba(30, 32, 44, .95) !important;
+  border-color: rgba(255, 255, 255, .08) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, .3) !important;
+}
+body.ty-dark .chart-box:hover {
+  box-shadow: 0 4px 24px rgba(93, 168, 255, .12) !important;
+  border-color: rgba(93, 168, 255, .2) !important;
+}
+body.ty-dark .chart-box.chart-glow {
+  box-shadow: 0 6px 32px rgba(93, 168, 255, .2), 0 0 0 2px rgba(93, 168, 255, .1) !important;
+  border-color: rgba(93, 168, 255, .3) !important;
+}
+body.ty-dark .kpi-card::after { background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.06) 50%, transparent 70%) !important; }
+
+/* Text */
+body.ty-dark .kpi-value,
+body.ty-dark .chart-title,
+body.ty-dark .growth-value,
+body.ty-dark .section-title,
+body.ty-dark h2, body.ty-dark h3 { color: #e8eaed !important; }
+body.ty-dark .kpi-label,
+body.ty-dark .kpi-sub,
+body.ty-dark .growth-label,
+body.ty-dark .growth-sub,
+body.ty-dark .period-info { color: #9ca3af !important; }
+
+/* Tables */
+body.ty-dark .rank-table th { color: #9ca3af !important; border-bottom-color: rgba(255,255,255,.08) !important; }
+body.ty-dark .rank-table td { color: #e8eaed !important; border-bottom-color: rgba(255,255,255,.04) !important; }
+body.ty-dark .rank-table tr:hover td { background: rgba(93,168,255,.04) !important; }
+body.ty-dark .rank-num { color: #93b4f5 !important; }
+body.ty-dark .rank-bar { background: rgba(255,255,255,.06) !important; }
+
+/* Tabs */
+body.ty-dark .mod-tabs { background: rgba(255,255,255,.04) !important; }
+body.ty-dark .mod-tab { color: #9ca3af !important; }
+body.ty-dark .mod-tab.active { background: rgba(30,32,44,.95) !important; color: #93b4f5 !important; box-shadow: 0 2px 8px rgba(0,0,0,.3) !important; }
+body.ty-dark .mod-tab:hover { color: #93b4f5 !important; }
+
+/* Period pills */
+body.ty-dark .period-pill { color: #9ca3af !important; }
+body.ty-dark .period-pill:hover { background: rgba(93,168,255,.08) !important; color: #93b4f5 !important; }
+body.ty-dark .period-pill.active { background: #1B3E8C !important; color: #fff !important; }
+body.ty-dark .period-custom input {
+  background: rgba(255,255,255,.06) !important;
+  border-color: rgba(255,255,255,.1) !important;
+  color: #e8eaed !important;
+}
+
+/* Inputs, selects */
+body.ty-dark input,
+body.ty-dark select,
+body.ty-dark textarea {
+  background: rgba(255,255,255,.06) !important;
+  border-color: rgba(255,255,255,.1) !important;
+  color: #e8eaed !important;
+}
+body.ty-dark input:focus,
+body.ty-dark select:focus,
+body.ty-dark textarea:focus {
+  border-color: rgba(93,168,255,.5) !important;
+  box-shadow: 0 0 0 3px rgba(93,168,255,.12) !important;
+}
+
+/* Buttons */
+body.ty-dark .btn-filter,
+body.ty-dark .filter-btn,
+body.ty-dark button[type="button"]:not(.ty-op-toolbar__logout):not(.ty-op-toolbar__dark):not(.mod-tab):not(.period-pill) {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.1);
+  color: #e8eaed;
+}
+
+/* Funnel bars */
+body.ty-dark .funnel-label { color: #e8eaed !important; }
+body.ty-dark .funnel-pct { color: #9ca3af !important; }
+
+/* Empty state */
+body.ty-dark .empty-state { color: #9ca3af !important; }
+body.ty-dark .empty-state h2 { color: #e8eaed !important; }
+
+/* Scrollbars */
+body.ty-dark ::-webkit-scrollbar { width: 6px; height: 6px; }
+body.ty-dark ::-webkit-scrollbar-track { background: transparent; }
+body.ty-dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 3px; }
+
+/* Maps in dark mode */
+body.ty-dark .map-wrap { border-color: rgba(255,255,255,.08) !important; background: #1a1c28 !important; }
+body.ty-dark .map-legend { color: #9ca3af !important; }
+
+/* Cotizador dark overrides */
+body.ty-dark .card,
+body.ty-dark .panel,
+body.ty-dark .section,
+body.ty-dark .drawer { background: rgba(30,32,44,.95) !important; border-color: rgba(255,255,255,.08) !important; }
+body.ty-dark label { color: #c8cbd0 !important; }
+body.ty-dark .sum-line,
+body.ty-dark .tot-row { border-color: rgba(255,255,255,.06) !important; }
+
+/* Orden de servicio */
+body.ty-dark .os-card,
+body.ty-dark .os-section { background: rgba(30,32,44,.95) !important; border-color: rgba(255,255,255,.08) !important; }
+
+/* Servicios page */
+body.ty-dark table { background: rgba(30,32,44,.95) !important; }
+body.ty-dark th { background: rgba(22,24,34,.9) !important; color: #9ca3af !important; }
+body.ty-dark td { color: #e8eaed !important; }
+body.ty-dark tr:nth-child(even) td { background: rgba(255,255,255,.02) !important; }
+
+/* Badge */
+body.ty-dark .kpi-badge.up { background: rgba(21,128,61,.2) !important; }
+body.ty-dark .kpi-badge.down { background: rgba(227,6,19,.2) !important; }
+
+/* Lock button adjustment */
+body.ty-dark .ty-lock-btn { background: rgba(30,32,44,.85) !important; border-color: rgba(255,255,255,.1) !important; }
+body.ty-dark .ty-lock-btn:not(.ty-lock-btn--on) { color: #9ca3af !important; }
 
 /* ============================================
    MODO PUBLICO (cotizador) — esconde TODO lo de costos
