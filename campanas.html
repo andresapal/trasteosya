@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -121,7 +121,7 @@ body.ty-dark .preview-box{background:rgba(22,163,74,.08);border-color:rgba(22,16
 <div class="header">
   <div class="header-inner">
     <div class="header-left">
-      <a href="index.html"><img src="assets/img/logo.svg" alt="Trasteos Ya"></a>
+      <a href="index.html"><img src="assets/img/logo.png" alt="Trasteos Ya"></a>
       <h1>Campa&#241;as</h1>
     </div>
   </div>
@@ -148,7 +148,7 @@ body.ty-dark .preview-box{background:rgba(22,163,74,.08);border-color:rgba(22,16
 
     <!-- CAMPAIGN HISTORY -->
     <div class="hist-section" id="hist-section">
-      <h3>Historial de campanas</h3>
+      <h3>Historial de campañas</h3>
       <div id="hist-list"></div>
     </div>
   </div>
@@ -157,16 +157,16 @@ body.ty-dark .preview-box{background:rgba(22,163,74,.08);border-color:rgba(22,16
   <div>
     <div class="campaign">
       <div class="camp-head">
-        <h2>Crear campana</h2>
-        <p>Selecciona clientes y elige un modelo de campana</p>
+        <h2>Crear campaña</h2>
+        <p>Selecciona clientes y elige un modelo de campaña</p>
       </div>
       <div class="camp-body">
         <div class="field">
-          <label>Nombre de la campana</label>
+          <label>Nombre de la campaña</label>
           <input type="text" id="camp-name" placeholder="Ej: Referidos Julio 2026" oninput="updatePreview()">
         </div>
         <div class="field">
-          <label>Modelo de campana</label>
+          <label>Modelo de campaña</label>
           <div class="tpl-grid" id="tpl-grid"></div>
         </div>
         <div class="field">
@@ -182,10 +182,10 @@ body.ty-dark .preview-box{background:rgba(22,163,74,.08);border-color:rgba(22,16
       <div class="camp-actions">
         <button class="btn btn-wa" id="btn-send" onclick="ejecutarCampana()" disabled>
           <svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:middle;margin-right:4px" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-          Enviar campana (<span id="btn-count">0</span> clientes)
+          Enviar campaña (<span id="btn-count">0</span> clientes)
         </button>
         <button class="btn" onclick="copiarLista()">Copiar lista de numeros</button>
-        <button class="btn" onclick="exportarCampana()">Descargar CSV de campana</button>
+        <button class="btn" onclick="exportarCampana()">Descargar CSV de campaña</button>
       </div>
     </div>
   </div>
@@ -217,7 +217,7 @@ var TEMPLATES={
   temporada:{
     icon:'T',
     name:'Temporada',
-    desc:'Campanas de fechas clave',
+    desc:'Campañas de fechas clave',
     model:'Seasonal marketing calendar',
     msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nSe acerca la temporada de mudanzas y queremos que sepas que estamos listos para ayudarte o a quien tu conozcas.\n\nReserva con anticipacion y obtén *precio preferencial* como cliente nuestro.\n\nCotiza gratis: trasteosya.online\n\nGracias por tu confianza.'
   },
@@ -245,23 +245,71 @@ var TEMPLATES={
 };
 
 // ============ LOAD CLIENTS ============
+function getOSContacts(){
+  var contacts=[];
+  var seen={};
+  try{
+    var idx=JSON.parse(localStorage.getItem('ty_os_index')||'[]');
+    idx.forEach(function(key){
+      try{
+        var os=JSON.parse(localStorage.getItem('ty_os_'+key)||'{}');
+        var name=os.cliente||os.nombreCliente||'';
+        var phone=os.telefono||os.celularCliente||'';
+        var city=os.ciudadOrigen||'';
+        if(name&&phone&&!seen[phone]){
+          seen[phone]=true;
+          contacts.push({n:name,p:phone,c:city});
+        }
+      }catch(_){}
+    });
+  }catch(_){}
+  try{
+    var cache=JSON.parse(localStorage.getItem('ty_cot_cache')||'[]');
+    cache.forEach(function(c){
+      var name=c.nombre||c.cliente||'';
+      var phone=c.telefono||c.celular||'';
+      var city=c.ciudadOrigen||'';
+      if(name&&phone&&!seen[phone]){
+        seen[phone]=true;
+        contacts.push({n:name,p:phone,c:city});
+      }
+    });
+  }catch(_){}
+  return contacts;
+}
+
+function mergeContacts(fileClients,osContacts){
+  var seen={};
+  var merged=[];
+  fileClients.forEach(function(c){seen[c.p]=true;merged.push(c);});
+  osContacts.forEach(function(c){if(!seen[c.p]){seen[c.p]=true;merged.push(c);}});
+  merged.sort(function(a,b){return a.n.localeCompare(b.n);});
+  return merged;
+}
+
+function initClients(fileClients){
+  var osContacts=getOSContacts();
+  CLIENTS=mergeContacts(fileClients||[],osContacts);
+  filtered=CLIENTS.slice();
+  renderStats();
+  renderClients();
+  renderTemplates();
+  updatePreview();
+  renderHistory();
+}
+
 function loadClients(){
   try{
     var xhr=new XMLHttpRequest();
     xhr.open('GET','/output/clientes.json',true);
     xhr.onload=function(){
       if(xhr.status===200){
-        CLIENTS=JSON.parse(xhr.responseText);
-        filtered=CLIENTS.slice();
-        renderStats();
-        renderClients();
-        renderTemplates();
-        updatePreview();
-        renderHistory();
-      }
+        try{initClients(JSON.parse(xhr.responseText));}catch(_){initClients([]);}
+      }else{initClients([]);}
     };
+    xhr.onerror=function(){initClients([]);};
     xhr.send();
-  }catch(e){console.error('Error loading clients:',e);}
+  }catch(e){initClients([]);}
 }
 
 // ============ RENDER ============
@@ -272,7 +320,7 @@ function renderStats(){
     '<div class="stat"><div class="num">'+total+'</div><div class="lbl">Total clientes</div></div>'+
     '<div class="stat"><div class="num">'+selected.size+'</div><div class="lbl">Seleccionados</div></div>'+
     '<div class="stat"><div class="num">'+withCity+'</div><div class="lbl">Con ciudad</div></div>'+
-    '<div class="stat"><div class="num">'+getCampaignCount()+'</div><div class="lbl">Campanas enviadas</div></div>';
+    '<div class="stat"><div class="num">'+getCampaignCount()+'</div><div class="lbl">Campañas enviadas</div></div>';
 }
 
 function renderClients(){
@@ -432,7 +480,7 @@ function saveCampaign(name,type,msg,count){
 }
 function renderHistory(){
   var h=getCampaigns();
-  if(!h.length){document.getElementById('hist-list').innerHTML='<div style="color:var(--muted);font-size:13px">Aun no has enviado campanas</div>';return;}
+  if(!h.length){document.getElementById('hist-list').innerHTML='<div style="color:var(--muted);font-size:13px">Aun no has enviado campañas</div>';return;}
   var html='';
   h.slice(0,10).forEach(function(c){
     var d=new Date(c.date);
@@ -456,7 +504,7 @@ selectTemplate('referidos');
 loadClients();
 </script>
 <script src="js/swipe-nav.js"></script>
-<link rel="stylesheet" href="css/access-gate.css?v=7"/>
-<script src="js/access-gate.js?v=7"></script>
+<link rel="stylesheet" href="css/access-gate.css?v=8"/>
+<script src="js/access-gate.js?v=8"></script>
 </body>
 </html>

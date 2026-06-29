@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
@@ -38,8 +38,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;background:#f0f2
 .tab:not(.active) .badge{background:#e2e5ea;color:#666}
 
 /* Table */
-.tbl-wrap{background:#fff;border-radius:12px;border:1px solid #e2e5ea;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl-wrap{background:#fff;border-radius:12px;border:1px solid #e2e5ea;overflow-x:auto;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
 .tbl thead{background:#f8f9fb;position:sticky;top:60px;z-index:10}
 .tbl th{padding:10px 12px;text-align:left;font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #e2e5ea;white-space:nowrap}
 .tbl td{padding:10px 12px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
@@ -71,7 +71,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;background:#f0f2
   .kpi-notes{width:100%}
 }
 </style>
-<link rel="stylesheet" href="css/access-gate.css?v=7"/>
+<link rel="stylesheet" href="css/access-gate.css?v=8"/>
 </head>
 <body data-gate="admin-only">
 
@@ -293,6 +293,6 @@ function render(){
 render();
 </script>
 <script src="js/swipe-nav.js"></script>
-<script src="js/access-gate.js?v=7"></script>
+<script src="js/access-gate.js?v=8"></script>
 </body>
 </html>
