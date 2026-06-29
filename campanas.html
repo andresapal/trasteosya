@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="/assets/img/logo.svg">
+<title>Campanas · Trasteos Ya</title>
+<link rel="stylesheet" href="css/tokens.css"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+html{overflow-x:hidden}
+body{font-family:'Source Sans 3',sans-serif;background:#f4f5f9;color:#111827;font-size:14px;line-height:1.5;min-height:100vh;overflow-x:hidden}
+:root{--brand:#003DA5;--brand2:#E30613;--brand-light:#e8edfb;--surface:#fff;--border:#e2e5ed;--muted:#6b7280;--radius:10px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+
+/* HEADER */
+.header{background:#fff;border-bottom:3px solid var(--brand);position:sticky;top:0;z-index:100;padding:0 20px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-left img{height:38px}
+.header-left h1{font-size:15px;font-weight:700;color:var(--brand)}
+.header-nav{display:flex;gap:6px}
+.header-nav a{font-size:12px;padding:6px 12px;border-radius:6px;text-decoration:none;color:var(--muted);font-weight:500;transition:.15s}
+.header-nav a:hover{background:var(--brand-light);color:var(--brand)}
+
+/* LAYOUT */
+.layout{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 400px;gap:16px;padding:16px 20px 100px}
+@media(max-width:900px){.layout{grid-template-columns:1fr;padding:12px 12px 120px}
+  input,select,textarea{font-size:16px!important}
+}
+
+/* STATS BAR */
+.stats{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 16px;flex:1;min-width:120px;box-shadow:var(--shadow)}
+.stat .num{font-size:22px;font-weight:700;color:var(--brand);font-family:'JetBrains Mono',monospace}
+.stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+
+/* SEARCH + CONTROLS */
+.controls{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+.search-box{flex:1;min-width:180px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:13px;background:var(--surface)}
+.search-box:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(0,61,165,.1)}
+.btn{padding:8px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;white-space:nowrap}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.btn-primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+.btn-primary:hover{background:#002d7a}
+.btn-wa{background:#16a34a;color:#fff;border-color:#16a34a}
+.btn-wa:hover{background:#15803d}
+.btn-sm{padding:5px 10px;font-size:12px}
+.badge{display:inline-block;background:var(--brand-light);color:var(--brand);font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px}
+
+/* CLIENT LIST */
+.client-list{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.list-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);background:#fafbfc}
+.list-header label{font-size:12px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer}
+.list-header input[type=checkbox]{width:16px;height:16px;accent-color:var(--brand)}
+.list-scroll{max-height:55vh;overflow-y:auto}
+.cl-row{display:flex;align-items:center;padding:8px 14px;border-bottom:1px solid #f3f4f6;gap:10px;transition:background .1s;cursor:pointer}
+.cl-row:hover{background:#f8f9fc}
+.cl-row.selected{background:var(--brand-light)}
+.cl-row input[type=checkbox]{width:15px;height:15px;accent-color:var(--brand);flex-shrink:0;cursor:pointer}
+.cl-name{flex:1;font-size:13px;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cl-phone{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.cl-city{font-size:11px;color:var(--brand);background:var(--brand-light);padding:1px 6px;border-radius:4px;flex-shrink:0}
+.list-footer{padding:8px 14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);text-align:center}
+
+/* CAMPAIGN PANEL */
+.campaign{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);position:sticky;top:72px;overflow:hidden}
+.camp-head{padding:14px 16px;border-bottom:1px solid var(--border);background:#fafbfc}
+.camp-head h2{font-size:15px;font-weight:700}
+.camp-head p{font-size:12px;color:var(--muted);margin-top:2px}
+.camp-body{padding:14px 16px;display:flex;flex-direction:column;gap:12px;max-height:65vh;overflow-y:auto}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.field select,.field input,.field textarea{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:13px;background:var(--surface);transition:.15s}
+.field select:focus,.field input:focus,.field textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(0,61,165,.1)}
+.field textarea{resize:vertical;min-height:100px;line-height:1.5}
+
+/* TEMPLATE CARDS */
+.tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tpl-card{border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;transition:.15s;text-align:center}
+.tpl-card:hover{border-color:var(--brand);background:#fafbfc}
+.tpl-card.active{border-color:var(--brand);background:var(--brand-light)}
+.tpl-icon{font-size:20px;margin-bottom:4px}
+.tpl-name{font-size:12px;font-weight:600}
+.tpl-desc{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* PREVIEW */
+.preview-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;font-size:13px;white-space:pre-wrap;line-height:1.6;max-height:200px;overflow-y:auto}
+.preview-box .var{background:#fef3c7;padding:0 3px;border-radius:3px;font-weight:600}
+
+/* CAMP ACTIONS */
+.camp-actions{padding:12px 16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+
+/* HISTORY */
+.hist-section{margin-top:16px}
+.hist-section h3{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
+.hist-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:8px}
+.hist-top{display:flex;justify-content:space-between;align-items:center}
+.hist-name{font-weight:700;font-size:13px}
+.hist-date{font-size:11px;color:var(--muted)}
+.hist-stats{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* DARK MODE */
+body.ty-dark{background:#0f1117;color:#e8eaed}
+body.ty-dark .header{background:rgba(22,24,34,.92);border-bottom-color:rgba(255,255,255,.06)}
+body.ty-dark .stat,body.ty-dark .client-list,body.ty-dark .campaign,body.ty-dark .hist-card{background:rgba(30,32,44,.95);border-color:rgba(255,255,255,.08)}
+body.ty-dark .list-header,body.ty-dark .camp-head{background:rgba(20,22,32,.9)}
+body.ty-dark .cl-row{border-bottom-color:rgba(255,255,255,.04)}
+body.ty-dark .cl-row:hover{background:rgba(255,255,255,.04)}
+body.ty-dark .cl-row.selected{background:rgba(0,61,165,.2)}
+body.ty-dark .search-box,body.ty-dark .field select,body.ty-dark .field input,body.ty-dark .field textarea{background:rgba(20,22,32,.8);border-color:rgba(255,255,255,.1);color:#e8eaed}
+body.ty-dark .btn{background:rgba(30,32,44,.95);border-color:rgba(255,255,255,.1);color:#e8eaed}
+body.ty-dark .tpl-card{border-color:rgba(255,255,255,.08);background:rgba(20,22,32,.8)}
+body.ty-dark .tpl-card.active{background:rgba(0,61,165,.2);border-color:rgba(0,61,165,.5)}
+body.ty-dark .preview-box{background:rgba(22,163,74,.08);border-color:rgba(22,163,74,.2);color:#e8eaed}
+body.ty-dark .header-nav a{color:rgba(255,255,255,.5)}
+body.ty-dark .header-nav a:hover{background:rgba(255,255,255,.08);color:#fff}
+
+/* PRINT */
+@media print{.header,.controls,.camp-actions,.header-nav{display:none!important}}
+</style>
+</head>
+<body data-gate="admin-only">
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <img src="assets/img/logo.svg" alt="Logo">
+      <h1>Campanas</h1>
+    </div>
+    <div class="header-nav">
+      <a href="cotizador.html">Cotizador</a>
+      <a href="kpi-empresa.html">KPI Empresa</a>
+      <a href="servicios.html">Servicios</a>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- LEFT: CLIENTS -->
+  <div>
+    <div class="stats" id="stats-bar"></div>
+    <div class="controls">
+      <input type="text" class="search-box" id="search" placeholder="Buscar por nombre o telefono..." oninput="filterClients()">
+      <button class="btn btn-sm" onclick="selectAll()">Todos</button>
+      <button class="btn btn-sm" onclick="selectNone()">Ninguno</button>
+      <span class="badge" id="sel-count">0 seleccionados</span>
+    </div>
+    <div class="client-list">
+      <div class="list-header">
+        <label><input type="checkbox" id="check-all" onchange="toggleAll(this.checked)"> Seleccionar pagina</label>
+        <span style="font-size:12px;color:var(--muted)" id="showing-count"></span>
+      </div>
+      <div class="list-scroll" id="client-scroll"></div>
+      <div class="list-footer" id="list-footer"></div>
+    </div>
+
+    <!-- CAMPAIGN HISTORY -->
+    <div class="hist-section" id="hist-section">
+      <h3>Historial de campanas</h3>
+      <div id="hist-list"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CAMPAIGN PANEL -->
+  <div>
+    <div class="campaign">
+      <div class="camp-head">
+        <h2>Crear campana</h2>
+        <p>Selecciona clientes y elige un modelo de campana</p>
+      </div>
+      <div class="camp-body">
+        <div class="field">
+          <label>Nombre de la campana</label>
+          <input type="text" id="camp-name" placeholder="Ej: Referidos Julio 2026" oninput="updatePreview()">
+        </div>
+        <div class="field">
+          <label>Modelo de campana</label>
+          <div class="tpl-grid" id="tpl-grid"></div>
+        </div>
+        <div class="field">
+          <label>Mensaje WhatsApp</label>
+          <textarea id="camp-msg" placeholder="Escribe tu mensaje... Usa {nombre} para personalizar" oninput="updatePreview()"></textarea>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Variables: {nombre} = nombre del cliente</div>
+        </div>
+        <div class="field">
+          <label>Vista previa</label>
+          <div class="preview-box" id="preview"></div>
+        </div>
+      </div>
+      <div class="camp-actions">
+        <button class="btn btn-wa" id="btn-send" onclick="ejecutarCampana()" disabled>
+          <svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:middle;margin-right:4px" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          Enviar campana (<span id="btn-count">0</span> clientes)
+        </button>
+        <button class="btn" onclick="copiarLista()">Copiar lista de numeros</button>
+        <button class="btn" onclick="exportarCampana()">Descargar CSV de campana</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ DATA ============
+var CLIENTS=[];
+var selected=new Set();
+var filtered=[];
+var activeTpl='referidos';
+
+// Campaign templates based on proven marketing models
+var TEMPLATES={
+  referidos:{
+    icon:'R',
+    name:'Referidos',
+    desc:'Programa de referidos con incentivo',
+    model:'Viral Loop (Dropbox model)',
+    msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nGracias por haber confiado en nosotros para tu mudanza. Esperamos que todo haya quedado perfecto.\n\nQueremos invitarte a nuestro *programa de referidos*:\n\nPor cada persona que nos recomiendes y contrate con nosotros, recibes un *bono de $50.000* para tu proximo servicio (mudanza, bodegaje, empaque o instalaciones).\n\nSolo dile que te mencione al cotizar.\n\ntrasteosya.online\n\nGracias por ser parte de la familia Trasteos Ya.'
+  },
+  reactivacion:{
+    icon:'A',
+    name:'Reactivacion',
+    desc:'Recuperar clientes inactivos',
+    model:'Win-back campaign (RFM)',
+    msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nHace un tiempo tuvimos el gusto de ayudarte con tu mudanza y queriamos saber como te fue en tu nuevo hogar.\n\nSi conoces a alguien que necesite mudarse, recuerda que estamos para servirle con la misma calidad de siempre.\n\nAdemas, por ser cliente nuestro tienes un *10% de descuento* en tu proximo servicio.\n\ntrasteosya.online\n\nUn abrazo del equipo Trasteos Ya.'
+  },
+  temporada:{
+    icon:'T',
+    name:'Temporada',
+    desc:'Campanas de fechas clave',
+    model:'Seasonal marketing calendar',
+    msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nSe acerca la temporada de mudanzas y queremos que sepas que estamos listos para ayudarte o a quien tu conozcas.\n\nReserva con anticipacion y obtén *precio preferencial* como cliente nuestro.\n\nCotiza gratis: trasteosya.online\n\nGracias por tu confianza.'
+  },
+  agradecimiento:{
+    icon:'G',
+    name:'Agradecimiento',
+    desc:'Fortalecer relacion post-servicio',
+    model:'NPS + Relationship nurturing',
+    msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nQuiero agradecerte personalmente por haber confiado en nosotros. Tu satisfaccion es lo mas importante para nuestro equipo.\n\nSi en algun momento necesitas mudarte de nuevo, empacar, instalar o almacenar, aqui estamos para ti.\n\ntrasteosya.online\n\nUn gran saludo.'
+  },
+  corporativo:{
+    icon:'C',
+    name:'Corporativo',
+    desc:'Oficinas y empresas',
+    model:'B2B outreach (ABM lite)',
+    msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nManejamos mudanzas corporativas, traslado de oficinas, bodegas y archivos con personal capacitado y vehiculos adecuados.\n\nSi tu empresa o alguna que conozcas necesita este servicio, con gusto le hacemos una cotizacion sin compromiso.\n\ntrasteosya.online\n\nQuedo atento.'
+  },
+  fidelizacion:{
+    icon:'F',
+    name:'Fidelizacion',
+    desc:'Clientes VIP y recurrentes',
+    model:'Loyalty program (retention)',
+    msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nComo cliente especial nuestro, queremos ofrecerte beneficios exclusivos:\n\n- *Prioridad* en agenda para tu proxima mudanza\n- *Descuento VIP* del 15%\n- Empaque basico *sin costo adicional*\n\nEstos beneficios son intransferibles y validos por los proximos 60 dias.\n\ntrasteosya.online\n\nGracias por tu preferencia.'
+  }
+};
+
+// ============ LOAD CLIENTS ============
+function loadClients(){
+  try{
+    var xhr=new XMLHttpRequest();
+    xhr.open('GET','/output/clientes.json',true);
+    xhr.onload=function(){
+      if(xhr.status===200){
+        CLIENTS=JSON.parse(xhr.responseText);
+        filtered=CLIENTS.slice();
+        renderStats();
+        renderClients();
+        renderTemplates();
+        updatePreview();
+        renderHistory();
+      }
+    };
+    xhr.send();
+  }catch(e){console.error('Error loading clients:',e);}
+}
+
+// ============ RENDER ============
+function renderStats(){
+  var total=CLIENTS.length;
+  var withCity=CLIENTS.filter(function(c){return c.c;}).length;
+  document.getElementById('stats-bar').innerHTML=
+    '<div class="stat"><div class="num">'+total+'</div><div class="lbl">Total clientes</div></div>'+
+    '<div class="stat"><div class="num">'+selected.size+'</div><div class="lbl">Seleccionados</div></div>'+
+    '<div class="stat"><div class="num">'+withCity+'</div><div class="lbl">Con ciudad</div></div>'+
+    '<div class="stat"><div class="num">'+getCampaignCount()+'</div><div class="lbl">Campanas enviadas</div></div>';
+}
+
+function renderClients(){
+  var html='';
+  filtered.forEach(function(c,i){
+    var idx=CLIENTS.indexOf(c);
+    var sel=selected.has(idx);
+    var cityHtml=c.c?'<span class="cl-city">'+c.c+'</span>':'';
+    html+='<div class="cl-row'+(sel?' selected':'')+'" onclick="toggleClient('+idx+',this)">'+
+      '<input type="checkbox" '+(sel?'checked':'')+' onclick="event.stopPropagation();toggleClient('+idx+',this.parentElement)">'+
+      '<span class="cl-name">'+escH(c.n)+'</span>'+
+      '<span class="cl-phone">'+formatPhone(c.p)+'</span>'+
+      cityHtml+'</div>';
+  });
+  document.getElementById('client-scroll').innerHTML=html||'<div style="padding:20px;text-align:center;color:var(--muted)">No se encontraron clientes</div>';
+  document.getElementById('showing-count').textContent=filtered.length+' de '+CLIENTS.length;
+  document.getElementById('list-footer').textContent=filtered.length+' clientes mostrados';
+  updateSelCount();
+}
+
+function renderTemplates(){
+  var html='';
+  Object.keys(TEMPLATES).forEach(function(k){
+    var t=TEMPLATES[k];
+    html+='<div class="tpl-card'+(activeTpl===k?' active':'')+'" onclick="selectTemplate(\''+k+'\')">'+
+      '<div class="tpl-icon">'+t.icon+'</div>'+
+      '<div class="tpl-name">'+t.name+'</div>'+
+      '<div class="tpl-desc">'+t.desc+'</div></div>';
+  });
+  document.getElementById('tpl-grid').innerHTML=html;
+}
+
+function updatePreview(){
+  var msg=document.getElementById('camp-msg').value;
+  var sample=msg.replace(/\{nombre\}/g,'<span class="var">Maria Lopez</span>');
+  document.getElementById('preview').innerHTML=sample||'<span style="color:var(--muted)">Escribe un mensaje para ver la vista previa</span>';
+  var count=selected.size;
+  document.getElementById('btn-count').textContent=count;
+  document.getElementById('btn-send').disabled=count===0||!msg.trim();
+}
+
+function updateSelCount(){
+  document.getElementById('sel-count').textContent=selected.size+' seleccionados';
+  renderStats();
+  updatePreview();
+}
+
+// ============ INTERACTIONS ============
+function toggleClient(idx,row){
+  if(selected.has(idx)){selected.delete(idx);row.classList.remove('selected');row.querySelector('input').checked=false;}
+  else{selected.add(idx);row.classList.add('selected');row.querySelector('input').checked=true;}
+  updateSelCount();
+}
+
+function toggleAll(checked){
+  filtered.forEach(function(c){
+    var idx=CLIENTS.indexOf(c);
+    if(checked)selected.add(idx);else selected.delete(idx);
+  });
+  renderClients();
+}
+function selectAll(){filtered.forEach(function(c){selected.add(CLIENTS.indexOf(c));});document.getElementById('check-all').checked=true;renderClients();}
+function selectNone(){selected.clear();document.getElementById('check-all').checked=false;renderClients();}
+
+function filterClients(){
+  var q=(document.getElementById('search').value||'').toLowerCase().trim();
+  if(!q){filtered=CLIENTS.slice();}
+  else{filtered=CLIENTS.filter(function(c){return c.n.toLowerCase().indexOf(q)>=0||c.p.indexOf(q)>=0||(c.c||'').toLowerCase().indexOf(q)>=0;});}
+  renderClients();
+}
+
+function selectTemplate(k){
+  activeTpl=k;
+  var t=TEMPLATES[k];
+  document.getElementById('camp-msg').value=t.msg;
+  if(!document.getElementById('camp-name').value.trim()){
+    document.getElementById('camp-name').value=t.name+' '+new Date().toLocaleDateString('es-CO',{month:'long',year:'numeric'});
+  }
+  renderTemplates();
+  updatePreview();
+}
+
+// ============ CAMPAIGN ACTIONS ============
+function ejecutarCampana(){
+  if(selected.size===0){alert('Selecciona al menos un cliente');return;}
+  var msg=document.getElementById('camp-msg').value.trim();
+  if(!msg){alert('Escribe un mensaje');return;}
+  var campName=document.getElementById('camp-name').value.trim()||'Sin nombre';
+
+  var clients=[];
+  selected.forEach(function(idx){clients.push(CLIENTS[idx]);});
+
+  // Save campaign to history
+  saveCampaign(campName,activeTpl,msg,clients.length);
+
+  // Open WhatsApp links one by one with small delay
+  var i=0;
+  function next(){
+    if(i>=clients.length)return;
+    var c=clients[i];
+    var personal=msg.replace(/\{nombre\}/g,c.n.split(' ')[0]);
+    var url='https://wa.me/'+c.p+'?text='+encodeURIComponent(personal);
+    window.open(url,'_blank');
+    i++;
+    if(i<clients.length&&i<10){
+      setTimeout(next,800);
+    } else if(i>=10&&i<clients.length){
+      if(confirm('Se abrieron '+i+' chats. Continuar con los siguientes '+(clients.length-i)+'?')){
+        setTimeout(next,800);
+      }
+    }
+  }
+  if(confirm('Se abriran '+clients.length+' chats de WhatsApp con el mensaje personalizado.\n\nContinuar?')){
+    next();
+  }
+}
+
+function copiarLista(){
+  var lines=[];
+  selected.forEach(function(idx){
+    var c=CLIENTS[idx];
+    lines.push(c.n+'\t'+c.p);
+  });
+  if(!lines.length){alert('Selecciona al menos un cliente');return;}
+  var text=lines.join('\n');
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(function(){alert('Lista copiada al portapapeles ('+lines.length+' contactos)');});
+  } else {
+    var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+    alert('Lista copiada ('+lines.length+' contactos)');
+  }
+}
+
+function exportarCampana(){
+  var lines=['Nombre,Telefono,Ciudad'];
+  var targets=[];
+  if(selected.size>0){selected.forEach(function(idx){targets.push(CLIENTS[idx]);});}
+  else{targets=CLIENTS;}
+  targets.forEach(function(c){lines.push('"'+c.n+'","'+c.p+'","'+(c.c||'')+'"');});
+  var blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='campana_'+(document.getElementById('camp-name').value||'export').replace(/[^a-zA-Z0-9]/g,'_')+'.csv';
+  a.click();URL.revokeObjectURL(a.href);
+}
+
+// ============ CAMPAIGN HISTORY ============
+var HIST_KEY='ty_camp_history';
+function getCampaigns(){try{return JSON.parse(localStorage.getItem(HIST_KEY)||'[]');}catch(_){return[];}}
+function getCampaignCount(){return getCampaigns().length;}
+function saveCampaign(name,type,msg,count){
+  var h=getCampaigns();
+  h.unshift({name:name,type:type,count:count,date:new Date().toISOString()});
+  if(h.length>50)h.length=50;
+  localStorage.setItem(HIST_KEY,JSON.stringify(h));
+  renderHistory();
+  renderStats();
+}
+function renderHistory(){
+  var h=getCampaigns();
+  if(!h.length){document.getElementById('hist-list').innerHTML='<div style="color:var(--muted);font-size:13px">Aun no has enviado campanas</div>';return;}
+  var html='';
+  h.slice(0,10).forEach(function(c){
+    var d=new Date(c.date);
+    var fecha=d.toLocaleDateString('es-CO',{day:'numeric',month:'short',year:'numeric'});
+    var tpl=TEMPLATES[c.type]||{name:c.type};
+    html+='<div class="hist-card"><div class="hist-top"><span class="hist-name">'+escH(c.name)+'</span><span class="hist-date">'+fecha+'</span></div>'+
+      '<div class="hist-stats">'+tpl.name+' · '+c.count+' clientes</div></div>';
+  });
+  document.getElementById('hist-list').innerHTML=html;
+}
+
+// ============ UTILS ============
+function escH(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function formatPhone(p){
+  if(p.length===12&&p.startsWith('57')){return'+57 '+p.substring(2,5)+' '+p.substring(5,8)+' '+p.substring(8);}
+  return p;
+}
+
+// ============ INIT ============
+selectTemplate('referidos');
+loadClients();
+</script>
+<script src="js/swipe-nav.js"></script>
+<link rel="stylesheet" href="css/access-gate.css?v=5"/>
+<script src="js/access-gate.js?v=5"></script>
+</body>
+</html>
