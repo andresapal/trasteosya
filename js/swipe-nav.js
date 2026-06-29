@@ -5,7 +5,7 @@
     {path:'/orden-servicio.html',label:'Orden de Servicio'},
     {path:'/kpis.html',label:'KPI General'},
     {path:'/kpi-empresa.html',label:'KPI Empresa'},
-    {path:'/campanas.html',label:'Campanas'},
+    {path:'/campanas.html',label:'Campañas'},
     {path:'/servicios.html',label:'Servicios'}
   ];
 
