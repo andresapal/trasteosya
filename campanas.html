@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" type="image/svg+xml" href="/assets/img/logo.svg">
-<title>Campanas · Trasteos Ya</title>
+<title>Campa&#241;as · Trasteos Ya</title>
 <link rel="stylesheet" href="css/tokens.css"/>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
@@ -20,9 +20,6 @@ body{font-family:'Source Sans 3',sans-serif;background:#f4f5f9;color:#111827;fon
 .header-left{display:flex;align-items:center;gap:12px}
 .header-left img{height:38px}
 .header-left h1{font-size:15px;font-weight:700;color:var(--brand)}
-.header-nav{display:flex;gap:6px}
-.header-nav a{font-size:12px;padding:6px 12px;border-radius:6px;text-decoration:none;color:var(--muted);font-weight:500;transition:.15s}
-.header-nav a:hover{background:var(--brand-light);color:var(--brand)}
 
 /* LAYOUT */
 .layout{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 400px;gap:16px;padding:16px 20px 100px}
@@ -102,7 +99,7 @@ body{font-family:'Source Sans 3',sans-serif;background:#f4f5f9;color:#111827;fon
 .hist-stats{font-size:12px;color:var(--muted);margin-top:4px}
 
 /* DARK MODE */
-body.ty-dark{background:#0f1117;color:#e8eaed}
+body.ty-dark{color:#e8eaed}
 body.ty-dark .header{background:rgba(22,24,34,.92);border-bottom-color:rgba(255,255,255,.06)}
 body.ty-dark .stat,body.ty-dark .client-list,body.ty-dark .campaign,body.ty-dark .hist-card{background:rgba(30,32,44,.95);border-color:rgba(255,255,255,.08)}
 body.ty-dark .list-header,body.ty-dark .camp-head{background:rgba(20,22,32,.9)}
@@ -114,11 +111,9 @@ body.ty-dark .btn{background:rgba(30,32,44,.95);border-color:rgba(255,255,255,.1
 body.ty-dark .tpl-card{border-color:rgba(255,255,255,.08);background:rgba(20,22,32,.8)}
 body.ty-dark .tpl-card.active{background:rgba(0,61,165,.2);border-color:rgba(0,61,165,.5)}
 body.ty-dark .preview-box{background:rgba(22,163,74,.08);border-color:rgba(22,163,74,.2);color:#e8eaed}
-body.ty-dark .header-nav a{color:rgba(255,255,255,.5)}
-body.ty-dark .header-nav a:hover{background:rgba(255,255,255,.08);color:#fff}
 
 /* PRINT */
-@media print{.header,.controls,.camp-actions,.header-nav{display:none!important}}
+@media print{.header,.controls,.camp-actions{display:none!important}}
 </style>
 </head>
 <body data-gate="admin-only">
@@ -126,13 +121,8 @@ body.ty-dark .header-nav a:hover{background:rgba(255,255,255,.08);color:#fff}
 <div class="header">
   <div class="header-inner">
     <div class="header-left">
-      <img src="assets/img/logo.svg" alt="Logo">
-      <h1>Campanas</h1>
-    </div>
-    <div class="header-nav">
-      <a href="cotizador.html">Cotizador</a>
-      <a href="kpi-empresa.html">KPI Empresa</a>
-      <a href="servicios.html">Servicios</a>
+      <a href="index.html"><img src="assets/img/logo.svg" alt="Trasteos Ya"></a>
+      <h1>Campa&#241;as</h1>
     </div>
   </div>
 </div>
@@ -466,7 +456,7 @@ selectTemplate('referidos');
 loadClients();
 </script>
 <script src="js/swipe-nav.js"></script>
-<link rel="stylesheet" href="css/access-gate.css?v=5"/>
-<script src="js/access-gate.js?v=5"></script>
+<link rel="stylesheet" href="css/access-gate.css?v=7"/>
+<script src="js/access-gate.js?v=7"></script>
 </body>
 </html>
