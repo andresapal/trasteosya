@@ -169,6 +169,7 @@
       '<a href="cotizador.html" class="ty-op-toolbar__link">Cotizador</a>' +
       '<a href="orden-servicio.html" class="ty-op-toolbar__link">Orden de servicio</a>' +
       '<a href="kpi-empresa.html" class="ty-op-toolbar__link">KPI\'s</a>' +
+      '<a href="campanas.html" class="ty-op-toolbar__link">Campanas</a>' +
       '<a href="servicios.html" class="ty-op-toolbar__link">Servicios</a>' +
       '<button type="button" class="ty-op-toolbar__link ty-op-toolbar__resena" onclick="resenaStandalone()">Resena</button>' +
       '<button type="button" class="ty-op-toolbar__dark" title="Modo oscuro">' + (localStorage.getItem('ty_dark_mode')==='1' ? lightIcon : darkIcon) + '</button>' +
