@@ -395,17 +395,36 @@ body.ty-dark .ty-op-toolbar__dark {
    MODO OSCURO (solo operador)
    ============================================ */
 body.ty-dark {
-  --ty-bg: #0f1117;
+  --ty-bg: #0A1845;
   --ty-card: rgba(30, 32, 44, .95);
   --ty-border: rgba(255, 255, 255, .08);
   --ty-dark: #e8eaed;
   --ty-muted: #9ca3af;
-  background: linear-gradient(135deg, #0f1117 0%, #161822 40%, #1a1c28 100%) !important;
+  background: #0A1845 !important;
   color: #e8eaed;
+  position: relative;
+}
+body.ty-dark::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(45deg, rgba(255,255,255,0.045) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,0.045) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.045) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.045) 75%);
+  background-size: 56px 56px;
+  pointer-events: none;
+  z-index: 0;
+}
+body.ty-dark > * {
+  position: relative;
+  z-index: 1;
 }
 body.ty-dark .header,
-body.ty-dark .kpi-header {
-  background: rgba(22, 24, 34, .92) !important;
+body.ty-dark .kpi-header,
+body.ty-dark .main-header {
+  background: rgba(10, 24, 69, .95) !important;
   border-bottom-color: rgba(255, 255, 255, .06) !important;
   box-shadow: 0 1px 20px rgba(0, 0, 0, .3) !important;
 }
@@ -521,20 +540,51 @@ body.ty-dark .map-legend { color: #9ca3af !important; }
 body.ty-dark .card,
 body.ty-dark .panel,
 body.ty-dark .section,
-body.ty-dark .drawer { background: rgba(30,32,44,.95) !important; border-color: rgba(255,255,255,.08) !important; }
+body.ty-dark .drawer,
+body.ty-dark .summary,
+body.ty-dark .sum-head,
+body.ty-dark .mobile-bar { background: rgba(30,32,44,.95) !important; border-color: rgba(255,255,255,.08) !important; }
+body.ty-dark .btn-pdf { background: #1B3E8C !important; color: #fff !important; border-color: rgba(255,255,255,.1) !important; }
 body.ty-dark label { color: #c8cbd0 !important; }
 body.ty-dark .sum-line,
 body.ty-dark .tot-row { border-color: rgba(255,255,255,.06) !important; }
 
 /* Orden de servicio */
 body.ty-dark .os-card,
-body.ty-dark .os-section { background: rgba(30,32,44,.95) !important; border-color: rgba(255,255,255,.08) !important; }
+body.ty-dark .os-section,
+body.ty-dark .os-dropdown__menu,
+body.ty-dark .tab-bar,
+body.ty-dark .pv { background: rgba(30,32,44,.95) !important; border-color: rgba(255,255,255,.08) !important; }
+body.ty-dark .os-dropdown__menu button { background: transparent !important; color: #e8eaed !important; border-color: rgba(255,255,255,.08) !important; }
+body.ty-dark .os-dropdown__menu button:hover { background: rgba(93,168,255,.1) !important; }
+body.ty-dark .tab-bar .tab-btn { background: transparent !important; color: #9ca3af !important; border-color: rgba(255,255,255,.08) !important; }
+body.ty-dark .tab-bar .tab-btn.active { background: #1B3E8C !important; color: #fff !important; }
+body.ty-dark .btn { background: rgba(30,32,44,.85) !important; color: #e8eaed !important; border-color: rgba(255,255,255,.1) !important; }
+body.ty-dark .btn:hover { background: rgba(93,168,255,.15) !important; }
+body.ty-dark .btn-sm { background: rgba(30,32,44,.85) !important; color: #e8eaed !important; border-color: rgba(255,255,255,.1) !important; }
+body.ty-dark .btn-danger-sm { background: rgba(180,30,30,.3) !important; color: #f87171 !important; border-color: rgba(248,113,113,.2) !important; }
+body.ty-dark input, body.ty-dark select, body.ty-dark textarea { background: rgba(20,22,32,.9) !important; color: #e8eaed !important; border-color: rgba(255,255,255,.1) !important; }
+body.ty-dark input::placeholder { color: #6b7280 !important; }
 
 /* Servicios page */
-body.ty-dark table { background: rgba(30,32,44,.95) !important; }
+body.ty-dark .sum-card,
+body.ty-dark .tab,
+body.ty-dark .tabs { background: rgba(30,32,44,.95) !important; border-color: rgba(255,255,255,.08) !important; }
+body.ty-dark .tab { color: #9ca3af !important; }
+body.ty-dark .tab.active { background: #1B3E8C !important; color: #fff !important; }
+body.ty-dark .sum-card .label { color: #9ca3af !important; }
+body.ty-dark .sum-card .value { color: #e8eaed !important; }
+body.ty-dark .sum-card .sub { color: #6b7280 !important; }
+body.ty-dark .tbl-wrap,
+body.ty-dark table { background: rgba(30,32,44,.95) !important; border-color: rgba(255,255,255,.08) !important; }
 body.ty-dark th { background: rgba(22,24,34,.9) !important; color: #9ca3af !important; }
-body.ty-dark td { color: #e8eaed !important; }
+body.ty-dark td { color: #e8eaed !important; border-color: rgba(255,255,255,.06) !important; }
 body.ty-dark tr:nth-child(even) td { background: rgba(255,255,255,.02) !important; }
+body.ty-dark .os-bottom-panel { background: rgba(10,24,69,.95) !important; border-color: rgba(255,255,255,.08) !important; }
+
+/* Cotizador header controls */
+body.ty-dark .costs-toggle { background: rgba(255,255,255,.06) !important; border-color: rgba(255,255,255,.1) !important; color: #9ca3af !important; }
+body.ty-dark .costs-toggle:hover { color: #93b4f5 !important; border-color: rgba(93,168,255,.3) !important; }
 
 /* Badge */
 body.ty-dark .kpi-badge.up { background: rgba(21,128,61,.2) !important; }
