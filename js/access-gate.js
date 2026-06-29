@@ -67,7 +67,10 @@
         setOperator(true);
         wrap.remove();
         if (opts.onSuccess) opts.onSuccess();
-        else location.reload();
+        else {
+          if (typeof _saveSession === 'function') _saveSession();
+          location.reload();
+        }
       } else {
         err.textContent = 'PIN incorrecto. Intenta de nuevo.';
         input.value = '';
@@ -160,14 +163,22 @@
     if (document.querySelector('.ty-op-toolbar')) return;
     const bar = document.createElement('div');
     bar.className = 'ty-op-toolbar ty-op-toolbar--hidden';
+    var darkIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
+    var lightIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
     bar.innerHTML =
       '<a href="cotizador.html" class="ty-op-toolbar__link">Cotizador</a>' +
       '<a href="orden-servicio.html" class="ty-op-toolbar__link">Orden de servicio</a>' +
       '<a href="kpi-empresa.html" class="ty-op-toolbar__link">KPI\'s</a>' +
       '<a href="servicios.html" class="ty-op-toolbar__link">Servicios</a>' +
-      '<button type="button" class="ty-op-toolbar__link ty-op-toolbar__resena" onclick="resenaStandalone()">Reseña</button>' +
+      '<button type="button" class="ty-op-toolbar__link ty-op-toolbar__resena" onclick="resenaStandalone()">Resena</button>' +
+      '<button type="button" class="ty-op-toolbar__dark" title="Modo oscuro">' + (localStorage.getItem('ty_dark_mode')==='1' ? lightIcon : darkIcon) + '</button>' +
       '<button type="button" class="ty-op-toolbar__logout">Salir</button>';
     document.body.appendChild(bar);
+    bar.querySelector('.ty-op-toolbar__dark').onclick = function () {
+      var isDark = document.body.classList.toggle('ty-dark');
+      localStorage.setItem('ty_dark_mode', isDark ? '1' : '0');
+      this.innerHTML = isDark ? lightIcon : darkIcon;
+    };
     bar.querySelector('.ty-op-toolbar__logout').onclick = function () {
       if (confirm('¿Cerrar sesión operador?')) {
         setOperator(false);
@@ -204,6 +215,9 @@
   // ============ INIT ============
   function boot() {
     applyBodyClass();
+    if (isOperator() && localStorage.getItem('ty_dark_mode') === '1') {
+      document.body.classList.add('ty-dark');
+    }
 
     const isAdminOnly = document.body.dataset.gate === 'admin-only';
     const hasGate = document.body.dataset.gate;
@@ -216,6 +230,9 @@
         message: 'Esta es una herramienta privada del equipo Trasteos Ya. Ingresa tu PIN para continuar.',
         onSuccess: function () {
           applyBodyClass();
+          if (localStorage.getItem('ty_dark_mode') === '1') {
+            document.body.classList.add('ty-dark');
+          }
           document.body.style.visibility = '';
           injectLockButton();
           injectOpToolbar();
