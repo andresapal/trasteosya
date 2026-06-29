@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="color-scheme" content="light"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
 <title>Orden de Servicio · Trasteos Ya</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+html{overflow-x:hidden}
+body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;background:#f0f2f5;color:#1a1a2e;min-height:100vh;overflow-x:hidden}
+@media(max-width:768px){input,select,textarea{font-size:16px!important}}
 .main-header{background:#fff;border-bottom:3px solid #1B3E8C;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.08)}
 .main-header img{height:42px;width:auto}
 .header-actions{display:flex;gap:8px;flex-wrap:wrap}
@@ -94,7 +96,7 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
 .td-sub{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .td-emp{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 </style>
-<link rel="stylesheet" href="css/access-gate.css?v=3"><meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="css/access-gate.css?v=5"><meta name="robots" content="noindex,nofollow">
 <!-- Librerias para backup automatico a Drive (captura preview -> PDF) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
@@ -1032,6 +1034,10 @@ async function backupOrden(){
     const pdf_base64=pdf.output('datauristring').split(',')[1];
     const filename=`${state.numeroOS||'OSTY'}.pdf`;
 
+    // Read financial values from ty_os_financials
+    var _fin={};try{_fin=JSON.parse(localStorage.getItem('ty_os_financials')||'{}');}catch(_){}
+    var _osKey='ty_os_'+(state.numeroOS||'temp');
+    var _fv=_fin[_osKey]||{};
     const payload={
       type:'orden',
       apikey:BACKUP_APIKEY,
@@ -1047,7 +1053,9 @@ async function backupOrden(){
         dirOrigen:(state.recogidas&&state.recogidas[0]?state.recogidas[0].direccion:'')||'',
         dirDestino:(state.entregas&&state.entregas[0]?state.entregas[0].direccion:'')||'',
         empaque:state.empaque||{},
-        empacadores:(state.personas||[]).filter(function(p){return p.esEmp;}).length
+        empacadores:(state.personas||[]).filter(function(p){return p.esEmp;}).length,
+        valor:_fv.valor||0,
+        costo:_fv.costo||0
       }
     };
     const ok=await _enviarDrive(payload);
@@ -1192,8 +1200,16 @@ function guardarOS(){
     const entry={key:key,os:state.numeroOS,cliente:state.cliente,fecha:state.cargueFecha||state.fecha,saved:data._saved};
     const existing=idx.findIndex(e=>e.key===key);
     if(existing>=0)idx[existing]=entry;else idx.unshift(entry);
-    if(idx.length>50)idx.length=50;
-    localStorage.setItem('ty_os_index',JSON.stringify(idx));
+    // Auto-clean entries older than 15 days
+    var cutoff=Date.now()-15*24*60*60*1000;
+    var cleaned=idx.filter(function(e){
+      if(!e.saved)return true;
+      if(new Date(e.saved).getTime()>cutoff)return true;
+      try{localStorage.removeItem(e.key);}catch(_){}
+      return false;
+    });
+    if(cleaned.length>50)cleaned.length=50;
+    localStorage.setItem('ty_os_index',JSON.stringify(cleaned));
   }catch(e){console.warn('Error guardando OS:',e);}
 }
 function exportarOSjson(data){
@@ -1353,5 +1369,5 @@ document.addEventListener('click',function(e){
 });
 </script>
 <script src="js/swipe-nav.js"></script>
-<script src="js/access-gate.js?v=3"></script></body>
+<script src="js/access-gate.js?v=5"></script></body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex,nofollow"><meta name="description" content="Herramienta interna de cotización - Trasteos Ya"><link rel="icon" type="image/svg+xml" href="/assets/img/logo.svg"><link rel="alternate icon" type="image/png" href="/assets/img/logo.png"><link rel="apple-touch-icon" href="/assets/img/logo.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><meta name="robots" content="noindex,nofollow"><meta name="description" content="Herramienta interna de cotización - Trasteos Ya"><link rel="icon" type="image/svg+xml" href="/assets/img/logo.svg"><link rel="alternate icon" type="image/png" href="/assets/img/logo.png"><link rel="apple-touch-icon" href="/assets/img/logo.png">
 <title>Cotizador interno - Trasteos Ya</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -17,7 +17,8 @@
   --warn-bg:#fffbeb;--warn-border:#fbbf24;--warn-text:#92400e;
   --radius:10px;--radius-sm:7px;--shadow:0 1px 3px rgba(0,0,0,.08);
 }
-body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+html{overflow-x:hidden}
+body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;overflow-x:hidden}
 .header{background:#fff;border-bottom:3px solid var(--brand);position:sticky;top:0;z-index:100;padding:0 20px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
 .header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}
 .brand{display:flex;align-items:center;gap:12px}
@@ -31,7 +32,10 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--tex
 .sw.on{background:var(--brand)}
 .sw.on::after{left:18px}
 .layout{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 340px;gap:16px;padding:20px;padding-bottom:80px}
-@media(max-width:768px){.layout{grid-template-columns:1fr;padding:12px;padding-bottom:110px}}
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr;padding:12px;padding-bottom:110px}
+  .field input,.field select,.mat-input,.inst-input,input{font-size:16px!important}
+}
 .modules{display:flex;flex-direction:column;gap:10px}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:border-color .15s}
 .card.active{border-color:var(--brand);box-shadow:0 0 0 3px rgba(26,63,168,.07),var(--shadow)}
@@ -152,7 +156,7 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
 .hist-btn-clear{background:#fee2e2;color:#dc2626}
 .hist-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
 </style>
-<link rel="stylesheet" href="css/access-gate.css?v=3"></head>
+<link rel="stylesheet" href="css/access-gate.css?v=5"></head>
 <body data-gate="enabled">
 <!-- COTIZACION CARD para imagen (offscreen) -->
 <div id="cot-card" style="position:fixed;left:-9999px;top:0;width:420px;background:#fff;border-radius:12px;overflow:hidden;font-family:Source Sans 3,sans-serif;box-shadow:0 4px 24px rgba(0,0,0,.15)">
@@ -211,7 +215,7 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
           <div class="field"><label>Nombre del cliente</label><input id="cliente" placeholder="Ej: JUAN PÉREZ" style="text-transform:uppercase" autocomplete="name" oninput="this.value=this.value.toUpperCase();recalc()" onchange="this.value=this.value.toUpperCase();recalc()"></div>
           <div class="field"><label>Fecha</label><input id="fecha" type="date" oninput="recalc()"></div>
         </div>
-        <div class="field"><label>Teléfono (para WhatsApp)</label><input id="telefono" placeholder="573001234567" oninput="recalc()"></div>
+        <div class="field"><label>Teléfono (para WhatsApp)</label><input id="telefono" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="573001234567" oninput="this.value=this.value.replace(/\D/g,'');recalc()"></div>
       </div>
     </div>
     <!-- TRASTEO -->
@@ -600,8 +604,6 @@ function handleNumInput(el){
 
 let state={showCosts:false,mods:{trasteo:false,empaque:false,inst:false,desempaque:false,bodegaje:false,adicionales:false},trasteoSize:"mediano",empTab:"express",bodSize:"m10",cobertura:"urbano",modalidad:"expreso"};
 
-document.getElementById("fecha").value=new Date().toISOString().slice(0,10);
-
 // ============ BUILD UI, only rebuilds non-input elements, preserves input values ============
 function buildStaticUI(){
   // Trasteo options
@@ -623,6 +625,10 @@ function buildStaticUI(){
   if(fc)fc.style.display=state.showCosts?"block":"none";
   const fd=document.getElementById("field-des-cu");
   if(fd)fd.style.display=state.showCosts?"block":"none";
+  // Show/hide cost-only blocks (transporte empaque, cintas)
+  document.querySelectorAll('.ty-cost-block').forEach(function(el){el.style.display=state.showCosts?'block':'none';});
+  // Show/hide adicionales cost fields
+  document.querySelectorAll('.adic-cost-field').forEach(function(el){el.style.display=state.showCosts?'block':'none';});
 }
 
 function buildMaterials(){
@@ -665,7 +671,7 @@ function buildAdicionales(){
       <div class="grid2">
         <div class="field"><label>Cantidad</label><input type="text" inputmode="numeric" placeholder="0" id="adic-${a.k}-cant" oninput="handleNumInput(this)"></div>
         <div class="field"><label style="color:var(--sale)">Venta unit.</label><input type="text" inputmode="numeric" placeholder="0" id="adic-${a.k}-venta" oninput="handleNumInput(this)"></div>
-        <div class="field"><label style="color:var(--cost)">Costo unit.</label><input type="text" inputmode="numeric" placeholder="0" id="adic-${a.k}-costo" oninput="handleNumInput(this)"></div>
+        <div class="field adic-cost-field" style="${state.showCosts?'':'display:none'}"><label style="color:var(--cost)">Costo unit.</label><input type="text" inputmode="numeric" placeholder="0" id="adic-${a.k}-costo" oninput="handleNumInput(this)"></div>
       </div>
     </div>`).join("");
 }
@@ -1051,6 +1057,9 @@ function _guardarCotParaOS(lines,cliente,tel,fecha,subV,dcto,total){
     var cache=[];
     try{cache=JSON.parse(localStorage.getItem(COT_CACHE_KEY)||'[]');}catch(_){}
     cache.unshift(entry);
+    // Auto-clean entries older than 15 days
+    var cutoff=Date.now()-15*24*60*60*1000;
+    cache=cache.filter(function(e){return !e.saved||new Date(e.saved).getTime()>cutoff;});
     if(cache.length>COT_MAX)cache.length=COT_MAX;
     localStorage.setItem(COT_CACHE_KEY,JSON.stringify(cache));
     // Alerta cuando se acerque al límite
@@ -1214,6 +1223,8 @@ function pdfCliente(){
     const fn=`cotizacion_${safeName(cliente)}.pdf`;
     downloadPDF(doc,fn);
     _backupCotDrive(doc,fn,'cliente');
+    const tel=document.getElementById("telefono").value.replace(/\D/g,"");
+    _guardarCotParaOS(lines,cliente,tel,fecha,subV,dcto,total);
   });
 }
 
@@ -1342,6 +1353,12 @@ function pdfMateriales(){
       const ct=numVal("mat-cajas");
       if(ct>0){const p=Math.round(ct*.4),m=Math.round(ct*.4),g=ct-p-m;rows.push([`Cajas pequeñas (40%)`,String(p)],[`Cajas medianas (40%)`,String(m)],[`Cajas grandes (20%)`,String(Math.max(0,g))],[`Total cajas`,String(ct)]);}
     }
+    // Cintas
+    const cintasQ=numVal("cintas-cant");
+    if(cintasQ>0)rows.push(["Cintas",String(cintasQ)]);
+    // Transporte empaque
+    const transQ=numVal("trans-cant");
+    if(transQ>0)rows.push(["Transporte empaque",String(transQ)]);
     if(!rows.length){doc.setFontSize(11);doc.text("No se especificaron materiales.",14,y);}
     else{
       doc.autoTable({startY:y,head:[["Material","Cantidad"]],body:rows,theme:"striped",headStyles:{fillColor:[0,61,165],halign:"center",fontStyle:"bold"},columnStyles:{0:{halign:"left",cellWidth:130},1:{halign:"center",cellWidth:50}},bodyStyles:{fontSize:11,cellPadding:4}});
@@ -1527,10 +1544,60 @@ function limpiarHistorial(){
   alert('Historial vaciado');
 }
 
+// ============ SESSION PERSISTENCE ============
+const _SS_KEY='ty_cot_session';
+function _saveSession(){
+  try{
+    const inputs={};
+    document.querySelectorAll('input,select,textarea').forEach(function(el){
+      if(el.id)inputs[el.id]=el.value;
+    });
+    inputs._mods=JSON.parse(JSON.stringify(state.mods));
+    inputs._trasteoSize=state.trasteoSize;
+    inputs._empTab=state.empTab;
+    inputs._bodSize=state.bodSize;
+    inputs._cobertura=state.cobertura;
+    inputs._modalidad=state.modalidad;
+    inputs._showCosts=state.showCosts;
+    inputs._ts=Date.now();
+    sessionStorage.setItem(_SS_KEY,JSON.stringify(inputs));
+  }catch(e){}
+}
+function _restoreSession(){
+  try{
+    const raw=sessionStorage.getItem(_SS_KEY);
+    if(!raw)return false;
+    const d=JSON.parse(raw);
+    if(Date.now()-d._ts>86400000)return false;
+    // Restore state toggles first
+    if(d._showCosts){state.showCosts=true;document.getElementById("costs-sw").className="sw on";const ei=document.getElementById("eye-icon");if(ei)ei.innerHTML='<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';}
+    if(d._mods){Object.keys(d._mods).forEach(function(k){if(d._mods[k])toggleMod(k);});}
+    if(d._trasteoSize)sel('trasteo',d._trasteoSize);
+    if(d._empTab)setEmpTab(d._empTab);
+    if(d._bodSize)sel('bod',d._bodSize);
+    if(d._cobertura)setCobertura(d._cobertura);
+    if(d._modalidad)setModalidad(d._modalidad);
+    // Restore input values
+    Object.keys(d).forEach(function(k){
+      if(k.charAt(0)==='_')return;
+      var el=document.getElementById(k);
+      if(el)el.value=d[k];
+    });
+    return true;
+  }catch(e){return false;}
+}
+// Auto-save on any input change and before leaving
+document.addEventListener('input',function(){clearTimeout(window._ssSaveTimer);window._ssSaveTimer=setTimeout(_saveSession,500);});
+window.addEventListener('beforeunload',_saveSession);
+window.addEventListener('pagehide',_saveSession);
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')_saveSession();});
+
 // ============ INIT ============
 document.getElementById("nac-origen").innerHTML=ciudadOpts("Bogotá");
 document.getElementById("nac-destino").innerHTML=ciudadOpts("Medellín");
 buildStaticUI();
+const _restored=_restoreSession();
+if(!_restored){document.getElementById("fecha").value=new Date().toISOString().slice(0,10);}
 recalc();
 </script>
 <script src="js/swipe-nav.js"></script>
@@ -1550,5 +1617,5 @@ recalc();
     </div>
   </div>
 </div>
-<script src="js/access-gate.js?v=3"></script></body>
+<script src="js/access-gate.js?v=5"></script></body>
 </html>
