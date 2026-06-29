@@ -175,11 +175,23 @@
       '<button type="button" class="ty-op-toolbar__dark" title="Modo oscuro">' + (localStorage.getItem('ty_dark_mode')==='1' ? lightIcon : darkIcon) + '</button>' +
       '<button type="button" class="ty-op-toolbar__logout">Salir</button>';
     document.body.appendChild(bar);
+    function swapLogoDark(isDark) {
+      document.querySelectorAll('.header-left img, .kpi-header img').forEach(function(img) {
+        if (isDark && img.src.indexOf('logo.png') !== -1) {
+          img.setAttribute('data-light-src', img.src);
+          img.src = img.src.replace('logo.png', 'logo.svg');
+        } else if (!isDark && img.getAttribute('data-light-src')) {
+          img.src = img.getAttribute('data-light-src');
+        }
+      });
+    }
     bar.querySelector('.ty-op-toolbar__dark').onclick = function () {
       var isDark = document.body.classList.toggle('ty-dark');
       localStorage.setItem('ty_dark_mode', isDark ? '1' : '0');
       this.innerHTML = isDark ? lightIcon : darkIcon;
+      swapLogoDark(isDark);
     };
+    swapLogoDark(document.body.classList.contains('ty-dark'));
     bar.querySelector('.ty-op-toolbar__logout').onclick = function () {
       if (confirm('¿Cerrar sesión operador?')) {
         setOperator(false);
