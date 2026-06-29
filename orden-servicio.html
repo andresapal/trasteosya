@@ -1298,7 +1298,7 @@ const handleDuplicar=()=>{
 };
 
 window.onload=()=>{
-  document.getElementById("hLogo").src=LOGO_SRC;
+  // LOGO_SRC se usa solo para PDF — el header usa logo.svg (sin fondo blanco)
   const loadKey=sessionStorage.getItem('ty_load_os');
   if(loadKey){sessionStorage.removeItem('ty_load_os');cargarOSdesdeStorage(loadKey);return;}
   document.getElementById("fecha").value=state.fecha;
