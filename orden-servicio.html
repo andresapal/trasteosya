@@ -96,7 +96,7 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
 .td-sub{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .td-emp{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 </style>
-<link rel="stylesheet" href="css/access-gate.css?v=8"><meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="css/access-gate.css?v=9"><meta name="robots" content="noindex,nofollow">
 <!-- Librerias para backup automatico a Drive (captura preview -> PDF) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
@@ -714,11 +714,15 @@ function renderPreview(){
   print-color-adjust:exact;
 }
 #osty-carta .gap{margin-bottom:3px}
-@page{size:letter portrait;margin:12mm 12mm 12mm 12mm}
+@page{size:letter portrait;margin:8mm 10mm 8mm 10mm}
 @media print{
   body,html{margin:0;padding:0;background:#fff;min-height:0}
-  #osty-carta{width:186mm;margin:0 auto;padding:0}
-  #view-form,.swipe-nav-dots,.ty-lock-btn,.ty-op-toolbar,.ty-op-trigger{display:none!important}
+  #osty-carta{width:100%;max-width:195mm;margin:0 auto;padding:0;font-size:7pt}
+  #osty-carta td{font-size:7pt;padding:2px 3px}
+  #osty-carta .TH{font-size:6.5pt;padding:2px 3px}
+  #osty-carta .LB{font-size:6.5pt}
+  #osty-carta .gap{margin-bottom:2px}
+  #view-form,.swipe-nav-dots,.ty-lock-btn,.ty-op-toolbar,.ty-op-trigger,.os-bottom-panel{display:none!important}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
 </style>
@@ -1369,5 +1373,5 @@ document.addEventListener('click',function(e){
 });
 </script>
 <script src="js/swipe-nav.js"></script>
-<script src="js/access-gate.js?v=8"></script></body>
+<script src="js/access-gate.js?v=9"></script></body>
 </html>

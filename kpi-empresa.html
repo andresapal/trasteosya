@@ -145,7 +145,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
   .chart-box{break-inside:avoid}
 }
 </style>
-<link rel="stylesheet" href="css/access-gate.css?v=8"/>
+<link rel="stylesheet" href="css/access-gate.css?v=9"/>
 </head>
 <body data-gate="admin-only">
 
@@ -427,11 +427,7 @@ var doughnutLabels={
     formatter:function(val,ctx){
       var total=ctx.dataset.data.reduce(function(a,b){return a+b;},0);if(!total)return '';
       var pct=Math.round(val/total*100);if(pct<5)return '';
-      var ch=ctx.chart;if(!ch._dlStart)ch._dlStart=Date.now();
-      var dur=(ch.options.animation&&ch.options.animation.duration)||1400;
-      var t=Math.min((Date.now()-ch._dlStart)/dur,1);
-      t=1-Math.pow(1-t,3);
-      return Math.round(pct*t)+'%';
+      return pct+'%';
     },
     anchor:'center',align:'center'
   }
@@ -1336,6 +1332,6 @@ async function init(){
 init();
 </script>
 <script src="js/swipe-nav.js"></script>
-<script src="js/access-gate.js?v=8"></script>
+<script src="js/access-gate.js?v=9"></script>
 </body>
 </html>

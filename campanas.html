@@ -205,7 +205,7 @@ var TEMPLATES={
     name:'Referidos',
     desc:'Programa de referidos con incentivo',
     model:'Viral Loop (Dropbox model)',
-    msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nGracias por haber confiado en nosotros para tu mudanza. Esperamos que todo haya quedado perfecto.\n\nQueremos invitarte a nuestro *programa de referidos*:\n\nPor cada persona que nos recomiendes y contrate con nosotros, recibes un *bono de $50.000* para tu proximo servicio (mudanza, bodegaje, empaque o instalaciones).\n\nSolo dile que te mencione al cotizar.\n\ntrasteosya.online\n\nGracias por ser parte de la familia Trasteos Ya.'
+    msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nGracias por haber confiado en nosotros para tu mudanza. Esperamos que todo haya quedado perfecto.\n\nQueremos invitarte a nuestro *programa de referidos*:\n\nPor cada persona que nos recomiendes y contrate con nosotros, recibes una *comision de $20.000* a partir de servicio cerrado y/o vendido.\n\nSolo dile que te mencione al cotizar.\n\ntrasteosya.online\n\nGracias por ser parte de la familia Trasteos Ya.'
   },
   reactivacion:{
     icon:'A',
@@ -245,20 +245,21 @@ var TEMPLATES={
 };
 
 // ============ LOAD CLIENTS ============
-function getOSContacts(){
+function getLocalContacts(){
   var contacts=[];
   var seen={};
   try{
     var idx=JSON.parse(localStorage.getItem('ty_os_index')||'[]');
-    idx.forEach(function(key){
+    idx.forEach(function(entry){
       try{
-        var os=JSON.parse(localStorage.getItem('ty_os_'+key)||'{}');
+        var k=typeof entry==='string'?entry:entry.key;
+        var os=JSON.parse(localStorage.getItem(k)||'{}');
         var name=os.cliente||os.nombreCliente||'';
-        var phone=os.telefono||os.celularCliente||'';
-        var city=os.ciudadOrigen||'';
+        var phone=(os.telefono||os.celularCliente||'').replace(/\D/g,'');
+        var city=(os.recogidas&&os.recogidas[0]?os.recogidas[0].ciudad:'')||os.ciudadOrigen||'';
         if(name&&phone&&!seen[phone]){
           seen[phone]=true;
-          contacts.push({n:name,p:phone,c:city});
+          contacts.push({n:name,p:phone,c:city,src:'os'});
         }
       }catch(_){}
     });
@@ -267,11 +268,11 @@ function getOSContacts(){
     var cache=JSON.parse(localStorage.getItem('ty_cot_cache')||'[]');
     cache.forEach(function(c){
       var name=c.nombre||c.cliente||'';
-      var phone=c.telefono||c.celular||'';
+      var phone=(c.telefono||c.celular||'').replace(/\D/g,'');
       var city=c.ciudadOrigen||'';
       if(name&&phone&&!seen[phone]){
         seen[phone]=true;
-        contacts.push({n:name,p:phone,c:city});
+        contacts.push({n:name,p:phone,c:city,src:'cot'});
       }
     });
   }catch(_){}
@@ -288,8 +289,8 @@ function mergeContacts(fileClients,osContacts){
 }
 
 function initClients(fileClients){
-  var osContacts=getOSContacts();
-  CLIENTS=mergeContacts(fileClients||[],osContacts);
+  var localContacts=getLocalContacts();
+  CLIENTS=mergeContacts(fileClients||[],localContacts);
   filtered=CLIENTS.slice();
   renderStats();
   renderClients();
@@ -504,7 +505,7 @@ selectTemplate('referidos');
 loadClients();
 </script>
 <script src="js/swipe-nav.js"></script>
-<link rel="stylesheet" href="css/access-gate.css?v=8"/>
-<script src="js/access-gate.js?v=8"></script>
+<link rel="stylesheet" href="css/access-gate.css?v=9"/>
+<script src="js/access-gate.js?v=9"></script>
 </body>
 </html>
