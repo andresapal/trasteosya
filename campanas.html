@@ -158,7 +158,7 @@ body.ty-dark .preview-box{background:rgba(22,163,74,.08);border-color:rgba(22,16
     <div class="campaign">
       <div class="camp-head">
         <h2>Crear campaña</h2>
-        <p>Selecciona clientes y elige un modelo de campaña</p>
+        <p>Selecciona contactos y elige un modelo de campaña</p>
       </div>
       <div class="camp-body">
         <div class="field">
@@ -182,7 +182,7 @@ body.ty-dark .preview-box{background:rgba(22,163,74,.08);border-color:rgba(22,16
       <div class="camp-actions">
         <button class="btn btn-wa" id="btn-send" onclick="ejecutarCampana()" disabled>
           <svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:middle;margin-right:4px" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-          Enviar campaña (<span id="btn-count">0</span> clientes)
+          Enviar campaña (<span id="btn-count">0</span> contactos)
         </button>
         <button class="btn" onclick="copiarLista()">Copiar lista de numeros</button>
         <button class="btn" onclick="exportarCampana()">Descargar CSV de campaña</button>
@@ -279,18 +279,22 @@ function getLocalContacts(){
   return contacts;
 }
 
-function mergeContacts(fileClients,osContacts){
+function mergeAllContacts(sources){
   var seen={};
   var merged=[];
-  fileClients.forEach(function(c){seen[c.p]=true;merged.push(c);});
-  osContacts.forEach(function(c){if(!seen[c.p]){seen[c.p]=true;merged.push(c);}});
+  sources.forEach(function(list){
+    list.forEach(function(c){
+      var key=c.p.slice(-10);
+      if(!seen[key]){seen[key]=true;merged.push(c);}
+    });
+  });
   merged.sort(function(a,b){return a.n.localeCompare(b.n);});
   return merged;
 }
 
-function initClients(fileClients){
+function initClients(fileClients,allContacts){
   var localContacts=getLocalContacts();
-  CLIENTS=mergeContacts(fileClients||[],localContacts);
+  CLIENTS=mergeAllContacts([allContacts||[],fileClients||[],localContacts]);
   filtered=CLIENTS.slice();
   renderStats();
   renderClients();
@@ -300,17 +304,30 @@ function initClients(fileClients){
 }
 
 function loadClients(){
+  var fileClients=null;
+  var allContacts=null;
+  var done=0;
+  function check(){done++;if(done>=2)initClients(fileClients,allContacts);}
   try{
     var xhr=new XMLHttpRequest();
     xhr.open('GET','/output/clientes.json',true);
     xhr.onload=function(){
-      if(xhr.status===200){
-        try{initClients(JSON.parse(xhr.responseText));}catch(_){initClients([]);}
-      }else{initClients([]);}
+      if(xhr.status===200){try{fileClients=JSON.parse(xhr.responseText);}catch(_){}}
+      check();
     };
-    xhr.onerror=function(){initClients([]);};
+    xhr.onerror=function(){check();};
     xhr.send();
-  }catch(e){initClients([]);}
+  }catch(e){check();}
+  try{
+    var xhr2=new XMLHttpRequest();
+    xhr2.open('GET','/output/contactos.json',true);
+    xhr2.onload=function(){
+      if(xhr2.status===200){try{allContacts=JSON.parse(xhr2.responseText);}catch(_){}}
+      check();
+    };
+    xhr2.onerror=function(){check();};
+    xhr2.send();
+  }catch(e){check();}
 }
 
 // ============ RENDER ============
@@ -318,7 +335,7 @@ function renderStats(){
   var total=CLIENTS.length;
   var withCity=CLIENTS.filter(function(c){return c.c;}).length;
   document.getElementById('stats-bar').innerHTML=
-    '<div class="stat"><div class="num">'+total+'</div><div class="lbl">Total clientes</div></div>'+
+    '<div class="stat"><div class="num">'+total+'</div><div class="lbl">Total contactos</div></div>'+
     '<div class="stat"><div class="num">'+selected.size+'</div><div class="lbl">Seleccionados</div></div>'+
     '<div class="stat"><div class="num">'+withCity+'</div><div class="lbl">Con ciudad</div></div>'+
     '<div class="stat"><div class="num">'+getCampaignCount()+'</div><div class="lbl">Campañas enviadas</div></div>';
@@ -336,9 +353,9 @@ function renderClients(){
       '<span class="cl-phone">'+formatPhone(c.p)+'</span>'+
       cityHtml+'</div>';
   });
-  document.getElementById('client-scroll').innerHTML=html||'<div style="padding:20px;text-align:center;color:var(--muted)">No se encontraron clientes</div>';
+  document.getElementById('client-scroll').innerHTML=html||'<div style="padding:20px;text-align:center;color:var(--muted)">No se encontraron contactos</div>';
   document.getElementById('showing-count').textContent=filtered.length+' de '+CLIENTS.length;
-  document.getElementById('list-footer').textContent=filtered.length+' clientes mostrados';
+  document.getElementById('list-footer').textContent=filtered.length+' contactos mostrados';
   updateSelCount();
 }
 
@@ -406,7 +423,7 @@ function selectTemplate(k){
 
 // ============ CAMPAIGN ACTIONS ============
 function ejecutarCampana(){
-  if(selected.size===0){alert('Selecciona al menos un cliente');return;}
+  if(selected.size===0){alert('Selecciona al menos un contacto');return;}
   var msg=document.getElementById('camp-msg').value.trim();
   if(!msg){alert('Escribe un mensaje');return;}
   var campName=document.getElementById('camp-name').value.trim()||'Sin nombre';
