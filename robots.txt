@@ -5,6 +5,10 @@ Allow: /
 Disallow: /cotizador.html
 Disallow: /orden-servicio.html
 Disallow: /gracias.html
+Disallow: /kpis.html
+Disallow: /kpi-empresa.html
+Disallow: /campanas.html
+Disallow: /servicios.html
 
 # Permitir que Google indexe imagenes
 User-agent: Googlebot-Image
