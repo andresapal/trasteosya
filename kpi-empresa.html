@@ -145,7 +145,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
   .chart-box{break-inside:avoid}
 }
 </style>
-<link rel="stylesheet" href="css/access-gate.css?v=9"/>
+<link rel="stylesheet" href="css/access-gate.css?v=10"/>
 </head>
 <body data-gate="admin-only">
 
@@ -502,10 +502,26 @@ function renderIngresos(orders,allOrders,prevOrders){
   var total=orders.length;
   var totalValor=sumBy(orders,function(o){return o.valor;});
   var totalCosto=sumBy(orders,function(o){return o.costo;});
-  var utilidad=totalValor-totalCosto;
-  var margen=totalValor?Math.round(utilidad/totalValor*100):null;
-  var ticket=total&&totalValor?Math.round(totalValor/total):null;
-  var hasFinancials=totalValor>0;
+
+  // Cotizaciones: usar total cotizado como pipeline
+  var cotCache=getCotCache();
+  var cotValor=sumBy(cotCache,function(c){return c.total||0;});
+  var cotCosto=sumBy(cotCache,function(c){
+    if(!c.items)return 0;
+    var s=0;for(var i=0;i<c.items.length;i++)s+=(c.items[i].c||0);return s;
+  });
+
+  // Combinar: órdenes con valor asignado + cotizaciones como fallback
+  var displayValor=totalValor>0?totalValor:cotValor;
+  var displayCosto=totalCosto>0?totalCosto:cotCosto;
+  var valorSource=totalValor>0?'Ordenes confirmadas':'Cotizaciones (pipeline)';
+
+  var utilidad=displayValor-displayCosto;
+  var margen=displayValor?Math.round(utilidad/displayValor*100):null;
+  var cotCount=cotCache.length;
+  var ticketDivisor=totalValor>0?total:(cotCount||1);
+  var ticket=displayValor?Math.round(displayValor/ticketDivisor):null;
+  var hasFinancials=displayValor>0;
 
   var prevTotal=prevOrders.length;
   var prevValor=sumBy(prevOrders,function(o){return o.valor;});
@@ -521,14 +537,13 @@ function renderIngresos(orders,allOrders,prevOrders){
 
   var html='<div class="kpi-grid">'
     +'<div class="kpi-card c-blue"><div class="kpi-label">Servicios</div><div class="kpi-value"><span class="kpi-counter" data-target="'+total+'">0</span>'+badge(varServ)+'</div><div class="kpi-sub">'+orders.filter(function(o){return!isPending(o.fecha);}).length+' ejecutados · '+orders.filter(function(o){return isPending(o.fecha);}).length+' pendientes</div></div>'
-    +'<div class="kpi-card c-green"><div class="kpi-label">Ingresos totales</div><div class="kpi-value">'+(hasFinancials?'<span class="kpi-counter" data-target="'+Math.round(totalValor)+'" data-prefix="$ " data-format="money">0</span>'+badge(varVal):'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+(hasFinancials?'Periodo actual':'<span class="skeleton-msg">Asigna valor en Servicios</span>')+'</div></div>'
-    +'<div class="kpi-card c-red"><div class="kpi-label">Costo total</div><div class="kpi-value">'+(hasFinancials?'<span class="kpi-counter" data-target="'+Math.round(totalCosto)+'" data-prefix="$ " data-format="money">0</span>':'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+(hasFinancials?'Costos operativos':'<span class="skeleton-msg">Asigna costo en Servicios</span>')+'</div></div>'
+    +'<div class="kpi-card c-green"><div class="kpi-label">Ingresos totales</div><div class="kpi-value">'+(hasFinancials?'<span class="kpi-counter" data-target="'+Math.round(displayValor)+'" data-prefix="$ " data-format="money">0</span>'+badge(varVal):'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+(hasFinancials?valorSource:'<span class="skeleton-msg">Genera cotizaciones para ver datos</span>')+'</div></div>'
+    +'<div class="kpi-card c-red"><div class="kpi-label">Costo total</div><div class="kpi-value">'+(hasFinancials?'<span class="kpi-counter" data-target="'+Math.round(displayCosto)+'" data-prefix="$ " data-format="money">0</span>':'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+(hasFinancials?'Costos operativos':'<span class="skeleton-msg">Costos estimados de cotizaciones</span>')+'</div></div>'
     +'<div class="kpi-card c-teal"><div class="kpi-label">Utilidad bruta</div><div class="kpi-value">'+(hasFinancials?'<span class="kpi-counter" data-target="'+Math.round(utilidad)+'" data-prefix="$ " data-format="money">0</span>':'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+(hasFinancials?'Margen: '+fmtPct(margen):'<span class="skeleton-msg">Sin datos financieros</span>')+'</div></div>'
-    +'<div class="kpi-card c-purple"><div class="kpi-label">Ticket promedio</div><div class="kpi-value">'+(hasFinancials&&ticket?'<span class="kpi-counter" data-target="'+ticket+'" data-prefix="$ " data-format="money">0</span>':'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+(hasFinancials?'Por servicio':'<span class="skeleton-msg">Se calcula con valor asignado</span>')+'</div></div>'
+    +'<div class="kpi-card c-purple"><div class="kpi-label">Ticket promedio</div><div class="kpi-value">'+(hasFinancials&&ticket?'<span class="kpi-counter" data-target="'+ticket+'" data-prefix="$ " data-format="money">0</span>':'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+(hasFinancials?'Por '+(totalValor>0?'servicio':'cotizacion'):'<span class="skeleton-msg">Se calcula con cotizaciones</span>')+'</div></div>'
     +'</div>';
 
   // Conversion funnel
-  var cotCache=getCotCache();
   var totalCot=cotCache.length+allOrders.length;
   var confirmados=allOrders.filter(function(o){return o.fecha;}).length;
   var ejecutados=allOrders.filter(function(o){return o.fecha&&!isPending(o.fecha);}).length;
@@ -1332,6 +1347,6 @@ async function init(){
 init();
 </script>
 <script src="js/swipe-nav.js"></script>
-<script src="js/access-gate.js?v=9"></script>
+<script src="js/access-gate.js?v=10"></script>
 </body>
 </html>
