@@ -74,8 +74,8 @@ body{font-family:'Source Sans 3',sans-serif;background:#f4f5f9;color:#111827;fon
 .field textarea{resize:vertical;min-height:100px;line-height:1.5}
 
 /* TEMPLATE CARDS */
-.tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.tpl-card{border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;transition:.15s;text-align:center}
+.tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.tpl-card{border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;transition:.15s;text-align:center;min-width:0;overflow:hidden;word-wrap:break-word;overflow-wrap:break-word}
 .tpl-card:hover{border-color:var(--brand);background:#fafbfc}
 .tpl-card.active{border-color:var(--brand);background:var(--brand-light)}
 .tpl-icon{font-size:20px;margin-bottom:4px}
@@ -522,7 +522,7 @@ selectTemplate('referidos');
 loadClients();
 </script>
 <script src="js/swipe-nav.js"></script>
-<link rel="stylesheet" href="css/access-gate.css?v=9"/>
-<script src="js/access-gate.js?v=9"></script>
+<link rel="stylesheet" href="css/access-gate.css?v=10"/>
+<script src="js/access-gate.js?v=10"></script>
 </body>
 </html>

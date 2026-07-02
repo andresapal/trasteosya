@@ -61,6 +61,10 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--tex
 .ropt strong{display:block;font-size:13px;font-weight:600}
 .ropt small{font-size:11px;color:var(--muted)}
 .ropt .rprice{font-size:12px;color:var(--sale);font-family:'JetBrains Mono',monospace;margin-top:3px}
+.ropt .qty-ctrl{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--border)}
+.ropt .qty-btn{width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:15px;font-weight:600;color:var(--brand);display:flex;align-items:center;justify-content:center;padding:0}
+.ropt .qty-btn:hover{border-color:var(--brand);background:var(--brand-light)}
+.ropt .qty-val{font-size:14px;font-weight:600;min-width:20px;text-align:center;font-family:'JetBrains Mono',monospace}
 .tabs{display:flex;background:#f3f4f6;border-radius:var(--radius-sm);padding:3px;gap:3px;margin-bottom:13px}
 .tab{flex:1;padding:6px 8px;font-size:13px;font-weight:500;border:none;background:transparent;border-radius:6px;cursor:pointer;color:var(--muted);font-family:'Source Sans 3',sans-serif;transition:.15s}
 .tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
@@ -154,7 +158,7 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
 .hist-btn-clear{background:#fee2e2;color:#dc2626}
 .hist-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
 </style>
-<link rel="stylesheet" href="css/access-gate.css?v=11"></head>
+<link rel="stylesheet" href="css/access-gate.css?v=13"></head>
 <body data-gate="enabled">
 <!-- COTIZACION CARD para imagen (offscreen) -->
 <div id="cot-card" style="position:fixed;left:-9999px;top:0;width:420px;background:#fff;border-radius:12px;overflow:hidden;font-family:Source Sans 3,sans-serif;box-shadow:0 4px 24px rgba(0,0,0,.15)">
@@ -603,17 +607,24 @@ function handleNumInput(el){
   recalc();
 }
 
-let state={showCosts:false,mods:{trasteo:false,empaque:false,inst:false,desempaque:false,bodegaje:false,adicionales:false},trasteoSize:"mediano",empTab:"express",bodSize:"m10",cobertura:"urbano",modalidad:"expreso"};
+let state={showCosts:false,mods:{trasteo:false,empaque:false,inst:false,desempaque:false,bodegaje:false,adicionales:false},trasteoSize:"mediano",trasteoQty:{pequeno:1,mediano:1,grande:1},empTab:"express",bodSize:"m10",cobertura:"urbano",modalidad:"expreso"};
 
 // ============ BUILD UI, only rebuilds non-input elements, preserves input values ============
 function buildStaticUI(){
-  // Trasteo options
-  document.getElementById("trasteo-opts").innerHTML=Object.entries(TRASTEO).map(([k,t])=>
-    `<div class="ropt${state.trasteoSize===k?" sel":""}" onclick="sel('trasteo','${k}')">
+  // Trasteo options (multi-camion: each type has quantity)
+  document.getElementById("trasteo-opts").innerHTML=Object.entries(TRASTEO).map(([k,t])=>{
+    const qty=state.trasteoQty[k]||0;
+    return `<div class="ropt${qty>0?" sel":""}">
       <strong>${t.l}</strong>
       ${state.showCosts?`<small>C: ${COP(t.c)}</small>`:""}
       <div class="rprice">${COP(t.v)}</div>
-    </div>`).join("");
+      <div class="qty-ctrl" onclick="event.stopPropagation()">
+        <button type="button" class="qty-btn" onclick="trasteoQtyChg('${k}',-1)">−</button>
+        <span class="qty-val" id="qty-${k}">${qty}</span>
+        <button type="button" class="qty-btn" onclick="trasteoQtyChg('${k}',1)">+</button>
+      </div>
+    </div>`;
+  }).join("");
   // Bodegaje options
   document.getElementById("bodegaje-opts").innerHTML=Object.entries(BOD).map(([k,b])=>
     `<div class="ropt${state.bodSize===k?" sel":""}" onclick="sel('bod','${k}')">
@@ -733,6 +744,15 @@ function sel(type,k){
   recalc();
 }
 
+function trasteoQtyChg(k,delta){
+  if(!state.trasteoQty)state.trasteoQty={pequeno:0,mediano:0,grande:0};
+  var v=(state.trasteoQty[k]||0)+delta;
+  if(v<0)v=0;if(v>9)v=9;
+  state.trasteoQty[k]=v;
+  buildStaticUI();
+  recalc();
+}
+
 function setEmpTab(t){
   state.empTab=t;
   document.getElementById("tab-express").className="tab"+(t==="express"?" active":"");
@@ -747,8 +767,14 @@ function getLines(){
   const lines=[];
   if(state.mods.trasteo){
     if(state.cobertura==="urbano"){
-      const t=TRASTEO[state.trasteoSize];
-      lines.push({cat:"trasteo",l:`Trasteo Urbano ${t.l}`,c:t.c,v:t.v,qty:1,cu:t.c,vu:t.v});
+      const qtys=state.trasteoQty||{};
+      Object.keys(TRASTEO).forEach(function(k){
+        const q=qtys[k]||0;
+        if(q>0){
+          const t=TRASTEO[k];
+          lines.push({cat:"trasteo",l:`Trasteo Urbano ${t.l}${q>1?' × '+q:''}`,c:t.c*q,v:t.v*q,qty:q,cu:t.c,vu:t.v});
+        }
+      });
     } else {
       // Nacional: valores manuales
       const venta=numVal("nac-venta");
@@ -1576,6 +1602,7 @@ function _saveSession(){
     });
     inputs._mods=JSON.parse(JSON.stringify(state.mods));
     inputs._trasteoSize=state.trasteoSize;
+    inputs._trasteoQty=JSON.parse(JSON.stringify(state.trasteoQty||{}));
     inputs._empTab=state.empTab;
     inputs._bodSize=state.bodSize;
     inputs._cobertura=state.cobertura;
@@ -1595,6 +1622,7 @@ function _restoreSession(){
     if(d._showCosts){state.showCosts=true;document.getElementById("costs-sw").className="sw on";const ei=document.getElementById("eye-icon");if(ei)ei.innerHTML='<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';}
     if(d._mods){Object.keys(d._mods).forEach(function(k){if(d._mods[k])toggleMod(k);});}
     if(d._trasteoSize)sel('trasteo',d._trasteoSize);
+    if(d._trasteoQty){state.trasteoQty=d._trasteoQty;buildStaticUI();}
     if(d._empTab)setEmpTab(d._empTab);
     if(d._bodSize)sel('bod',d._bodSize);
     if(d._cobertura)setCobertura(d._cobertura);
@@ -1639,5 +1667,5 @@ recalc();
     </div>
   </div>
 </div>
-<script src="js/access-gate.js?v=11"></script></body>
+<script src="js/access-gate.js?v=13"></script></body>
 </html>
