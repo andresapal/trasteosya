@@ -145,7 +145,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
   .chart-box{break-inside:avoid}
 }
 </style>
-<link rel="stylesheet" href="css/access-gate.css?v=12"/>
+<link rel="stylesheet" href="css/access-gate.css?v=13"/>
 </head>
 <body data-gate="admin-only">
 
@@ -348,11 +348,15 @@ async function fetchDriveCots(){
     var r=await fetch(url,{redirect:'follow'});var data=await r.json();
     if(data.ok&&data.cotizaciones){
       driveCots=data.cotizaciones.map(function(c){
-        var total=+c['INGRESO']||0;
-        var costo=(+c['COSTO TRASTEO']||0)+(+c['COSTO TOTAL EMPAQUE']||0)+(+c['COSTO  TOTAL EMPAQUE-']||0)
-          +(+c['COSTO DESEMPAQUE']||0)+(+c['COSTO BODEGAJE']||0)+(+c['COSTO CAMINADO']||0)
-          +(+c['COSTO ESCALERAS']||0)+(+c['COSTO PARADA ADICIONAL']||0)+(+c['COSTO FACHADA O VACIO']||0)
-          +(+c['COSTO CINTAS']||0)+(+c['COSTO TRANSPORTE ENVIO EMPAQUE']||0)+(+c['COSTO OPERARIOS EMPAQUE']||0);
+        var total=+c['INGRESO TOTAL']||+c['INGRESO']||0;
+        var costo=+c['COSTO TOTAL']||0;
+        if(!costo){
+          costo=(+c['COSTO TRASTEO']||0)+(+c['COSTO TOTAL EMPAQUE']||0)+(+c['COSTO TOTAL EMPAQUE-']||0)
+            +(+c['COSTO TOTAL INSTALACIONES']||0)
+            +(+c['COSTO DESEMPAQUE']||0)+(+c['COSTO BODEGAJE']||0)+(+c['COSTO CAMINADO']||0)
+            +(+c['COSTO ESCALERAS']||0)+(+c['COSTO PARADA ADICIONAL']||0)+(+c['COSTO FACHADA O VACIO']||0)
+            +(+c['COSTO CINTAS']||0)+(+c['COSTO TRANSPORTE ENVIO EMPAQUE']||0)+(+c['COSTO OPERARIOS EMPAQUE']||0);
+        }
         var fechaRaw=c['FECHA']||'';
         var fecha=(typeof fechaRaw==='string'&&fechaRaw.length>=10)?fechaRaw.substring(0,10):
           (fechaRaw&&fechaRaw.toISOString?fechaRaw.toISOString().substring(0,10):'');
@@ -1383,6 +1387,6 @@ async function init(){
 init();
 </script>
 <script src="js/swipe-nav.js"></script>
-<script src="js/access-gate.js?v=12"></script>
+<script src="js/access-gate.js?v=13"></script>
 </body>
 </html>
