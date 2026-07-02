@@ -154,7 +154,7 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
 .hist-btn-clear{background:#fee2e2;color:#dc2626}
 .hist-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
 </style>
-<link rel="stylesheet" href="css/access-gate.css?v=10"></head>
+<link rel="stylesheet" href="css/access-gate.css?v=11"></head>
 <body data-gate="enabled">
 <!-- COTIZACION CARD para imagen (offscreen) -->
 <div id="cot-card" style="position:fixed;left:-9999px;top:0;width:420px;background:#fff;border-radius:12px;overflow:hidden;font-family:Source Sans 3,sans-serif;box-shadow:0 4px 24px rgba(0,0,0,.15)">
@@ -1136,7 +1136,21 @@ function _notificarCotizacion(lines,subV,dcto,total){
 
 // ============ BACKUP A GOOGLE DRIVE ============
 const BACKUP_URL='https://script.google.com/macros/s/AKfycbytFjQC4osp6QNdCyALI5DGLCMtomQ_DYGqa56MQkGJoykyZcJIPiA1JVyrJ2Smj3ST-w/exec';
+const COT_SHEET_URL='https://script.google.com/macros/s/AKfycbxiGsi4MbySxkzUEeV2APSutpJhm-DR_a6Q0PGhkLXIXbTbSkA0mEJm-Hi3EW-LRfw8/exec';
 const BACKUP_APIKEY='TrasteosYa-2026-Backup';
+async function _saveCotSheet(financials){
+  try{
+    const cliente=document.getElementById("cliente").value.trim();
+    const telefono=document.getElementById("telefono")?document.getElementById("telefono").value.trim():'';
+    const fecha=document.getElementById("fecha").value;
+    var meta={cliente:cliente,telefono:telefono,fecha:fecha,tipo:financials.tipo||'',estado:'COTIZADO',
+      total:financials.total||0,subtotal:financials.subtotal||0,descuento:financials.descuento||0,
+      costo:financials.costo||0,utilidad:financials.utilidad||0,items:financials.items||[]};
+    await fetch(COT_SHEET_URL,{method:'POST',body:JSON.stringify({
+      type:'cotizacion',apikey:BACKUP_APIKEY,meta:meta
+    }),redirect:'follow'});
+  }catch(e){console.warn('Save Sheet cot:',e.message);}
+}
 async function _backupCotDrive(doc,filename,tipo,financials){
   try{
     const pdf_base64=doc.output('datauristring').split(',')[1];
@@ -1229,6 +1243,7 @@ function pdfCliente(){
     const fn=`cotizacion_${safeName(cliente)}.pdf`;
     downloadPDF(doc,fn);
     _backupCotDrive(doc,fn,'cliente',{total:total,subtotal:subV,descuento:dcto,items:lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,qty:l.qty};})});
+    _saveCotSheet({tipo:'Mudanza',total:total,subtotal:subV,descuento:dcto,items:lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,c:l.c||0,qty:l.qty};})});
     const tel=document.getElementById("telefono").value.replace(/\D/g,"");
     _guardarCotParaOS(lines,cliente,tel,fecha,subV,dcto,total);
   });
@@ -1339,6 +1354,7 @@ function pdfInterno(){
     const fn=`cotizacion_interna_${safeName(cliente)}.pdf`;
     downloadPDF(doc,fn);
     _backupCotDrive(doc,fn,'interno',{total:total,subtotal:subV,descuento:dcto,costo:subC,utilidad:utilNeta,items:lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,c:l.c,qty:l.qty};})});
+    _saveCotSheet({tipo:'Mudanza',total:total,subtotal:subV,descuento:dcto,costo:subC,utilidad:utilNeta,items:lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,c:l.c||0,qty:l.qty};})});
   });
 }
 
@@ -1623,5 +1639,5 @@ recalc();
     </div>
   </div>
 </div>
-<script src="js/access-gate.js?v=10"></script></body>
+<script src="js/access-gate.js?v=11"></script></body>
 </html>

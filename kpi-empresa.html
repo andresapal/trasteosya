@@ -145,7 +145,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
   .chart-box{break-inside:avoid}
 }
 </style>
-<link rel="stylesheet" href="css/access-gate.css?v=10"/>
+<link rel="stylesheet" href="css/access-gate.css?v=12"/>
 </head>
 <body data-gate="admin-only">
 
@@ -200,7 +200,9 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
    DATA ENGINE
    ============================================ */
 var BACKUP_URL='https://script.google.com/macros/s/AKfycbytFjQC4osp6QNdCyALI5DGLCMtomQ_DYGqa56MQkGJoykyZcJIPiA1JVyrJ2Smj3ST-w/exec';
+var COT_SHEET_URL='https://script.google.com/macros/s/AKfycbxiGsi4MbySxkzUEeV2APSutpJhm-DR_a6Q0PGhkLXIXbTbSkA0mEJm-Hi3EW-LRfw8/exec';
 var BACKUP_APIKEY='TrasteosYa-2026-Backup';
+var driveCots=[];
 var COLORS={blue:'#1B3E8C',red:'#E30613',green:'#15803d',orange:'#d97706',teal:'#0d9488',purple:'#7c3aed',pink:'#db2777',sky:'#0284c7',lime:'#65a30d',amber:'#b45309'};
 var PALETTE=['#1B3E8C','#E30613','#0d9488','#d97706','#7c3aed','#db2777','#0284c7','#65a30d','#b45309','#6366f1','#059669','#ea580c'];
 var FIN_KEY='ty_os_financials';
@@ -339,6 +341,34 @@ function mergeOrders(local,drive,file){
 
 function getCotCache(){
   try{return JSON.parse(localStorage.getItem('ty_cot_cache')||'[]');}catch(_){return[];}
+}
+
+async function fetchDriveCots(){
+  try{var url=COT_SHEET_URL+'?action=cotizaciones&apikey='+BACKUP_APIKEY;
+    var r=await fetch(url,{redirect:'follow'});var data=await r.json();
+    if(data.ok&&data.cotizaciones){
+      driveCots=data.cotizaciones.map(function(c){
+        var total=+c['INGRESO']||0;
+        var costo=(+c['COSTO TRASTEO']||0)+(+c['COSTO TOTAL EMPAQUE']||0)+(+c['COSTO  TOTAL EMPAQUE-']||0)
+          +(+c['COSTO DESEMPAQUE']||0)+(+c['COSTO BODEGAJE']||0)+(+c['COSTO CAMINADO']||0)
+          +(+c['COSTO ESCALERAS']||0)+(+c['COSTO PARADA ADICIONAL']||0)+(+c['COSTO FACHADA O VACIO']||0)
+          +(+c['COSTO CINTAS']||0)+(+c['COSTO TRANSPORTE ENVIO EMPAQUE']||0)+(+c['COSTO OPERARIOS EMPAQUE']||0);
+        var fechaRaw=c['FECHA']||'';
+        var fecha=(typeof fechaRaw==='string'&&fechaRaw.length>=10)?fechaRaw.substring(0,10):
+          (fechaRaw&&fechaRaw.toISOString?fechaRaw.toISOString().substring(0,10):'');
+        return{cliente:c['CLIENTE']||'',telefono:String(c['TELEFONO']||''),fecha:fecha,
+          total:total,costo:costo,estado:String(c['ESTADO']||'').toUpperCase()};
+      });
+    }
+  }catch(e){console.warn('KPI-E: no Drive cots',e);}
+  return driveCots;
+}
+function getAllCots(){
+  var local=getCotCache();
+  var merged=[];var seen={};
+  driveCots.forEach(function(c){var k=(c.cliente||'')+'|'+(c.fecha||'');if(!seen[k]){seen[k]=1;merged.push(c);}});
+  local.forEach(function(c){var k=(c.cliente||'')+'|'+(c.fecha||'');if(!seen[k]){seen[k]=1;merged.push(c);}});
+  return merged;
 }
 
 /* Helpers */
@@ -503,23 +533,26 @@ function renderIngresos(orders,allOrders,prevOrders){
   var totalValor=sumBy(orders,function(o){return o.valor;});
   var totalCosto=sumBy(orders,function(o){return o.costo;});
 
-  // Cotizaciones: usar total cotizado como pipeline
-  var cotCache=getCotCache();
-  var cotValor=sumBy(cotCache,function(c){return c.total||0;});
-  var cotCosto=sumBy(cotCache,function(c){
-    if(c.costo)return c.costo;
-    if(!c.items)return 0;
-    var s=0;for(var i=0;i<c.items.length;i++)s+=(c.items[i].c||0);return s;
-  });
+  // Cotizaciones: separar VENDIDO (ingreso real) vs COTIZADO (pipeline)
+  var cotCache=getAllCots();
+  function _isVendido(c){var e=String(c.estado||'').toUpperCase();return e.indexOf('VEND')>=0||e==='V';}
+  function _itemsCosto(c){if(c.costo)return c.costo;if(!c.items)return 0;var s=0;for(var i=0;i<c.items.length;i++)s+=(c.items[i].c||0);return s;}
+  var cotsVendidas=cotCache.filter(_isVendido);
+  var cotsPipeline=cotCache.filter(function(c){return !_isVendido(c);});
+  var vendValor=sumBy(cotsVendidas,function(c){return c.total||0;});
+  var vendCosto=sumBy(cotsVendidas,_itemsCosto);
+  var pipeValor=sumBy(cotsPipeline,function(c){return c.total||0;});
+  var pipeCosto=sumBy(cotsPipeline,_itemsCosto);
 
-  // Combinar: órdenes con valor asignado + cotizaciones como fallback
-  var displayValor=totalValor>0?totalValor:cotValor;
-  var displayCosto=totalCosto>0?totalCosto:cotCosto;
-  var valorSource=totalValor>0?'Ordenes confirmadas':'Cotizaciones (pipeline)';
+  // Ingresos reales: vendidas + valor asignado en ordenes; fallback pipeline
+  var displayValor=vendValor+totalValor;
+  var displayCosto=vendCosto+totalCosto;
+  var valorSource=displayValor>0?(vendValor>0?'Ordenes vendidas':'Ordenes confirmadas'):(pipeValor>0?'Cotizaciones (pipeline)':'');
+  if(displayValor===0){displayValor=pipeValor;displayCosto=pipeCosto;}
 
   var utilidad=displayValor-displayCosto;
   var margen=displayValor?Math.round(utilidad/displayValor*100):null;
-  var cotCount=cotCache.length;
+  var cotCount=cotsVendidas.length||cotCache.length;
   var ticketDivisor=totalValor>0?total:(cotCount||1);
   var ticket=displayValor?Math.round(displayValor/ticketDivisor):null;
   var hasFinancials=displayValor>0;
@@ -542,6 +575,8 @@ function renderIngresos(orders,allOrders,prevOrders){
     +'<div class="kpi-card c-red"><div class="kpi-label">Costo total</div><div class="kpi-value">'+(hasFinancials?'<span class="kpi-counter" data-target="'+Math.round(displayCosto)+'" data-prefix="$ " data-format="money">0</span>':'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+(hasFinancials?'Costos operativos':'<span class="skeleton-msg">Costos estimados de cotizaciones</span>')+'</div></div>'
     +'<div class="kpi-card c-teal"><div class="kpi-label">Utilidad bruta</div><div class="kpi-value">'+(hasFinancials?'<span class="kpi-counter" data-target="'+Math.round(utilidad)+'" data-prefix="$ " data-format="money">0</span>':'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+(hasFinancials?'Margen: '+fmtPct(margen):'<span class="skeleton-msg">Sin datos financieros</span>')+'</div></div>'
     +'<div class="kpi-card c-purple"><div class="kpi-label">Ticket promedio</div><div class="kpi-value">'+(hasFinancials&&ticket?'<span class="kpi-counter" data-target="'+ticket+'" data-prefix="$ " data-format="money">0</span>':'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+(hasFinancials?'Por '+(totalValor>0?'servicio':'cotizacion'):'<span class="skeleton-msg">Se calcula con cotizaciones</span>')+'</div></div>'
+    +'<div class="kpi-card c-orange"><div class="kpi-label">Pipeline</div><div class="kpi-value">'+(pipeValor>0?'<span class="kpi-counter" data-target="'+Math.round(pipeValor)+'" data-prefix="$ " data-format="money">0</span>':'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+cotsPipeline.length+' cotizaciones sin cerrar</div></div>'
+    +'<div class="kpi-card c-lime"><div class="kpi-label">Vendidas</div><div class="kpi-value">'+(vendValor>0?'<span class="kpi-counter" data-target="'+Math.round(vendValor)+'" data-prefix="$ " data-format="money">0</span>':'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+cotsVendidas.length+' cotizaciones vendidas</div></div>'
     +'</div>';
 
   // Conversion funnel
@@ -789,7 +824,7 @@ function renderEmpaque(orders,allOrders){
   });
 
   // Cotizaciones con empaque detail
-  var cotCache=getCotCache();
+  var cotCache=getAllCots();
   var cotEmpItems={};
   cotCache.forEach(function(cot){
     if(!cot.items)return;
@@ -959,7 +994,7 @@ function renderOperacion(orders,allOrders){
   });
 
   // Cotizador cache: instalaciones, adicionales, bodegaje, desempaque
-  var cotCache=getCotCache();
+  var cotCache=getAllCots();
   var catSections=[
     {cat:'instalaciones',elId:'rank-instalaciones'},
     {cat:'adicionales',elId:'rank-adicionales'},
@@ -1340,7 +1375,7 @@ document.querySelectorAll('.mod-tab').forEach(function(tab){
 // Init
 async function init(){
   var local=getAllOrders();
-  await Promise.all([fetchFileOrders(),fetchDriveOrders()]);
+  await Promise.all([fetchFileOrders(),fetchDriveOrders(),fetchDriveCots()]);
   allMerged=mergeOrders(local,driveOrders,fileOrders);
   allMerged.sort(function(a,b){return(b.fecha||'').localeCompare(a.fecha||'');});
   renderModule();
@@ -1348,6 +1383,6 @@ async function init(){
 init();
 </script>
 <script src="js/swipe-nav.js"></script>
-<script src="js/access-gate.js?v=10"></script>
+<script src="js/access-gate.js?v=12"></script>
 </body>
 </html>
