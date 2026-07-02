@@ -1046,13 +1046,16 @@ function _guardarCotParaOS(lines,cliente,tel,fecha,subV,dcto,total){
       else if(n.indexOf('burbuja')>=0) empaque.burbuja+=(l.qty||0);
       else if(n.indexOf('caja')>=0) empaque.cajas+=(l.qty||0);
     });
+    var mappedItems=lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,c:l.c||0,qty:l.qty};});
+    var costoTotal=lines.reduce(function(a,l){return a+(l.c||0);},0);
     var entry={
       cliente:cliente.trim().toUpperCase(),
       telefono:tel,
       fecha:fecha,
       empaque:empaque,
-      items:lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,qty:l.qty};}),
+      items:mappedItems,
       total:total||subV,
+      costo:costoTotal,
       saved:new Date().toISOString()
     };
     var cache=[];

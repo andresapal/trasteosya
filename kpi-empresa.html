@@ -507,6 +507,7 @@ function renderIngresos(orders,allOrders,prevOrders){
   var cotCache=getCotCache();
   var cotValor=sumBy(cotCache,function(c){return c.total||0;});
   var cotCosto=sumBy(cotCache,function(c){
+    if(c.costo)return c.costo;
     if(!c.items)return 0;
     var s=0;for(var i=0;i<c.items.length;i++)s+=(c.items[i].c||0);return s;
   });
