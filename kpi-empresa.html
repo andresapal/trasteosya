@@ -145,7 +145,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
   .chart-box{break-inside:avoid}
 }
 </style>
-<link rel="stylesheet" href="css/access-gate.css?v=13"/>
+<link rel="stylesheet" href="css/access-gate.css?v=15"/>
 </head>
 <body data-gate="admin-only">
 
@@ -156,6 +156,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
   </div>
   <div class="header-nav">
     <a href="/kpis.html">KPI General</a>
+    <a href="#" onclick="limpiarDatos();return false;" style="color:#E30613!important;border-color:rgba(227,6,19,.25)!important;background:rgba(227,6,19,.05)!important">Limpiar datos</a>
   </div>
 </div>
 
@@ -671,7 +672,7 @@ function renderIngresos(orders,allOrders,prevOrders){
     if(c.items){c.items.forEach(function(it){
       var cat=it.cat||'otros';
       if(!catTotals[cat])catTotals[cat]={valor:0,count:0};
-      catTotals[cat].valor+=(it.v||0)*(it.qty||1);
+      catTotals[cat].valor+=(it.v||0);
       catTotals[cat].count++;
     });}
   });
@@ -1376,6 +1377,14 @@ document.querySelectorAll('.mod-tab').forEach(function(tab){
   });
 });
 
+function limpiarDatos(){
+  var n=0;
+  try{n=(JSON.parse(localStorage.getItem('ty_cot_cache')||'[]')).length;}catch(_){}
+  if(!confirm('Limpiar '+n+' cotizaciones del cache local del navegador?\n\nEsto NO borra el Google Sheet. Solo elimina datos locales para que el KPI muestre solo la fuente oficial.'))return;
+  localStorage.removeItem('ty_cot_cache');
+  location.reload();
+}
+
 // Init
 async function init(){
   var local=getAllOrders();
@@ -1387,6 +1396,6 @@ async function init(){
 init();
 </script>
 <script src="js/swipe-nav.js"></script>
-<script src="js/access-gate.js?v=13"></script>
+<script src="js/access-gate.js?v=15"></script>
 </body>
 </html>
