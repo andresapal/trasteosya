@@ -54,6 +54,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
 .kpi-grid.kpi-6col{grid-template-columns:repeat(6,1fr)}
 .kpi-grid.kpi-1col-servicios{grid-template-columns:1fr}
+@media(min-width:701px){.kpi-grid.kpi-1col-servicios{display:none}}
 .gauge-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .gauge-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .gauge-title{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
@@ -91,7 +92,8 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 .chart-box.chart-glow{box-shadow:0 6px 32px rgba(27,62,140,.22),0 0 0 2px rgba(27,62,140,.08);border-color:rgba(27,62,140,.3);transform:translateY(-1px)}
 .chart-title{font-size:13px;font-weight:700;color:var(--ty-dark);margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .chart-title .tag{font-size:9px;font-weight:600;padding:2px 8px;border-radius:10px;background:rgba(27,62,140,.06);color:var(--ty-blue)}
-.chart-canvas{position:relative;width:100%;max-height:280px}
+.chart-canvas{position:relative;width:100%;max-height:280px;display:flex;justify-content:center;align-items:center}
+.chart-canvas canvas{margin:0 auto}
 .chart-canvas canvas{transition:filter .2s ease}
 .chart-box:hover .chart-canvas canvas{filter:brightness(1.02)}
 .chart-box.full{grid-column:1/-1}
@@ -157,7 +159,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
   .chart-box{break-inside:avoid}
 }
 </style>
-<link rel="stylesheet" href="css/access-gate.css?v=16"/>
+<link rel="stylesheet" href="css/access-gate.css?v=17"/>
 </head>
 <body data-gate="admin-only">
 
@@ -378,6 +380,12 @@ async function fetchDriveCots(){
         return{cliente:c['CLIENTE']||'',telefono:String(c['TELEFONO']||''),fecha:fecha,
           total:total,costo:costoTot,estado:String(c['ESTADO']||'').toUpperCase(),
           ingEmp:ingEmp,ingInst:ingInst,ingOtros:ingOtros,
+          ingTrans:ingTrans,
+          ingBodegaje:+c['ING BODEGAJE']||0,
+          ingCaminados:+c['ING CAMINADOS']||0,
+          ingEscaleras:+c['ING ESCALERAS']||0,
+          ingParadas:+c['ING PARADAS ADICIONAL']||0,
+          ingFachada:+c['INGRESO FACHADA']||0,
           costoEmp:costoEmp,costoInst:costoInst,costoOtros:costoOtros};
       });
     }
@@ -550,29 +558,51 @@ function drawGauge(canvasId,value,color){
   if(!canvas)return;
   var ctx=canvas.getContext('2d');
   var w=canvas.width, h=canvas.height;
-  var cx=w/2, cy=h*.9;
-  var r=Math.min(w/2-10,h-20);
+  var cx=w/2, cy=h*.85;
+  var r=Math.min(w/2-15,h-25);
   var pct=Math.max(0,Math.min(100,value))/100;
   ctx.clearRect(0,0,w,h);
-  // Background arc
-  ctx.beginPath();
-  ctx.arc(cx,cy,r,Math.PI,2*Math.PI);
-  ctx.lineWidth=18;
-  ctx.strokeStyle='#f1f5f9';
-  ctx.stroke();
+  // Background arc (3 color zones)
+  ctx.lineWidth=16;
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,Math.PI+Math.PI*0.33);ctx.strokeStyle='#fee2e2';ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI+Math.PI*0.33,Math.PI+Math.PI*0.66);ctx.strokeStyle='#fef3c7';ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,r,Math.PI+Math.PI*0.66,2*Math.PI);ctx.strokeStyle='#d1fae5';ctx.stroke();
   // Value arc
   ctx.beginPath();
   ctx.arc(cx,cy,r,Math.PI,Math.PI+pct*Math.PI);
-  ctx.lineWidth=18;
+  ctx.lineWidth=16;
   ctx.strokeStyle=color;
   ctx.lineCap='round';
   ctx.stroke();
-  // Ticks
-  ctx.fillStyle='#94a3b8';
-  ctx.font='10px Source Sans 3, sans-serif';
+  // Ticks 0/50/100
+  ctx.fillStyle='#64748b';
+  ctx.font='bold 10px Source Sans 3, sans-serif';
   ctx.textAlign='center';
-  ctx.fillText('0%',cx-r,cy+16);
-  ctx.fillText('100%',cx+r,cy+16);
+  ctx.fillText('0',cx-r,cy+18);
+  ctx.fillText('50',cx,cy-r-6);
+  ctx.fillText('100',cx+r,cy+18);
+  // Needle (interactive pointer)
+  var needleLen=r-4;
+  var angle=Math.PI+pct*Math.PI;
+  var nx=cx+Math.cos(angle)*needleLen;
+  var ny=cy+Math.sin(angle)*needleLen;
+  // Needle line
+  ctx.beginPath();
+  ctx.moveTo(cx,cy);
+  ctx.lineTo(nx,ny);
+  ctx.strokeStyle='#1a1a2e';
+  ctx.lineWidth=3;
+  ctx.lineCap='round';
+  ctx.stroke();
+  // Needle center pin
+  ctx.beginPath();
+  ctx.arc(cx,cy,7,0,2*Math.PI);
+  ctx.fillStyle='#1a1a2e';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(cx,cy,3,0,2*Math.PI);
+  ctx.fillStyle='#fff';
+  ctx.fill();
 }
 
 /* ============================================
@@ -586,7 +616,14 @@ function renderIngresos(orders,allOrders,prevOrders){
 
   // Cotizaciones: separar VENDIDO (ingreso real) vs COTIZADO (pipeline)
   var cotCache=getAllCots();
-  function _isVendido(c){var e=String(c.estado||'').toUpperCase();return e.indexOf('VEND')>=0||e==='V';}
+  function _isVendido(c){
+    var e=String(c.estado||'').toUpperCase().trim();
+    return e.indexOf('VEND')>=0||e==='V'||e==='SOLD'||e==='OK';
+  }
+  function _isCotizado(c){
+    var e=String(c.estado||'').toUpperCase().trim();
+    return !e||e.indexOf('COT')>=0||e==='C'||e==='PENDING'||e==='PIPELINE';
+  }
   function _itemsCosto(c){if(c.costo)return c.costo;if(!c.items)return 0;var s=0;for(var i=0;i<c.items.length;i++)s+=(c.items[i].c||0);return s;}
   var cotsVendidas=cotCache.filter(_isVendido);
   var cotsPipeline=cotCache.filter(function(c){return !_isVendido(c);});
@@ -755,24 +792,35 @@ function renderIngresos(orders,allOrders,prevOrders){
     options:{responsive:true,animation:doughnutAnim,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}},datalabels:doughnutLabels.datalabels}}
   });
 
-  // 3. Revenue by category (from sheet aggregates + items[] fallback)
-  var catTotals={empaque:0,inst:0,otros:0};
+  // 3. Revenue by category (each category separate — sheet + items[] fallback)
+  var catTotals={trasteo:0,empaque:0,instalaciones:0,bodegaje:0,caminados:0,escaleras:0,paradas:0,fachada:0};
   cotCache.forEach(function(c){
-    if(c.ingEmp||c.ingInst||c.ingOtros){
+    if(c.ingEmp||c.ingInst||c.ingTrans){
+      catTotals.trasteo+=c.ingTrans||0;
       catTotals.empaque+=c.ingEmp||0;
-      catTotals.inst+=c.ingInst||0;
-      catTotals.otros+=c.ingOtros||0;
+      catTotals.instalaciones+=c.ingInst||0;
+      catTotals.bodegaje+=c.ingBodegaje||0;
+      catTotals.caminados+=c.ingCaminados||0;
+      catTotals.escaleras+=c.ingEscaleras||0;
+      catTotals.paradas+=c.ingParadas||0;
+      catTotals.fachada+=c.ingFachada||0;
     } else if(c.items){
       c.items.forEach(function(it){
-        var cat=it.cat||'otros';
-        var v=it.v||0;
-        if(cat==='empaque')catTotals.empaque+=v;
-        else if(cat==='inst')catTotals.inst+=v;
-        else catTotals.otros+=v;
+        var cat=it.cat||'otros', l=String(it.l||'').toLowerCase(), v=it.v||0;
+        if(cat==='trasteo')catTotals.trasteo+=v;
+        else if(cat==='empaque')catTotals.empaque+=v;
+        else if(cat==='inst')catTotals.instalaciones+=v;
+        else if(cat==='adicionales'){
+          if(l.indexOf('bodegaje')>=0)catTotals.bodegaje+=v;
+          else if(l.indexOf('caminad')>=0)catTotals.caminados+=v;
+          else if(l.indexOf('escalera')>=0)catTotals.escaleras+=v;
+          else if(l.indexOf('parada')>=0)catTotals.paradas+=v;
+          else if(l.indexOf('fachada')>=0)catTotals.fachada+=v;
+        }
       });
     }
   });
-  var catLabels={empaque:'Empaque',inst:'Instalaciones',otros:'Otros (trasteo, bodegaje, adicionales)'};
+  var catLabels={trasteo:'Trasteo',empaque:'Empaque',instalaciones:'Instalaciones',bodegaje:'Bodegaje',caminados:'Caminados',escaleras:'Escaleras',paradas:'Paradas adicional',fachada:'Fachada / Vacio'};
   var catKeys=Object.keys(catTotals).filter(function(k){return catTotals[k]>0;}).sort(function(a,b){return catTotals[b]-catTotals[a];});
   var catData=catKeys.map(function(k){return catTotals[k];});
   var catLbls=catKeys.map(function(k){return catLabels[k]||k;});
@@ -1493,6 +1541,6 @@ async function init(){
 init();
 </script>
 <script src="js/swipe-nav.js"></script>
-<script src="js/access-gate.js?v=16"></script>
+<script src="js/access-gate.js?v=17"></script>
 </body>
 </html>
