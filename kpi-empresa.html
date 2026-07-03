@@ -41,6 +41,8 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 .period-custom input{padding:4px 8px;border:1px solid rgba(27,62,140,.12);border-radius:8px;font-size:11px;font-family:inherit;background:rgba(255,255,255,.7)}
 .period-custom input:focus{outline:none;border-color:var(--ty-blue)}
 .period-info{font-size:10px;color:var(--ty-muted);margin-left:8px;font-style:italic}
+.btn-limpiar{margin-left:8px;font-size:10px;font-weight:600;color:#E30613;background:rgba(227,6,19,.06);border:1px solid rgba(227,6,19,.25);border-radius:6px;padding:3px 8px;cursor:pointer;transition:.15s;font-family:inherit}
+.btn-limpiar:hover{background:#E30613;color:#fff;border-color:#E30613}
 
 /* Module tabs - iOS segmented control */
 .mod-tabs{display:flex;background:rgba(27,62,140,.06);border-radius:12px;padding:3px;margin-bottom:16px;gap:2px}
@@ -50,6 +52,16 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 
 /* KPI Cards */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.kpi-grid.kpi-6col{grid-template-columns:repeat(6,1fr)}
+.kpi-grid.kpi-1col-servicios{grid-template-columns:1fr}
+.gauge-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.gauge-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.gauge-title{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
+.gauge-canvas{max-width:220px;margin:0 auto;position:relative}
+.gauge-value{position:absolute;top:65%;left:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:800;color:var(--text)}
+.gauge-sub{font-size:12px;color:var(--muted);margin-top:4px}
+@media(max-width:1100px){.kpi-grid.kpi-6col{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.kpi-grid.kpi-6col{grid-template-columns:repeat(2,1fr)}.gauge-row{grid-template-columns:1fr}}
 .kpi-card{background:var(--ty-card);backdrop-filter:blur(12px);border-radius:var(--radius);border:1px solid var(--ty-border);padding:18px 20px;box-shadow:0 2px 12px rgba(27,62,140,.06),inset 0 1px 0 rgba(255,255,255,.8);position:relative;overflow:hidden;opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
 .kpi-card.in-view{opacity:1;transform:translateY(0)}
 .kpi-card:nth-child(2){transition-delay:.07s}.kpi-card:nth-child(3){transition-delay:.14s}.kpi-card:nth-child(4){transition-delay:.21s}.kpi-card:nth-child(5){transition-delay:.28s}
@@ -145,7 +157,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
   .chart-box{break-inside:avoid}
 }
 </style>
-<link rel="stylesheet" href="css/access-gate.css?v=15"/>
+<link rel="stylesheet" href="css/access-gate.css?v=16"/>
 </head>
 <body data-gate="admin-only">
 
@@ -156,7 +168,6 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
   </div>
   <div class="header-nav">
     <a href="/kpis.html">KPI General</a>
-    <a href="#" onclick="limpiarDatos();return false;" style="color:#E30613!important;border-color:rgba(227,6,19,.25)!important;background:rgba(227,6,19,.05)!important">Limpiar datos</a>
   </div>
 </div>
 
@@ -176,6 +187,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
       <button class="period-pill" data-period="custom">Aplicar</button>
     </div>
     <span class="period-info" id="period-label">Mostrando todos los datos</span>
+    <button type="button" class="btn-limpiar" onclick="limpiarDatos()">Limpiar datos</button>
   </div>
 
   <!-- Module tabs -->
@@ -350,19 +362,23 @@ async function fetchDriveCots(){
     if(data.ok&&data.cotizaciones){
       driveCots=data.cotizaciones.map(function(c){
         var total=+c['INGRESO TOTAL']||+c['INGRESO']||0;
-        var costo=+c['COSTO TOTAL']||0;
-        if(!costo){
-          costo=(+c['COSTO TRASTEO']||0)+(+c['COSTO TOTAL EMPAQUE']||0)+(+c['COSTO TOTAL EMPAQUE-']||0)
-            +(+c['COSTO TOTAL INSTALACIONES']||0)
-            +(+c['COSTO DESEMPAQUE']||0)+(+c['COSTO BODEGAJE']||0)+(+c['COSTO CAMINADO']||0)
-            +(+c['COSTO ESCALERAS']||0)+(+c['COSTO PARADA ADICIONAL']||0)+(+c['COSTO FACHADA O VACIO']||0)
-            +(+c['COSTO CINTAS']||0)+(+c['COSTO TRANSPORTE ENVIO EMPAQUE']||0)+(+c['COSTO OPERARIOS EMPAQUE']||0);
-        }
+        var ingEmp=+c['ING EMPAQUE']||((+c['ING VINIPEL']||0)+(+c['ING BURBUJA']||0)+(+c['ING CAJAS']||0)+(+c['ING CRAFT']||0)+(+c['ING CARTON CORRUGADO']||0));
+        var ingInst=+c['ING INSTALACIONES TOTAL']||0;
+        var ingTrans=+c['ING TRANSPORTE']||0;
+        var ingOtros=(+c['ING BODEGAJE']||0)+(+c['ING CAMINADOS']||0)+(+c['ING ESCALERAS']||0)+(+c['ING PARADAS ADICIONAL']||0)+(+c['INGRESO FACHADA']||0)+ingTrans;
+        var costoTot=+c['COSTO TOTAL']||0;
+        var costoEmp=+c['COSTO TOTAL EMPAQUE-']||+c['COSTO TOTAL EMPAQUE']||((+c['COSTO VINIPEL']||0)+(+c['COSTO BURBUJA']||0)+(+c['COSTO CAJAS']||0)+(+c['COSTO CRAFT']||0)+(+c['COSTO CARTON CORRUGADO']||0)+(+c['COSTO CINTAS']||0)+(+c['COSTO TRANSPORTE ENVIO EMPAQUE']||0)+(+c['COSTO OPERARIOS EMPAQUE']||0));
+        var costoInst=+c['COSTO TOTAL INSTALACIONES']||((+c['COSTO INST NEVECON']||0)+(+c['COSTO INST SECADORA']||0)+(+c['COSTO INST TV']||0)+(+c['COSTO INSTALACION REPISAS']||0)+(+c['COSTO INSTALACION CUADROS']||0)+(+c['COSTO INSTALACION MUEBLES/OTROS']||0));
+        var costoTras=+c['COSTO TRASTEO']||0;
+        var costoOtros=costoTras+(+c['COSTO BODEGAJE']||0)+(+c['COSTO CAMINADO']||0)+(+c['COSTO ESCALERAS']||0)+(+c['COSTO PARADA ADICIONAL']||0)+(+c['COSTO FACHADA O VACIO']||0)+(+c['COSTO DESEMPAQUE']||0);
+        if(!costoTot)costoTot=costoEmp+costoInst+costoOtros;
         var fechaRaw=c['FECHA']||'';
         var fecha=(typeof fechaRaw==='string'&&fechaRaw.length>=10)?fechaRaw.substring(0,10):
           (fechaRaw&&fechaRaw.toISOString?fechaRaw.toISOString().substring(0,10):'');
         return{cliente:c['CLIENTE']||'',telefono:String(c['TELEFONO']||''),fecha:fecha,
-          total:total,costo:costo,estado:String(c['ESTADO']||'').toUpperCase()};
+          total:total,costo:costoTot,estado:String(c['ESTADO']||'').toUpperCase(),
+          ingEmp:ingEmp,ingInst:ingInst,ingOtros:ingOtros,
+          costoEmp:costoEmp,costoInst:costoInst,costoOtros:costoOtros};
       });
     }
   }catch(e){console.warn('KPI-E: no Drive cots',e);}
@@ -529,6 +545,36 @@ function animateRankBars(){
   });
 }
 
+function drawGauge(canvasId,value,color){
+  var canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  var ctx=canvas.getContext('2d');
+  var w=canvas.width, h=canvas.height;
+  var cx=w/2, cy=h*.9;
+  var r=Math.min(w/2-10,h-20);
+  var pct=Math.max(0,Math.min(100,value))/100;
+  ctx.clearRect(0,0,w,h);
+  // Background arc
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,Math.PI,2*Math.PI);
+  ctx.lineWidth=18;
+  ctx.strokeStyle='#f1f5f9';
+  ctx.stroke();
+  // Value arc
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,Math.PI,Math.PI+pct*Math.PI);
+  ctx.lineWidth=18;
+  ctx.strokeStyle=color;
+  ctx.lineCap='round';
+  ctx.stroke();
+  // Ticks
+  ctx.fillStyle='#94a3b8';
+  ctx.font='10px Source Sans 3, sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText('0%',cx-r,cy+16);
+  ctx.fillText('100%',cx+r,cy+16);
+}
+
 /* ============================================
    MODULE: INGRESOS
    ============================================ */
@@ -574,14 +620,54 @@ function renderIngresos(orders,allOrders,prevOrders){
     return'<span class="kpi-badge '+cls+'">'+arrow+' '+Math.abs(val)+'%</span>';
   }
 
-  var html='<div class="kpi-grid">'
+  // Agrupar por categoria
+  var ingEmp=sumBy(cotCache,function(c){return c.ingEmp||0;});
+  var ingInst=sumBy(cotCache,function(c){return c.ingInst||0;});
+  var ingOtros=sumBy(cotCache,function(c){return c.ingOtros||0;});
+  var costoEmp=sumBy(cotCache,function(c){return c.costoEmp||0;});
+  var costoInst=sumBy(cotCache,function(c){return c.costoInst||0;});
+  var costoOtros=sumBy(cotCache,function(c){return c.costoOtros||0;});
+
+  function cardK(label,val,color,sub,prefix){
+    prefix=prefix||'$ ';
+    var has=val>0;
+    return '<div class="kpi-card '+color+'"><div class="kpi-label">'+label+'</div><div class="kpi-value">'
+      +(has?'<span class="kpi-counter" data-target="'+Math.round(val)+'" data-prefix="'+prefix+'" data-format="money">0</span>':'<span class="kpi-skeleton">'+prefix+'---</span>')
+      +'</div><div class="kpi-sub">'+(sub||'')+'</div></div>';
+  }
+  function cardPct(label,val,color,sub){
+    var has=val!==null&&val!==undefined;
+    return '<div class="kpi-card '+color+'"><div class="kpi-label">'+label+'</div><div class="kpi-value">'
+      +(has?'<span class="kpi-counter" data-target="'+val+'" data-suffix="%">0</span>':'<span class="kpi-skeleton">--%</span>')
+      +'</div><div class="kpi-sub">'+(sub||'')+'</div></div>';
+  }
+
+  var html='<div class="kpi-grid kpi-6col">'
+    +cardK('Ingresos total',displayValor,'c-green','Suma cotizaciones')
+    +cardK('Ingreso empaque',ingEmp,'c-teal','Vinipel, burbuja, cajas, craft')
+    +cardK('Ingresos instalaciones',ingInst,'c-sky','Nevecon, TV, muebles, otros')
+    +cardK('Otros ingresos',ingOtros,'c-purple','Trasteo, bodegaje, escaleras, etc.')
+    +cardK('Utilidad',utilidad,'c-lime','Ingresos − Costos')
+    +cardPct('Margen',margen,'c-amber','Utilidad / Ingresos')
+    +'</div>'
+    +'<div class="kpi-grid kpi-6col">'
+    +cardK('Costo total',displayCosto,'c-red','Suma cotizaciones')
+    +cardK('Costo empaque',costoEmp,'c-orange','Materiales + operarios empaque')
+    +cardK('Costo instalaciones',costoInst,'c-pink','Nevecon, TV, muebles, otros')
+    +cardK('Otros costos',costoOtros,'c-red','Trasteo, bodegaje, escaleras, etc.')
+    +cardK('Pipeline',pipeValor,'c-orange',cotsPipeline.length+' cotizaciones sin cerrar')
+    +cardK('Vendido',vendValor,'c-green',cotsVendidas.length+' cotizaciones vendidas')
+    +'</div>'
+    +'<div class="kpi-grid kpi-1col-servicios">'
     +'<div class="kpi-card c-blue"><div class="kpi-label">Servicios</div><div class="kpi-value"><span class="kpi-counter" data-target="'+total+'">0</span>'+badge(varServ)+'</div><div class="kpi-sub">'+orders.filter(function(o){return!isPending(o.fecha);}).length+' ejecutados · '+orders.filter(function(o){return isPending(o.fecha);}).length+' pendientes</div></div>'
-    +'<div class="kpi-card c-green"><div class="kpi-label">Ingresos totales</div><div class="kpi-value">'+(hasFinancials?'<span class="kpi-counter" data-target="'+Math.round(displayValor)+'" data-prefix="$ " data-format="money">0</span>'+badge(varVal):'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+(hasFinancials?valorSource:'<span class="skeleton-msg">Genera cotizaciones para ver datos</span>')+'</div></div>'
-    +'<div class="kpi-card c-red"><div class="kpi-label">Costo total</div><div class="kpi-value">'+(hasFinancials?'<span class="kpi-counter" data-target="'+Math.round(displayCosto)+'" data-prefix="$ " data-format="money">0</span>':'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+(hasFinancials?'Costos operativos':'<span class="skeleton-msg">Costos estimados de cotizaciones</span>')+'</div></div>'
-    +'<div class="kpi-card c-teal"><div class="kpi-label">Utilidad bruta</div><div class="kpi-value">'+(hasFinancials?'<span class="kpi-counter" data-target="'+Math.round(utilidad)+'" data-prefix="$ " data-format="money">0</span>':'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+(hasFinancials?'Margen: '+fmtPct(margen):'<span class="skeleton-msg">Sin datos financieros</span>')+'</div></div>'
-    +'<div class="kpi-card c-purple"><div class="kpi-label">Ticket promedio</div><div class="kpi-value">'+(hasFinancials&&ticket?'<span class="kpi-counter" data-target="'+ticket+'" data-prefix="$ " data-format="money">0</span>':'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+(hasFinancials?'Por '+(totalValor>0?'servicio':'cotizacion'):'<span class="skeleton-msg">Se calcula con cotizaciones</span>')+'</div></div>'
-    +'<div class="kpi-card c-orange"><div class="kpi-label">Pipeline</div><div class="kpi-value">'+(pipeValor>0?'<span class="kpi-counter" data-target="'+Math.round(pipeValor)+'" data-prefix="$ " data-format="money">0</span>':'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+cotsPipeline.length+' cotizaciones sin cerrar</div></div>'
-    +'<div class="kpi-card c-lime"><div class="kpi-label">Vendidas</div><div class="kpi-value">'+(vendValor>0?'<span class="kpi-counter" data-target="'+Math.round(vendValor)+'" data-prefix="$ " data-format="money">0</span>':'<span class="kpi-skeleton">$ ---</span>')+'</div><div class="kpi-sub">'+cotsVendidas.length+' cotizaciones vendidas</div></div>'
+    +'</div>';
+
+  // Gauges (efectividad y salud financiera)
+  var efectividad=cotCache.length?Math.round(cotsVendidas.length/cotCache.length*100):0;
+  var margenGauge=margen||0;
+  html+='<div class="gauge-row">'
+    +'<div class="gauge-box"><div class="gauge-title">Efectividad de cierre</div><div class="gauge-canvas"><canvas id="gauge-efec" width="220" height="130"></canvas><div class="gauge-value">'+efectividad+'%</div></div><div class="gauge-sub">'+cotsVendidas.length+' vendidas de '+cotCache.length+' cotizadas</div></div>'
+    +'<div class="gauge-box"><div class="gauge-title">Margen bruto</div><div class="gauge-canvas"><canvas id="gauge-mgn" width="220" height="130"></canvas><div class="gauge-value">'+margenGauge+'%</div></div><div class="gauge-sub">'+(margenGauge>=40?'Saludable':margenGauge>=25?'Aceptable':'Bajo — revisar precios')+'</div></div>'
     +'</div>';
 
   // Conversion funnel
@@ -641,6 +727,10 @@ function renderIngresos(orders,allOrders,prevOrders){
 
   container.innerHTML=html;
 
+  // === RENDER GAUGES ===
+  drawGauge('gauge-efec',efectividad,efectividad>=50?'#15803d':efectividad>=25?'#d97706':'#E30613');
+  drawGauge('gauge-mgn',margenGauge,margenGauge>=40?'#15803d':margenGauge>=25?'#d97706':'#E30613');
+
   // === RENDER CHARTS ===
 
   // 1. Monthly trend
@@ -665,19 +755,26 @@ function renderIngresos(orders,allOrders,prevOrders){
     options:{responsive:true,animation:doughnutAnim,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10,usePointStyle:true,pointStyle:'circle'}},datalabels:doughnutLabels.datalabels}}
   });
 
-  // 3. Revenue by category (from cotization cache)
-  var catTotals={};
-  var catLabels={trasteo:'Trasteo',empaque:'Empaque',inst:'Instalaciones',desempaque:'Desinstalación',bodegaje:'Bodegaje',adicionales:'Adicionales'};
+  // 3. Revenue by category (from sheet aggregates + items[] fallback)
+  var catTotals={empaque:0,inst:0,otros:0};
   cotCache.forEach(function(c){
-    if(c.items){c.items.forEach(function(it){
-      var cat=it.cat||'otros';
-      if(!catTotals[cat])catTotals[cat]={valor:0,count:0};
-      catTotals[cat].valor+=(it.v||0);
-      catTotals[cat].count++;
-    });}
+    if(c.ingEmp||c.ingInst||c.ingOtros){
+      catTotals.empaque+=c.ingEmp||0;
+      catTotals.inst+=c.ingInst||0;
+      catTotals.otros+=c.ingOtros||0;
+    } else if(c.items){
+      c.items.forEach(function(it){
+        var cat=it.cat||'otros';
+        var v=it.v||0;
+        if(cat==='empaque')catTotals.empaque+=v;
+        else if(cat==='inst')catTotals.inst+=v;
+        else catTotals.otros+=v;
+      });
+    }
   });
-  var catKeys=Object.keys(catTotals).sort(function(a,b){return catTotals[b].valor-catTotals[a].valor;});
-  var catData=catKeys.map(function(k){return catTotals[k].valor;});
+  var catLabels={empaque:'Empaque',inst:'Instalaciones',otros:'Otros (trasteo, bodegaje, adicionales)'};
+  var catKeys=Object.keys(catTotals).filter(function(k){return catTotals[k]>0;}).sort(function(a,b){return catTotals[b]-catTotals[a];});
+  var catData=catKeys.map(function(k){return catTotals[k];});
   var catLbls=catKeys.map(function(k){return catLabels[k]||k;});
   if(!catKeys.length){catLbls=['Sin datos de cotizaciones'];catData=[1];}
   charts.cat=new Chart(document.getElementById('ch-cat'),{
@@ -1396,6 +1493,6 @@ async function init(){
 init();
 </script>
 <script src="js/swipe-nav.js"></script>
-<script src="js/access-gate.js?v=15"></script>
+<script src="js/access-gate.js?v=16"></script>
 </body>
 </html>
