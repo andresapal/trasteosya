@@ -261,6 +261,7 @@ body.ty-dark .ty-op-toolbar__dark {
   align-items: center;
   justify-content: center;
   padding: 20px;
+  visibility: visible;
 }
 .ty-gate-modal__overlay {
   position: absolute;
