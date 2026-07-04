@@ -468,6 +468,7 @@ body{padding-top:68px}
       <button class="btn-pdf" id="btn-pdf"><span>📄</span> Descargar PDF</button>
     </div>
     <p class="disclaimer">Los valores son estimados y pueden ajustarse según validación en sitio (condiciones de origen y/o destino). Sin compromiso. Trasteos Ya · trasteosya.online</p>
+    <a href="#" id="btn-corregir" style="display:block;text-align:center;margin-top:12px;color:var(--blue);font-size:14px;text-decoration:underline;cursor:pointer">Corregir mis datos</a>
   </div>
 
   <div class="site-foot"><a href="https://trasteosya.online" style="color:var(--muted);text-decoration:none">trasteosya.online</a></div>
@@ -524,8 +525,8 @@ const CIUDADES=['Bogotá','Chía','Cajicá','Cota','Madrid','Otra ciudad'];
 const CERCANAS={'Chía':1,'Cajicá':1,'Cota':1,'Madrid':1};
 const CERCANA_SURCHARGE={v:140000,c:100000};
 function reveal(id){
-  const el=$('#'+id);if(!el||el.classList.contains('show'))return;
-  el.classList.add('show');
+  const el=$('#'+id);if(!el)return;
+  if(!el.classList.contains('show'))el.classList.add('show');
   setTimeout(()=>{
     const nav=document.querySelector('.nav');
     const prog=$('#progress');
@@ -589,7 +590,7 @@ function cancelAutoPrompt(){clearTimeout(_autoPromptTimer);}
 /* ========= NAV AUTO-HIDE + PROGRESS BAR SYNC ========= */
 (function(){
   const nav=document.querySelector('.nav');if(!nav)return;
-  let lastY=window.scrollY,hiddenNav=false,hideT=null;
+  let lastY=window.scrollY,hiddenNav=false;
   const THRESH=80;
   function navHide(){
     if(hiddenNav||window.scrollY<THRESH)return;
@@ -601,8 +602,6 @@ function cancelAutoPrompt(){clearTimeout(_autoPromptTimer);}
   function navShow(){
     hiddenNav=false;nav.classList.remove('nav--hidden');
     var p=$('#progress');if(p&&p.classList.contains('show'))p.style.top=(nav.offsetHeight+8)+'px';
-    clearTimeout(hideT);
-    if(window.scrollY>=THRESH)hideT=setTimeout(navHide,3000);
   }
   window.addEventListener('scroll',function(){
     var y=window.scrollY;
@@ -610,16 +609,12 @@ function cancelAutoPrompt(){clearTimeout(_autoPromptTimer);}
     if(y>lastY+5)navHide();
     if(y<lastY-10){
       var p=$('#progress');
-      if(p&&p.classList.contains('progress--faded')){
-        var res=$('#c-resultado');
-        if(res&&res.getBoundingClientRect().top>window.innerHeight*0.5)p.classList.remove('progress--faded');
-      }
+      if(p&&p.classList.contains('progress--faded'))p.classList.remove('progress--faded');
     }
     lastY=y;
   },{passive:true});
-  ['click','mousemove','touchstart'].forEach(function(ev){
-    document.addEventListener(ev,function(){if(hiddenNav)navShow();},{passive:true});
-  });
+  var burger=nav.querySelector('.nav__burger');
+  if(burger)burger.addEventListener('click',function(){if(hiddenNav)navShow();});
 })();
 
 /* Shake numeros al entrar en viewport (IntersectionObserver) */
@@ -660,12 +655,13 @@ function timerNext(sectionId,revealId,stepName,msg,secs){
 
 /* ========= STEP 1: DATOS → VIVIENDA ========= */
 function checkDatos(){
-  const n=$('#ur-nombre').value.trim(),w=$('#ur-whatsapp').value.replace(/\D/g,'');
+  const n=$('#ur-nombre').value.trim(),raw=$('#ur-whatsapp').value.replace(/\D/g,'');
+  const w=(raw.startsWith('57')&&raw.length>=12)?raw.slice(2):raw;
   if(n.length>=2&&w.length>=10){S.nombre=n;S.whatsapp=w;
     if(!S._ready){S._ready=true;$('#progress').classList.add('show');stepCurrent('vivienda');setTimeout(()=>reveal('c-vivienda'),400);}}
 }
 $('#ur-nombre').addEventListener('input',checkDatos);
-$('#ur-whatsapp').addEventListener('input',function(){this.value=this.value.replace(/\D/g,'').slice(0,10);checkDatos();});
+$('#ur-whatsapp').addEventListener('input',function(){this.value=this.value.replace(/\D/g,'');this.value=this.value.startsWith('57')?this.value.slice(0,12):this.value.slice(0,10);checkDatos();});
 
 /* ========= STEP 2: VIVIENDA ========= */
 $$('#viv-grid .opt').forEach(o=>o.addEventListener('click',()=>{
@@ -682,9 +678,9 @@ $$('#viv-grid .opt').forEach(o=>o.addEventListener('click',()=>{
   buildEmpaque();
   reveal('c-ruta');stepCurrent('ruta');
   // Auto-prompt 5s si deja Bogota-Bogota por defecto sin tocar
-  armAutoPrompt('ruta',5,'¿Confirmas Bogotá como origen y destino?',()=>{
+  armAutoPrompt('ruta',25,'¿Confirmas Bogotá como origen y destino?',()=>{
     stepDone('ruta');stepCurrent('empaque');reveal('c-empaque');
-    armAutoPrompt('empaque',15,'¿Deseas continuar con instalaciones?',()=>{
+    armAutoPrompt('empaque',30,'¿Deseas continuar con instalaciones?',()=>{
       stepDone('empaque');stepCurrent('servicio');reveal('c-inst');
     });
   });
@@ -771,9 +767,9 @@ window.empChg=function(k,d){
 $$('.tab[data-emp]').forEach(t=>t.addEventListener('click',()=>{
   $$('.tab[data-emp]').forEach(x=>x.classList.remove('active'));t.classList.add('active');
   S.empaque.tipo=t.dataset.emp;
-  if(S.empaque.tipo==='express')toast('Escoge los rollos de vinipel para empaque el mismo día.');
-  else toast('El empaque Full toma entre 1 y 2 días en realizarse.');
   buildEmpaque();
+  if(S.empaque.tipo==='express'){toast('Escoge los rollos de vinipel para empaque el mismo día.');}
+  else{showPrompt('El empaque que aparece aquí corresponde al material y al tiempo de empaque estimado y sugerido para tu servicio. Puedes modificarlo; sin embargo, como expertos te estamos indicando lo que consideramos necesario para un servicio con empaque completo.');}
 }));
 
 /* ========= STEP 5: INSTALACIONES ========= */
@@ -811,7 +807,7 @@ function buildAdic(){
     buildEscalera();persistNow();
   }));
   // Auto-prompt 5s si no toca nada
-  armAutoPrompt('adic',5,'¿Deseas continuar sin condiciones especiales?',()=>{
+  armAutoPrompt('adic',20,'¿Deseas continuar sin condiciones especiales?',()=>{
     if(S.caminado===null)S.caminado=false;if(S.ascensor===null)S.ascensor=true;
     adicDone();
   });
@@ -833,7 +829,7 @@ function buildEscalera(){
     }
   }));
 }
-function adicDone(){reveal('c-bodegaje');armAutoPrompt('bod',5,'¿Deseas continuar sin bodegaje?',()=>{S.bodegaje=false;confirmAndFinalize();});persistNow();}
+function adicDone(){reveal('c-bodegaje');armAutoPrompt('bod',15,'¿Deseas continuar sin bodegaje?',()=>{S.bodegaje=false;confirmAndFinalize();});persistNow();}
 
 /* ========= STEP 8: BODEGAJE ========= */
 $$('#bodegaje-yn button').forEach(b=>b.addEventListener('click',()=>{
@@ -903,9 +899,11 @@ function finalizar(){
   $('#result-name').textContent='Estimado '+S.nombre;
   let html='';
   let idx=0;
-  lines.forEach(l=>{
-    html+='<div class="rline anim" style="animation-delay:'+(0.4+idx*0.1)+'s"><div class="rline-info"><div class="rline-name">'+l.l+'</div><div class="rline-detail">'+(l.detail||'')+'</div></div><div class="rline-val'+(l.est?' est':'')+'">'+COP(l.v)+'</div></div>';
-    idx++;
+  var resCats={trasteo:{label:'Trasteo',items:[],t:0},empaque:{label:'Empaque',items:[],t:0},inst:{label:'Instalaciones',items:[],t:0},adicionales:{label:'Otros servicios',items:[],t:0},bodegaje:{label:'Bodegaje',items:[],t:0}};
+  lines.forEach(function(l){var c=resCats[l.cat]||resCats.adicionales;c.items.push(l);c.t+=l.v;});
+  Object.keys(resCats).forEach(function(k){var c=resCats[k];if(!c.items.length)return;
+    html+='<div class="rline rline-cat anim" style="animation-delay:'+(0.4+idx*0.07)+'s"><div class="rline-info"><div class="rline-name" style="font-weight:700;color:var(--navy)">'+c.label+'</div></div><div class="rline-val" style="font-weight:700;color:var(--navy)">'+COP(c.t)+'</div></div>';idx++;
+    c.items.forEach(function(l){html+='<div class="rline anim" style="animation-delay:'+(0.4+idx*0.07)+'s;padding-left:12px"><div class="rline-info"><div class="rline-name">'+l.l+'</div><div class="rline-detail">'+(l.detail||'')+'</div></div><div class="rline-val'+(l.est?' est':'')+'">'+COP(l.v)+'</div></div>';idx++;});
   });
   if(S.empaque.tipo==='full'){const cajas=S.empaque.mat.cajas||0;const dias=cajas>=45?2:1;
     html+='<div class="rline anim" style="animation-delay:'+(0.4+idx*0.1)+'s"><div class="rline-info"><div class="rline-name">Empacadores</div><div class="rline-detail">2 empacadores · '+dias+' dia'+(dias>1?'s':'')+' (incluido en empaque)</div></div><div class="rline-val" style="color:var(--muted);font-size:12px">referencia</div></div>';idx++;}
@@ -983,7 +981,7 @@ function armResultPrompt(){
         document.querySelector('#btn-wa').scrollIntoView({behavior:'smooth',block:'center'});
       });
     }
-  },10000);
+  },25000);
 }
 ['#btn-wa','#btn-inq','#btn-pdf'].forEach(sel=>{
   const el=document.querySelector(sel);
@@ -1037,8 +1035,10 @@ function notifyOperador(text){
 function buildCotMsg(prefix){
   const lines=S._lines||[];
   let msg=(prefix||'')+'*Cotización Trasteos Ya*\n\nCliente: '+S.nombre+'\nWhatsApp: '+S.whatsapp+'\nRuta: '+S.origen+' → '+S.destino+'\n\n';
-  lines.forEach(l=>{msg+='• '+l.l+': '+COP(l.v)+(l.est?' (estimado)':'')+'\n';});
-  msg+='\n*Total estimado: '+COP(S._total)+'*\n\nValores sujetos a validación en sitio. Sin compromiso.\ntrasteosya.online';
+  var cats={trasteo:{label:'Trasteo',items:[],t:0},empaque:{label:'Empaque',items:[],t:0},inst:{label:'Instalaciones',items:[],t:0},adicionales:{label:'Otros servicios',items:[],t:0},bodegaje:{label:'Bodegaje',items:[],t:0}};
+  lines.forEach(function(l){var c=cats[l.cat]||cats.adicionales;c.items.push(l);c.t+=l.v;});
+  Object.keys(cats).forEach(function(k){var c=cats[k];if(!c.items.length)return;msg+='*'+c.label+': '+COP(c.t)+'*\n';c.items.forEach(function(l){msg+='  • '+l.l+': '+COP(l.v)+(l.est?' (estimado)':'')+'\n';});msg+='\n';});
+  msg+='*Total estimado: '+COP(S._total)+'*\n\nValores sujetos a validación en sitio. Sin compromiso.\ntrasteosya.online';
   return msg;
 }
 $('#btn-wa').addEventListener('click',()=>{
@@ -1114,10 +1114,9 @@ $('#btn-pdf').addEventListener('click',async()=>{
   doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(10,24,69);
   doc.text('Detalle del servicio',14,y);y+=8;
   doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(15,23,42);
-  lines.forEach(l=>{
-    doc.text(l.l+(l.est?' (estimado)':''),14,y);
-    doc.text(COP(l.v),196,y,{align:'right'});y+=7;if(y>262){doc.addPage();y=20;}
-  });
+  var pdfCats={trasteo:{label:'Trasteo',items:[],t:0},empaque:{label:'Empaque',items:[],t:0},inst:{label:'Instalaciones',items:[],t:0},adicionales:{label:'Otros servicios',items:[],t:0},bodegaje:{label:'Bodegaje',items:[],t:0}};
+  lines.forEach(function(l){var c=pdfCats[l.cat]||pdfCats.adicionales;c.items.push(l);c.t+=l.v;});
+  Object.keys(pdfCats).forEach(function(k){var c=pdfCats[k];if(!c.items.length)return;doc.setFont('helvetica','bold');doc.setTextColor(10,24,69);doc.text(c.label,14,y);doc.text(COP(c.t),196,y,{align:'right'});y+=6;doc.setFont('helvetica','normal');doc.setTextColor(15,23,42);c.items.forEach(function(l){doc.text('   '+l.l+(l.est?' (estimado)':''),14,y);doc.text(COP(l.v),196,y,{align:'right'});y+=6;if(y>262){doc.addPage();y=20;}});y+=3;});
   y+=3;doc.setDrawColor(220,225,235);doc.line(14,y,196,y);y+=10;
   // Total
   doc.setFillColor(10,24,69);doc.roundedRect(14,y-7,182,14,2,2,'F');
@@ -1137,8 +1136,8 @@ $('#btn-pdf').addEventListener('click',async()=>{
 });
 
 /* ========= CONTINUE BUTTONS ========= */
-$('#cont-empaque').addEventListener('click',()=>{cancelAutoPrompt();stepDone('empaque');stepCurrent('servicio');reveal('c-inst');armAutoPrompt('inst',15,'¿Deseas continuar sin instalaciones?',()=>{reveal('c-desempaque');armAutoPrompt('desempaque',15,'¿Deseas continuar?',()=>{S.desempaque=false;stepDone('servicio');reveal('c-adicionales');buildAdic();});});persistNow();});
-$('#cont-inst').addEventListener('click',()=>{cancelAutoPrompt();reveal('c-desempaque');persistNow();armAutoPrompt('desempaque',15,'¿Deseas continuar?',()=>{S.desempaque=false;stepDone('servicio');reveal('c-adicionales');buildAdic();});});
+$('#cont-empaque').addEventListener('click',()=>{cancelAutoPrompt();stepDone('empaque');stepCurrent('servicio');reveal('c-inst');armAutoPrompt('inst',30,'¿Deseas continuar sin instalaciones?',()=>{reveal('c-desempaque');armAutoPrompt('desempaque',25,'¿Deseas continuar?',()=>{S.desempaque=false;stepDone('servicio');reveal('c-adicionales');buildAdic();});});persistNow();});
+$('#cont-inst').addEventListener('click',()=>{cancelAutoPrompt();reveal('c-desempaque');persistNow();armAutoPrompt('desempaque',25,'¿Deseas continuar?',()=>{S.desempaque=false;stepDone('servicio');reveal('c-adicionales');buildAdic();});});
 
 /* ========= PERSISTENCIA 10 MIN (localStorage) ========= */
 const STORE_KEY='ty_cotpt_state';
@@ -1208,6 +1207,18 @@ document.addEventListener('input',()=>{clearTimeout(window._psvT);window._psvT=s
 window.addEventListener('beforeunload',persistNow);
 window.addEventListener('pagehide',persistNow);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')persistNow();});
+
+/* ========= CORREGIR DATOS (Fix #10) ========= */
+$('#btn-corregir').addEventListener('click',function(e){
+  e.preventDefault();
+  var p=$('#progress');if(p)p.classList.remove('progress--faded');
+  _resultActioned=true;clearTimeout(_resultPromptTimer);
+  window.scrollTo({top:0,behavior:'auto'});
+  $('#ur-whatsapp').focus();
+});
+
+/* ========= BLANK SCREEN RECOVERY (Fix #13) ========= */
+window.addEventListener('pageshow',function(e){if(e.persisted){var p=$('#progress');if(p&&p.classList.contains('progress--faded'))p.classList.remove('progress--faded');}});
 
 /* ========= INIT ========= */
 buildRuta();buildInst();
