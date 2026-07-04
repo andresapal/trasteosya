@@ -57,21 +57,23 @@ h1,h2,h3{font-family:'Plus Jakarta Sans','Inter',sans-serif;letter-spacing:-.02e
 /* WRAP */
 .wrap{max-width:640px;margin:0 auto;padding:0 20px 40px}
 
-/* PROGRESS */
-.progress{background:var(--card);border-radius:var(--r-lg);padding:18px 20px;margin-bottom:20px;box-shadow:var(--sh-card);border:1px solid var(--border);opacity:0;transform:translateY(10px);transition:.5s;position:sticky;top:70px;z-index:50}
+/* PROGRESS — flotante en scroll, sin línea, iconos sólidos, solo el current late */
+.progress{background:rgba(255,255,255,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:var(--r-lg);padding:14px 18px;margin-bottom:20px;box-shadow:0 2px 6px rgba(10,24,69,.06),0 12px 32px rgba(10,24,69,.1);border:1px solid var(--border);opacity:0;transform:translateY(10px);transition:opacity .5s,transform .5s,box-shadow .3s;position:sticky;top:12px;z-index:80}
 .progress.show{opacity:1;transform:translateY(0)}
-.progress-steps{display:flex;justify-content:space-between;position:relative;align-items:flex-start}
-.progress-steps::before{content:'';position:absolute;top:22px;left:6%;right:6%;height:3px;background:#e5e5ea;border-radius:2px;z-index:1}
-.progress-fill{position:absolute;top:22px;left:6%;height:3px;background:linear-gradient(90deg,var(--blue),var(--navy));border-radius:2px;z-index:2;width:0;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.progress.stuck{box-shadow:0 4px 12px rgba(10,24,69,.1),0 16px 40px rgba(10,24,69,.15);background:rgba(255,255,255,.97)}
+.progress-steps{display:flex;justify-content:space-between;position:relative;align-items:flex-start;gap:4px}
 .step{position:relative;z-index:3;text-align:center;flex:1;min-width:0}
-.step-icon{width:44px;height:44px;border-radius:50%;background:#e5e5ea;display:inline-flex;align-items:center;justify-content:center;font-size:20px;transition:.3s;border:3px solid #f4f6fa;opacity:.35;filter:grayscale(.6)}
-.step.done .step-icon{background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;transform:scale(1.03);opacity:.55;filter:grayscale(.4)}
-.step.current .step-icon{background:var(--card);border-color:var(--blue);color:var(--blue);animation:stepPulse 1.4s infinite;opacity:1;filter:none;transform:scale(1.18)}
-@keyframes stepPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,61,165,.55),0 4px 14px rgba(0,61,165,.3)}50%{box-shadow:0 0 0 10px rgba(0,61,165,0),0 4px 14px rgba(0,61,165,.5)}}
-.step-label{font-size:10.5px;font-weight:600;color:var(--muted);margin-top:6px;line-height:1.2;transition:.3s;opacity:.55}
-.step.done .step-label{color:var(--navy);opacity:.75}
-.step.current .step-label{color:var(--blue);opacity:1;font-weight:700}
-@media(max-width:480px){.step-icon{width:36px;height:36px;font-size:16px}.step-label{font-size:9px}}
+.step-icon{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#eef1f6,#dde3ee);display:inline-flex;align-items:center;justify-content:center;font-size:19px;transition:.3s;border:2px solid #fff;box-shadow:0 2px 6px rgba(10,24,69,.08);opacity:1;filter:none}
+.step.done .step-icon{background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;box-shadow:0 3px 10px rgba(0,61,165,.35)}
+.step.current .step-icon{background:linear-gradient(135deg,#fff,#f4f7ff);border-color:var(--blue);color:var(--blue);animation:stepPulse 1.3s ease-in-out infinite;transform:scale(1.15);box-shadow:0 4px 14px rgba(0,61,165,.35)}
+@keyframes stepPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(0,61,165,.55),0 4px 14px rgba(0,61,165,.35);transform:scale(1.15)}
+  50%{box-shadow:0 0 0 10px rgba(0,61,165,0),0 6px 18px rgba(0,61,165,.5);transform:scale(1.22)}
+}
+.step-label{font-size:10.5px;font-weight:600;color:var(--muted);margin-top:6px;line-height:1.2;transition:.3s}
+.step.done .step-label{color:var(--navy);font-weight:700}
+.step.current .step-label{color:var(--blue);font-weight:800}
+@media(max-width:480px){.step-icon{width:36px;height:36px;font-size:16px}.step-label{font-size:9.5px}.progress{padding:12px 14px}}
 
 /* CARDS */
 .card{background:var(--card);border-radius:var(--r-lg);padding:22px 22px 24px;margin-bottom:18px;box-shadow:var(--sh-card);border:1px solid var(--border);opacity:0;transform:translateY(20px);transition:.6s cubic-bezier(.4,0,.2,1);position:relative;display:none}
@@ -265,7 +267,7 @@ h1,h2,h3{font-family:'Plus Jakarta Sans','Inter',sans-serif;letter-spacing:-.02e
   <!-- PROGRESS -->
   <div class="progress" id="progress">
     <div class="progress-steps">
-      <div class="progress-fill" id="progress-fill"></div>
+      <div class="progress-fill" id="progress-fill" style="display:none"></div>
       <div class="step" data-step="vivienda"><div class="step-icon">🏠</div><div class="step-label">Vivienda</div></div>
       <div class="step" data-step="ruta"><div class="step-icon">📍</div><div class="step-label">Ruta</div></div>
       <div class="step" data-step="empaque"><div class="step-icon">📦</div><div class="step-label">Empaque</div></div>
@@ -404,6 +406,22 @@ function toast(msg,ms){
   },5000);
   t._t=setTimeout(()=>{t.classList.remove('show','rebote');t.style.opacity='';t.style.transform='';},ms||8500);
 }
+
+/* Sticky detector: pinta sombra flotante cuando la barra queda pegada al top */
+(function(){
+  const p=$('#progress');if(!p)return;
+  const sentinel=document.createElement('div');
+  sentinel.style.cssText='position:absolute;top:-1px;height:1px;left:0;right:0;pointer-events:none';
+  p.style.position='sticky';
+  // El sentinel va justo antes del progress
+  p.parentNode.insertBefore(sentinel,p);
+  if('IntersectionObserver' in window){
+    const io=new IntersectionObserver((ents)=>{
+      ents.forEach(e=>{p.classList.toggle('stuck',!e.isIntersecting);});
+    },{threshold:0,rootMargin:'-12px 0px 0px 0px'});
+    io.observe(sentinel);
+  }
+})();
 
 /* Shake numeros al entrar en viewport (IntersectionObserver) */
 function setupCardShake(){
