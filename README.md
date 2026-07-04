@@ -187,3 +187,4 @@ Sistema construido sobre el skill `ui-ux-pro-max` de Claude. Para iterar:
 1. Abre la conversación con Claude
 2. Comparte qué quieres cambiar
 3. Pega el archivo a editar
+
