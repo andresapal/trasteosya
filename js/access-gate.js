@@ -56,6 +56,7 @@
           '<button type="button" class="ty-gate-modal__ok">Entrar</button>' +
         '</div>' +
       '</div>';
+    wrap.style.visibility = 'visible';
     document.body.appendChild(wrap);
 
     const input = wrap.querySelector('.ty-gate-modal__input');
