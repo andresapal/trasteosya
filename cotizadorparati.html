@@ -24,7 +24,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth;overflow-x:hidden}
+html{scroll-behavior:smooth}
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f6fa;color:#0F172A;min-height:100vh;overflow-x:hidden;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
 h1,h2,h3{font-family:'Plus Jakarta Sans','Inter',sans-serif;letter-spacing:-.02em}
 :root{
@@ -58,9 +58,12 @@ h1,h2,h3{font-family:'Plus Jakarta Sans','Inter',sans-serif;letter-spacing:-.02e
 .wrap{max-width:640px;margin:0 auto;padding:0 20px 40px}
 
 /* PROGRESS — flotante en scroll, sin línea, iconos sólidos, solo el current late */
-.progress{background:rgba(255,255,255,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:var(--r-lg);padding:14px 18px;margin-bottom:20px;box-shadow:0 2px 6px rgba(10,24,69,.06),0 12px 32px rgba(10,24,69,.1);border:1px solid var(--border);opacity:0;transform:translateY(10px);transition:opacity .5s,transform .5s,box-shadow .3s;position:sticky;top:12px;z-index:80}
+.progress{background:rgba(255,255,255,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:var(--r-lg);padding:14px 18px;margin-bottom:20px;box-shadow:0 2px 6px rgba(10,24,69,.06),0 12px 32px rgba(10,24,69,.1);border:1px solid var(--border);opacity:0;transform:translateY(10px);transition:opacity .5s,transform .5s,box-shadow .3s,background .3s,padding .3s;position:sticky;top:10px;z-index:80;will-change:transform}
 .progress.show{opacity:1;transform:translateY(0)}
-.progress.stuck{box-shadow:0 4px 12px rgba(10,24,69,.1),0 16px 40px rgba(10,24,69,.15);background:rgba(255,255,255,.97)}
+.progress.stuck{background:rgba(255,255,255,.72);box-shadow:0 4px 14px rgba(10,24,69,.12),0 20px 50px rgba(10,24,69,.18);padding:10px 16px;border-color:rgba(10,24,69,.12)}
+.progress.stuck .step-icon{width:36px;height:36px;font-size:16px}
+.progress.stuck .step.current .step-icon{transform:scale(1.12)}
+.progress.stuck .step-label{font-size:9.5px;opacity:.85}
 .progress-steps{display:flex;justify-content:space-between;position:relative;align-items:flex-start;gap:4px}
 .step{position:relative;z-index:3;text-align:center;flex:1;min-width:0}
 .step-icon{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#eef1f6,#dde3ee);display:inline-flex;align-items:center;justify-content:center;font-size:19px;transition:.3s;border:2px solid #fff;box-shadow:0 2px 6px rgba(10,24,69,.08);opacity:1;filter:none}
@@ -176,6 +179,22 @@ h1,h2,h3{font-family:'Plus Jakarta Sans','Inter',sans-serif;letter-spacing:-.02e
 .hint .arrow{margin-left:auto;font-size:18px;animation:bounce 1.4s infinite}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
 
+/* PROMPT MODAL "¿Deseas continuar?" */
+.pmodal{position:fixed;inset:0;background:rgba(10,24,69,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:10000;padding:20px;opacity:0;transition:opacity .3s}
+.pmodal.show{display:flex;opacity:1;animation:pmodalFade .3s}
+@keyframes pmodalFade{from{opacity:0}to{opacity:1}}
+.pmodal-box{background:var(--card);border-radius:22px;padding:26px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(10,24,69,.4);animation:pmodalIn .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pmodalIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+.pmodal-icon{font-size:44px;margin-bottom:8px;animation:pmodalBounce 1.2s ease-in-out infinite}
+@keyframes pmodalBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.pmodal-title{font-size:19px;font-weight:800;color:var(--navy);margin-bottom:20px;letter-spacing:-.01em}
+.pmodal-actions{display:flex;flex-direction:column;gap:10px}
+.pmodal-btn{padding:14px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;border:none;transition:.2s}
+.pmodal-ok{background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;box-shadow:0 4px 14px rgba(0,61,165,.3)}
+.pmodal-ok:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,61,165,.42)}
+.pmodal-cancel{background:transparent;color:var(--muted);border:1.5px solid var(--border)}
+.pmodal-cancel:hover{background:#fafafa;color:var(--navy)}
+
 /* POPUP TOAST */
 .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120px);background:var(--navy);color:#fff;padding:14px 20px;border-radius:var(--r-md);font-size:14px;font-weight:600;box-shadow:0 8px 32px rgba(10,24,69,.4);z-index:9999;max-width:90%;text-align:center;line-height:1.4;opacity:0}
 .toast.show{animation:toastIn .55s cubic-bezier(.36,.07,.19,.97) forwards}
@@ -223,6 +242,8 @@ h1,h2,h3{font-family:'Plus Jakarta Sans','Inter',sans-serif;letter-spacing:-.02e
 .result-actions{display:grid;gap:12px;margin-top:20px}
 .btn-wa{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--green);color:#fff;padding:16px;border-radius:var(--r-md);font-size:16px;font-weight:700;text-decoration:none;border:none;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(22,163,74,.35);transition:.2s}
 .btn-wa:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(22,163,74,.45)}
+.btn-inq{display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,var(--navy),var(--blue-d));color:#fff;padding:15px;border-radius:var(--r-md);font-size:15px;font-weight:700;border:none;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(10,24,69,.25);transition:.2s}
+.btn-inq:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(10,24,69,.35)}
 .btn-pdf{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--card);color:var(--navy);padding:15px;border-radius:var(--r-md);font-size:15px;font-weight:600;border:1.5px solid var(--border);cursor:pointer;font-family:inherit;transition:.2s}
 .btn-pdf:hover{border-color:var(--blue);background:rgba(0,61,165,.04)}
 .disclaimer{font-size:11.5px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.5}
@@ -345,6 +366,7 @@ h1,h2,h3{font-family:'Plus Jakarta Sans','Inter',sans-serif;letter-spacing:-.02e
     <div class="rtotal"><span class="rtotal-lbl">Total estimado</span><span class="rtotal-val" id="result-total">$ 0</span></div>
     <div class="result-actions">
       <button class="btn-wa" id="btn-wa"><span>📲</span> Enviar a mi WhatsApp</button>
+      <button class="btn-inq" id="btn-inq"><span>💬</span> Tienes inquietudes? Escríbenos</button>
       <button class="btn-pdf" id="btn-pdf"><span>📄</span> Descargar PDF</button>
     </div>
     <p class="disclaimer">Los valores son estimados y pueden ajustarse según validación en sitio (condiciones de origen y/o destino). Sin compromiso. Trasteos Ya · trasteosya.online</p>
@@ -355,6 +377,18 @@ h1,h2,h3{font-family:'Plus Jakarta Sans','Inter',sans-serif;letter-spacing:-.02e
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- Modal prompt "¿Deseas continuar?" -->
+<div class="pmodal" id="pmodal">
+  <div class="pmodal-box">
+    <div class="pmodal-icon">👉</div>
+    <div class="pmodal-title" id="pmodal-title">¿Deseas continuar?</div>
+    <div class="pmodal-actions">
+      <button class="pmodal-btn pmodal-ok" id="pmodal-ok">Sí, continuar</button>
+      <button class="pmodal-btn pmodal-cancel" id="pmodal-cancel">Todavía no</button>
+    </div>
+  </div>
+</div>
 
 <script>
 'use strict';
@@ -399,13 +433,29 @@ function toast(msg,ms){
   t.classList.remove('show','rebote');void t.offsetWidth; // reset animation
   t.classList.add('show');
   clearTimeout(t._t);clearTimeout(t._r);
-  // Rebote de recordatorio a los 5s
-  t._r=setTimeout(()=>{
-    t.classList.remove('rebote');void t.offsetWidth;
-    t.classList.add('rebote');
-  },5000);
+  t._r=setTimeout(()=>{t.classList.remove('rebote');void t.offsetWidth;t.classList.add('rebote');},5000);
   t._t=setTimeout(()=>{t.classList.remove('show','rebote');t.style.opacity='';t.style.transform='';},ms||8500);
 }
+
+/* ========= MODAL PROMPT "¿Deseas continuar?" ========= */
+let _promptActive=false;
+function showPrompt(title,onOK){
+  if(_promptActive)return;
+  _promptActive=true;
+  const m=$('#pmodal');$('#pmodal-title').textContent=title||'¿Deseas continuar?';
+  m.classList.add('show');
+  const clean=()=>{m.classList.remove('show');_promptActive=false;$('#pmodal-ok').onclick=null;$('#pmodal-cancel').onclick=null;};
+  $('#pmodal-ok').onclick=()=>{clean();if(onOK)onOK();};
+  $('#pmodal-cancel').onclick=clean;
+}
+
+/* ========= Auto-prompt 5s por seccion (si el usuario no interactua) ========= */
+let _autoPromptTimer=null;
+function armAutoPrompt(sectionKey,secs,title,onOK){
+  clearTimeout(_autoPromptTimer);
+  _autoPromptTimer=setTimeout(()=>{showPrompt(title||'¿Deseas continuar?',onOK);},(secs||5)*1000);
+}
+function cancelAutoPrompt(){clearTimeout(_autoPromptTimer);}
 
 /* Sticky detector: pinta sombra flotante cuando la barra queda pegada al top */
 (function(){
@@ -474,16 +524,22 @@ $$('#viv-grid .opt').forEach(o=>o.addEventListener('click',()=>{
   o.classList.add('sel');S.vivienda=o.dataset.viv;
   if(S.vivienda==='oficina'){oficinaFlow();return;}
   stepDone('vivienda');
-  // Casa: opcion camion extra removible
   const ce=$('#casa-extra');
   if(S.vivienda==='casa'){
     ce.style.display='block';
     ce.innerHTML='<div class="mat-row"><div class="mat-info"><div class="mat-name">¿Tu casa tiene mucha carga?</div><div class="mat-hint">Podemos añadir un camión pequeño adicional</div></div><div class="stepper"><button type="button" id="ce-toggle">Añadir</button></div></div>';
-    $('#ce-toggle').onclick=function(){S.camionExtra=!S.camionExtra;this.textContent=S.camionExtra?'Quitar':'Añadir';this.style.background=S.camionExtra?'rgba(0,61,165,.08)':'';this.style.borderColor=S.camionExtra?'var(--blue)':'';};
+    $('#ce-toggle').onclick=function(){S.camionExtra=!S.camionExtra;this.textContent=S.camionExtra?'Quitar':'Añadir';this.style.background=S.camionExtra?'rgba(0,61,165,.08)':'';this.style.borderColor=S.camionExtra?'var(--blue)':'';persistNow();};
   } else {ce.style.display='none';S.camionExtra=false;}
   buildEmpaque();
   reveal('c-ruta');stepCurrent('ruta');
-  timerNext('c-ruta','c-empaque','empaque','Sigue con tu empaque',10);
+  // Auto-prompt 5s si deja Bogota-Bogota por defecto sin tocar
+  armAutoPrompt('ruta',5,'¿Confirmas Bogotá como origen y destino?',()=>{
+    stepDone('ruta');stepCurrent('empaque');reveal('c-empaque');
+    armAutoPrompt('empaque',5,'¿Deseas continuar con instalaciones?',()=>{
+      stepDone('empaque');stepCurrent('servicio');reveal('c-inst');
+    });
+  });
+  persistNow();
 }));
 
 /* ========= OFICINA ========= */
@@ -507,9 +563,11 @@ function buildRuta(){
   $('#ur-origen').onchange=$('#ur-destino').onchange=checkNacional;
 }
 function checkNacional(){
+  cancelAutoPrompt();
   S.origen=$('#ur-origen').value;S.destino=$('#ur-destino').value;
   const otra=S.origen==='Otra ciudad'||S.destino==='Otra ciudad';
   const box=$('#ruta-nacional');
+  persistNow();
   if(otra){
     clearTimeout(_pending);
     stepDone('ruta');
@@ -584,30 +642,32 @@ window.instChg=function(k,d){let q=(S.inst[k]||0)+d;if(q<0)q=0;S.inst[k]=q;const
 
 /* ========= STEP 6: DESEMPAQUE ========= */
 $$('#desempaque-yn button').forEach(b=>b.addEventListener('click',()=>{
+  cancelAutoPrompt();
   $$('#desempaque-yn button').forEach(x=>x.classList.remove('sel-yes','sel-no'));
   const v=b.dataset.v;S.desempaque=(v==='si');
   b.classList.add(v==='si'?'sel-yes':'sel-no');
   stepDone('servicio');
-  reveal('c-adicionales');buildAdic();
-  timerAdic();
+  reveal('c-adicionales');buildAdic();persistNow();
 }));
 
-/* ========= STEP 7: ADICIONALES (12s auto) ========= */
-function buildAdic(){$('#adic-body').innerHTML='';}
-function timerAdic(){
-  clearTimeout(_pending);
-  _pending=setTimeout(()=>{
-    $('#adic-body').innerHTML=
-      '<div style="margin-bottom:16px"><label style="display:block;font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px">¿Hay caminados largos? (distancia entre el camión y la puerta)</label><div class="yn" id="caminado-yn"><button data-v="si">Sí</button><button data-v="no">No</button></div></div>'
-      +'<div id="escalera-block"></div>';
-    $$('#caminado-yn button').forEach(b=>b.addEventListener('click',()=>{
-      $$('#caminado-yn button').forEach(x=>x.classList.remove('sel-yes','sel-no'));
-      S.caminado=(b.dataset.v==='si');b.classList.add(S.caminado?'sel-yes':'sel-no');
-      buildEscalera();
-    }));
-    $('#adic-body').scrollIntoView({behavior:'smooth',block:'center'});
-  },12000);
+/* ========= STEP 7: ADICIONALES (aparece de una vez) ========= */
+function buildAdic(){
+  $('#adic-body').innerHTML=
+    '<div style="margin-bottom:16px"><label style="display:block;font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px">¿Hay caminados largos? (distancia entre el camión y la puerta)</label><div class="yn" id="caminado-yn"><button data-v="si">Sí</button><button data-v="no">No</button></div></div>'
+    +'<div id="escalera-block"></div>';
+  $$('#caminado-yn button').forEach(b=>b.addEventListener('click',()=>{
+    cancelAutoPrompt();
+    $$('#caminado-yn button').forEach(x=>x.classList.remove('sel-yes','sel-no'));
+    S.caminado=(b.dataset.v==='si');b.classList.add(S.caminado?'sel-yes':'sel-no');
+    buildEscalera();persistNow();
+  }));
+  // Auto-prompt 5s si no toca nada
+  armAutoPrompt('adic',5,'¿Deseas continuar sin condiciones especiales?',()=>{
+    if(S.caminado===null)S.caminado=false;if(S.ascensor===null)S.ascensor=true;
+    adicDone();
+  });
 }
+function timerAdic(){/* no-op — mantenido por compat */}
 function buildEscalera(){
   $('#escalera-block').innerHTML=
     '<div style="margin-top:8px"><label style="display:block;font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px">¿Tienes ascensor o todo es por escalera?</label><div class="yn" id="asc-yn"><button data-v="si">Tengo ascensor</button><button data-v="no">Todo por escalera</button></div><div id="pisos-block"></div></div>';
@@ -624,13 +684,15 @@ function buildEscalera(){
     }
   }));
 }
-function adicDone(){reveal('c-bodegaje');}
+function adicDone(){reveal('c-bodegaje');armAutoPrompt('bod',5,'¿Deseas continuar sin bodegaje?',()=>{S.bodegaje=false;finalizar();});persistNow();}
 
 /* ========= STEP 8: BODEGAJE ========= */
 $$('#bodegaje-yn button').forEach(b=>b.addEventListener('click',()=>{
+  cancelAutoPrompt();
   $$('#bodegaje-yn button').forEach(x=>x.classList.remove('sel-yes','sel-no'));
   const v=b.dataset.v;S.bodegaje=(v==='si');
   b.classList.add(v==='si'?'sel-yes':'sel-no');
+  persistNow();
   const body=$('#bod-body');
   if(S.bodegaje){
     let html='<div style="margin-top:14px"><label style="display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px">¿Cuánto espacio necesitas?</label><div class="pills" id="bod-pills">';
@@ -714,12 +776,23 @@ function notifyOperador(text){
   fetch('https://api.telegram.org/bot'+NOTIFY.TG_TOKEN+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:NOTIFY.TG_CHAT,text:text,parse_mode:'Markdown'})}).catch(()=>{});
 }
 
-/* ========= WHATSAPP (texto) ========= */
-$('#btn-wa').addEventListener('click',()=>{
-  const lines=S._lines||[];let msg='*Cotización Trasteos Ya*\n\nHola '+S.nombre+', esta es tu cotización estimada:\n\n';
+/* ========= WHATSAPP (texto al cliente) ========= */
+function buildCotMsg(prefix){
+  const lines=S._lines||[];
+  let msg=(prefix||'')+'*Cotización Trasteos Ya*\n\nCliente: '+S.nombre+'\nWhatsApp: '+S.whatsapp+'\nRuta: '+S.origen+' → '+S.destino+'\n\n';
   lines.forEach(l=>{msg+='• '+l.l+': '+COP(l.v)+(l.est?' (estimado)':'')+'\n';});
   msg+='\n*Total estimado: '+COP(S._total)+'*\n\nValores sujetos a validación en sitio. Sin compromiso.\ntrasteosya.online';
-  const wa='https://wa.me/57'+S.whatsapp+'?text='+encodeURIComponent(msg);
+  return msg;
+}
+$('#btn-wa').addEventListener('click',()=>{
+  const wa='https://wa.me/57'+S.whatsapp+'?text='+encodeURIComponent(buildCotMsg());
+  window.open(wa,'_blank','noopener');
+});
+
+/* ========= INQUIETUDES: WhatsApp al operador con toda la cotización ========= */
+$('#btn-inq').addEventListener('click',()=>{
+  const msg=buildCotMsg('Hola equipo, tengo una inquietud sobre esta cotización.\n\n');
+  const wa='https://wa.me/'+OPERADOR_WA+'?text='+encodeURIComponent(msg);
   window.open(wa,'_blank','noopener');
 });
 
@@ -804,11 +877,81 @@ $('#btn-pdf').addEventListener('click',async()=>{
 });
 
 /* ========= CONTINUE BUTTONS ========= */
-$('#cont-empaque').addEventListener('click',()=>{stepDone('empaque');stepCurrent('servicio');reveal('c-inst');});
-$('#cont-inst').addEventListener('click',()=>{reveal('c-desempaque');});
+$('#cont-empaque').addEventListener('click',()=>{cancelAutoPrompt();stepDone('empaque');stepCurrent('servicio');reveal('c-inst');armAutoPrompt('inst',5,'¿Deseas continuar sin instalaciones?',()=>{reveal('c-desempaque');armAutoPrompt('desempaque',5,'¿Deseas continuar?',()=>{S.desempaque=false;stepDone('servicio');reveal('c-adicionales');buildAdic();});});persistNow();});
+$('#cont-inst').addEventListener('click',()=>{cancelAutoPrompt();reveal('c-desempaque');persistNow();armAutoPrompt('desempaque',5,'¿Deseas continuar?',()=>{S.desempaque=false;stepDone('servicio');reveal('c-adicionales');buildAdic();});});
+
+/* ========= PERSISTENCIA 10 MIN (localStorage) ========= */
+const STORE_KEY='ty_cotpt_state';
+const TTL_MS=10*60*1000;
+function persistNow(){
+  try{
+    const data={
+      S:S,
+      inputs:{
+        nombre:$('#ur-nombre')?$('#ur-nombre').value:'',
+        whatsapp:$('#ur-whatsapp')?$('#ur-whatsapp').value:'',
+        origen:$('#ur-origen')?$('#ur-origen').value:'',
+        destino:$('#ur-destino')?$('#ur-destino').value:'',
+        instOtro:$('#inst-otro')?$('#inst-otro').value:''
+      },
+      shownCards:Array.from(document.querySelectorAll('.card.show')).map(c=>c.id),
+      doneSteps:Array.from(document.querySelectorAll('.step.done')).map(s=>s.dataset.step),
+      currentStep:(document.querySelector('.step.current')||{dataset:{}}).dataset.step,
+      empTab:S.empaque.tipo,
+      ts:Date.now()
+    };
+    localStorage.setItem(STORE_KEY,JSON.stringify(data));
+  }catch(e){}
+}
+function restoreState(){
+  try{
+    const raw=localStorage.getItem(STORE_KEY);if(!raw)return false;
+    const d=JSON.parse(raw);
+    if(!d.ts||Date.now()-d.ts>TTL_MS){localStorage.removeItem(STORE_KEY);return false;}
+    // Restaurar S (mantener default y sobrescribir campos)
+    if(d.S){
+      Object.keys(d.S).forEach(k=>{if(d.S[k]!==undefined)S[k]=d.S[k];});
+    }
+    // Inputs
+    if(d.inputs){
+      if(d.inputs.nombre)$('#ur-nombre').value=d.inputs.nombre;
+      if(d.inputs.whatsapp)$('#ur-whatsapp').value=d.inputs.whatsapp;
+    }
+    // Progress + cards
+    $('#progress').classList.add('show');
+    (d.shownCards||[]).forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('show');});
+    (d.doneSteps||[]).forEach(n=>{const s=document.querySelector('.step[data-step="'+n+'"]');if(s)s.classList.add('done');});
+    if(d.currentStep){stepCurrent(d.currentStep);}
+    fill();
+    // Selecciones visuales
+    if(S.vivienda){const o=document.querySelector('#viv-grid .opt[data-viv="'+S.vivienda+'"]');if(o)o.classList.add('sel');}
+    // Ruta
+    if(d.inputs&&$('#ur-origen'))$('#ur-origen').value=d.inputs.origen||'Bogotá';
+    if(d.inputs&&$('#ur-destino'))$('#ur-destino').value=d.inputs.destino||'Bogotá';
+    // Empaque tab + materiales
+    if(d.empTab){document.getElementById('tab-'+d.empTab).click();}
+    if(S.empaque&&S.empaque.mat){Object.keys(S.empaque.mat).forEach(k=>{const el=$('#q-'+k);if(el)el.textContent=S.empaque.mat[k];});}
+    // Instalaciones
+    ['nevecon','secadora','tv'].forEach(k=>{const el=$('#qi-'+k);if(el&&S.inst)el.textContent=S.inst[k]||0;});
+    if(d.inputs&&d.inputs.instOtro&&$('#inst-otro'))$('#inst-otro').value=d.inputs.instOtro;
+    // Yn buttons
+    if(S.desempaque===true){const b=document.querySelector('#desempaque-yn button[data-v="si"]');if(b)b.classList.add('sel-yes');}
+    else if(S.desempaque===false){const b=document.querySelector('#desempaque-yn button[data-v="no"]');if(b)b.classList.add('sel-no');}
+    if(S.bodegaje===true){const b=document.querySelector('#bodegaje-yn button[data-v="si"]');if(b)b.classList.add('sel-yes');}
+    else if(S.bodegaje===false){const b=document.querySelector('#bodegaje-yn button[data-v="no"]');if(b)b.classList.add('sel-no');}
+    toast('Retomamos tu cotización donde la dejaste ✨',3500);
+    return true;
+  }catch(e){return false;}
+}
+// Guardar en cambios de input y al salir
+document.addEventListener('input',()=>{clearTimeout(window._psvT);window._psvT=setTimeout(persistNow,600);});
+window.addEventListener('beforeunload',persistNow);
+window.addEventListener('pagehide',persistNow);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')persistNow();});
 
 /* ========= INIT ========= */
 buildRuta();buildInst();
+setTimeout(restoreState,300);
 </script>
 </body>
 </html>
