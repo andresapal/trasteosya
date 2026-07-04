@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-# Herramientas internas - uso del operador (gated con PIN)
+# Herramientas internas y Cotizador Corporativo (Uso operador / Gated con PIN)
 Disallow: /cotizador.html
 Disallow: /orden-servicio.html
 Disallow: /gracias.html
