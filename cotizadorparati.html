@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0A1845">
+<title>Cotizador Trasteos Ya — Cotiza tu mudanza en menos de 2 minutos</title>
+<meta name="description" content="Cotiza tu trasteo o mudanza en Bogotá en menos de 2 minutos. Precio estimado inmediato, sin compromiso, atención por WhatsApp. Trasteos Ya, 15+ años, 5000+ mudanzas.">
+<meta name="keywords" content="cotizador trasteos, mudanzas Bogotá, cotizar trasteo, servicio mudanza, empaque mudanza, trasteos ya">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://trasteosya.online/cotizadorparati.html">
+<link rel="icon" type="image/png" href="/assets/img/logo.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Cotiza tu trasteo en 2 minutos — Trasteos Ya">
+<meta property="og:description" content="Cotización inmediata para tu mudanza en Bogotá. Sin compromiso.">
+<meta property="og:url" content="https://trasteosya.online/cotizadorparati.html">
+<meta property="og:image" content="https://trasteosya.online/assets/img/logo.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"MovingCompany","name":"Trasteos Ya","url":"https://trasteosya.online","areaServed":"Bogotá, Colombia","priceRange":"$$","telephone":"+57 314 309 5194"}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f6fa;color:#0F172A;min-height:100vh;overflow-x:hidden;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Plus Jakarta Sans','Inter',sans-serif;letter-spacing:-.02em}
+:root{
+  --navy:#0A1845;--navy-d:#050E2D;--blue:#003DA5;--blue-d:#001E5C;--blue-l:#3B82F6;
+  --red:#E30613;--red-d:#B0050F;--green:#16A34A;--orange:#F59E0B;--yellow:#FFCC00;
+  --card:#fff;--border:rgba(10,24,69,.08);--text:#0F172A;--muted:#64748B;
+  --r-lg:20px;--r-md:14px;--r-sm:10px;
+  --sh-card:0 1px 3px rgba(10,24,69,.05),0 8px 20px rgba(10,24,69,.06);
+  --sh-hov:0 4px 12px rgba(10,24,69,.08),0 16px 32px rgba(10,24,69,.12);
+  --diamond:linear-gradient(45deg,rgba(255,255,255,.05) 25%,transparent 25%),linear-gradient(-45deg,rgba(255,255,255,.05) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,rgba(255,255,255,.05) 75%),linear-gradient(-45deg,transparent 75%,rgba(255,255,255,.05) 75%);
+}
+
+/* HEADER */
+.hdr{background:rgba(255,255,255,.92);padding:14px 20px;box-shadow:0 1px 0 var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.hdr-inner{max-width:640px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hdr-logo img{height:34px;display:block}
+.hdr-empresa{font-size:13px;color:var(--blue);font-weight:600;text-decoration:none;padding:6px 12px;border-radius:20px;border:1px solid rgba(0,61,165,.2);background:rgba(0,61,165,.05);transition:.2s}
+.hdr-empresa:hover{background:rgba(0,61,165,.1)}
+
+/* HERO */
+.hero{padding:30px 20px 16px;text-align:center}
+.hero-inner{max-width:640px;margin:0 auto}
+.hero-title{font-size:32px;font-weight:800;color:var(--navy);line-height:1.15;margin-bottom:18px}
+.hero-title .accent{color:var(--red)}
+.badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--card);padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;color:var(--navy);box-shadow:0 1px 3px rgba(10,24,69,.05),0 2px 8px rgba(10,24,69,.04);border:1px solid var(--border)}
+.badge .chk{color:var(--green);font-weight:800;font-size:15px}
+@media(max-width:480px){.hero-title{font-size:26px}.badge{font-size:12px;padding:7px 11px}}
+
+/* WRAP */
+.wrap{max-width:640px;margin:0 auto;padding:0 20px 40px}
+
+/* PROGRESS */
+.progress{background:var(--card);border-radius:var(--r-lg);padding:18px 20px;margin-bottom:20px;box-shadow:var(--sh-card);border:1px solid var(--border);opacity:0;transform:translateY(10px);transition:.5s;position:sticky;top:70px;z-index:50}
+.progress.show{opacity:1;transform:translateY(0)}
+.progress-steps{display:flex;justify-content:space-between;position:relative;align-items:flex-start}
+.progress-steps::before{content:'';position:absolute;top:22px;left:6%;right:6%;height:3px;background:#e5e5ea;border-radius:2px;z-index:1}
+.progress-fill{position:absolute;top:22px;left:6%;height:3px;background:linear-gradient(90deg,var(--blue),var(--navy));border-radius:2px;z-index:2;width:0;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.step{position:relative;z-index:3;text-align:center;flex:1;min-width:0}
+.step-icon{width:44px;height:44px;border-radius:50%;background:#e5e5ea;display:inline-flex;align-items:center;justify-content:center;font-size:20px;transition:.3s;border:3px solid #f4f6fa;opacity:.35;filter:grayscale(.6)}
+.step.done .step-icon{background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;transform:scale(1.03);opacity:.55;filter:grayscale(.4)}
+.step.current .step-icon{background:var(--card);border-color:var(--blue);color:var(--blue);animation:stepPulse 1.4s infinite;opacity:1;filter:none;transform:scale(1.18)}
+@keyframes stepPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,61,165,.55),0 4px 14px rgba(0,61,165,.3)}50%{box-shadow:0 0 0 10px rgba(0,61,165,0),0 4px 14px rgba(0,61,165,.5)}}
+.step-label{font-size:10.5px;font-weight:600;color:var(--muted);margin-top:6px;line-height:1.2;transition:.3s;opacity:.55}
+.step.done .step-label{color:var(--navy);opacity:.75}
+.step.current .step-label{color:var(--blue);opacity:1;font-weight:700}
+@media(max-width:480px){.step-icon{width:36px;height:36px;font-size:16px}.step-label{font-size:9px}}
+
+/* CARDS */
+.card{background:var(--card);border-radius:var(--r-lg);padding:22px 22px 24px;margin-bottom:18px;box-shadow:var(--sh-card);border:1px solid var(--border);opacity:0;transform:translateY(20px);transition:.6s cubic-bezier(.4,0,.2,1);position:relative;display:none}
+.card.show{opacity:1;transform:translateY(0);display:block}
+.card-hd{margin-bottom:16px}
+.card-title{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card-title .num{background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;width:26px;height:26px;border-radius:50%;font-size:13px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;transition:transform .25s,box-shadow .25s}
+.card:hover .card-title .num,.card.in-view .card-title .num{animation:numShake .55s cubic-bezier(.36,.07,.19,.97)}
+@keyframes numShake{0%,100%{transform:rotate(0) scale(1)}15%{transform:rotate(-14deg) scale(1.12)}30%{transform:rotate(12deg) scale(1.14)}45%{transform:rotate(-8deg) scale(1.1)}60%{transform:rotate(6deg) scale(1.08)}80%{transform:rotate(-2deg) scale(1.04)}}
+.card-desc{font-size:14px;color:var(--muted);line-height:1.4}
+
+/* INPUTS */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:14px 16px;font-size:16px;border:1.5px solid var(--border);border-radius:var(--r-md);background:#fafafa;font-family:inherit;color:var(--text);transition:.2s;-webkit-appearance:none;appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue);background:var(--card);box-shadow:0 0 0 4px rgba(0,61,165,.1)}
+.field input::placeholder{color:var(--muted)}
+.field-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:420px){.field-2{grid-template-columns:1fr}}
+
+/* OPTION GRID (vivienda) */
+.opt-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.opt{background:#fafafa;border:2px solid var(--border);border-radius:var(--r-md);padding:16px 12px 14px;cursor:pointer;transition:.2s;text-align:center;position:relative;user-select:none}
+.opt:hover{border-color:rgba(0,61,165,.3);background:var(--card);transform:translateY(-1px)}
+.opt.sel{border-color:var(--blue);background:rgba(0,61,165,.07);box-shadow:0 4px 12px rgba(0,61,165,.14)}
+.opt.sel::after{content:'✓';position:absolute;top:6px;right:8px;width:22px;height:22px;background:var(--blue);color:#fff;border-radius:50%;font-size:13px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+.opt-icon{font-size:34px;line-height:1;margin-bottom:8px}
+.opt-name{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:2px}
+.opt-rule{font-size:11.5px;color:var(--muted);line-height:1.3}
+.opt.oficina{grid-column:1/-1;background:linear-gradient(135deg,rgba(245,158,11,.06),rgba(255,204,0,.04));border-color:rgba(245,158,11,.2)}
+.opt.oficina.sel{background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(255,204,0,.08));border-color:var(--orange)}
+.opt.oficina.sel::after{background:var(--orange)}
+@media(max-width:380px){.opt-grid{grid-template-columns:1fr}.opt.oficina{grid-column:1}}
+
+/* TABS (empaque express/full) */
+.tabs{display:flex;background:#eef1f6;border-radius:var(--r-md);padding:4px;gap:4px;margin-bottom:16px}
+.tab{flex:1;padding:12px 8px;font-size:14px;font-weight:600;border:none;background:transparent;border-radius:var(--r-sm);cursor:pointer;color:var(--muted);transition:.2s;text-align:center}
+.tab.active{background:var(--card);color:var(--navy);box-shadow:0 1px 4px rgba(10,24,69,.1)}
+
+/* STEPPER (qty +/-) */
+.mat-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r-md);margin-bottom:10px;background:#fafafa;gap:10px}
+.mat-info{flex:1;min-width:0}
+.mat-name{font-size:14px;font-weight:600;color:var(--navy)}
+.mat-hint{font-size:11.5px;color:var(--muted)}
+.stepper{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.stepper button{width:34px;height:34px;border-radius:9px;border:1.5px solid var(--border);background:var(--card);font-size:18px;font-weight:600;color:var(--blue);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
+.stepper button:hover{border-color:var(--blue);background:rgba(0,61,165,.06)}
+.stepper button:active{transform:scale(.92)}
+.stepper .qv{font-size:16px;font-weight:700;min-width:28px;text-align:center;font-variant-numeric:tabular-nums;color:var(--navy)}
+
+/* YES/NO CHOICE */
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.yn button{padding:14px;border:2px solid var(--border);border-radius:var(--r-md);background:#fafafa;font-size:15px;font-weight:700;color:var(--navy);cursor:pointer;transition:.25s;font-family:inherit;position:relative;overflow:hidden}
+.yn button:hover{border-color:rgba(0,61,165,.3)}
+.yn button.sel-yes{border-color:var(--green);background:rgba(22,163,74,.1);color:var(--green);animation:selBounce .5s}
+.yn button.sel-no{border-color:var(--muted);background:rgba(100,116,139,.06);animation:selBounce .5s}
+.yn button.sel-yes::after,.yn button.sel-no::after{content:'✓';position:absolute;top:6px;right:8px;width:22px;height:22px;background:var(--green);color:#fff;border-radius:50%;font-size:13px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;animation:checkPop .55s cubic-bezier(.36,.07,.19,.97);box-shadow:0 2px 8px rgba(22,163,74,.35)}
+.yn button.sel-no::after{background:var(--muted);box-shadow:0 2px 8px rgba(100,116,139,.3)}
+
+/* PILL CHOICE (pisos) */
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.pill{padding:10px 18px;border:2px solid var(--border);border-radius:20px;background:#fafafa;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;transition:.25s;position:relative}
+.pill.sel{border-color:var(--green);background:rgba(22,163,74,.1);color:var(--green);animation:selBounce .5s;padding-right:34px}
+.pill.sel::after{content:'✓';position:absolute;top:50%;right:10px;transform:translateY(-50%);width:18px;height:18px;background:var(--green);color:#fff;border-radius:50%;font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;animation:checkPop .55s cubic-bezier(.36,.07,.19,.97)}
+
+@keyframes selBounce{
+  0%{transform:scale(1)}
+  25%{transform:scale(1.05)}
+  50%{transform:scale(.97)}
+  75%{transform:scale(1.02)}
+  100%{transform:scale(1)}
+}
+@keyframes checkPop{
+  0%{transform:scale(0) rotate(-90deg);opacity:0}
+  60%{transform:scale(1.3) rotate(15deg);opacity:1}
+  100%{transform:scale(1) rotate(0);opacity:1}
+}
+/* opt (vivienda) - refuerza el check */
+.opt.sel::after{animation:checkPop .55s cubic-bezier(.36,.07,.19,.97);box-shadow:0 2px 8px rgba(0,61,165,.35)}
+.opt.sel{animation:selBounce .5s}
+
+/* NOTE / referencia */
+.note{background:rgba(0,61,165,.05);border-left:3px solid var(--blue);border-radius:var(--r-sm);padding:11px 14px;font-size:12.5px;color:var(--navy);margin-top:12px;line-height:1.4}
+.note.warn{background:rgba(245,158,11,.08);border-left-color:var(--orange);color:#92600b}
+.note.ref{background:rgba(10,24,69,.04);border-left-color:var(--muted);color:var(--muted)}
+
+/* CONTINUE BTN */
+.btn-continue{display:block;width:100%;margin-top:16px;padding:15px;background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;border:none;border-radius:var(--r-md);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .15s,box-shadow .2s;position:relative;animation:btnPulse 2s infinite}
+.btn-continue:hover{transform:translateY(-2px);animation-play-state:paused}
+.btn-continue:active{transform:scale(.97)}
+@keyframes btnPulse{
+  0%,100%{box-shadow:0 4px 14px rgba(0,61,165,.28),0 0 0 0 rgba(0,61,165,.4)}
+  50%{box-shadow:0 4px 14px rgba(0,61,165,.28),0 0 0 12px rgba(0,61,165,0)}
+}
+
+/* HINT (timer prompt) */
+.hint{background:linear-gradient(135deg,rgba(0,61,165,.06),rgba(10,24,69,.03));border:1px dashed rgba(0,61,165,.3);border-radius:var(--r-md);padding:14px 18px;margin-top:16px;font-size:14px;color:var(--blue);font-weight:600;display:none;align-items:center;gap:8px;cursor:pointer}
+.hint.show{display:flex;animation:hintIn .4s}
+@keyframes hintIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.hint .arrow{margin-left:auto;font-size:18px;animation:bounce 1.4s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+
+/* POPUP TOAST */
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120px);background:var(--navy);color:#fff;padding:14px 20px;border-radius:var(--r-md);font-size:14px;font-weight:600;box-shadow:0 8px 32px rgba(10,24,69,.4);z-index:9999;max-width:90%;text-align:center;line-height:1.4;opacity:0}
+.toast.show{animation:toastIn .55s cubic-bezier(.36,.07,.19,.97) forwards}
+.toast.rebote{animation:toastShake .55s cubic-bezier(.36,.07,.19,.97)}
+@keyframes toastIn{
+  0%{transform:translate(-50%,120px);opacity:0}
+  60%{opacity:1}
+  70%{transform:translate(calc(-50% - 6px),0)}
+  80%{transform:translate(calc(-50% + 6px),0)}
+  90%{transform:translate(calc(-50% - 3px),0)}
+  100%{transform:translate(-50%,0);opacity:1}
+}
+@keyframes toastShake{
+  0%,100%{transform:translate(-50%,0)}
+  20%{transform:translate(calc(-50% - 8px),0)}
+  40%{transform:translate(calc(-50% + 8px),0)}
+  60%{transform:translate(calc(-50% - 5px),0)}
+  80%{transform:translate(calc(-50% + 3px),0)}
+}
+
+/* MSG BOX (oficina/nacional) */
+.msgbox{background:linear-gradient(135deg,var(--navy),var(--blue-d));color:#fff;border-radius:var(--r-lg);padding:24px;text-align:center;box-shadow:var(--sh-hov);position:relative;overflow:hidden}
+.msgbox::before{content:'';position:absolute;inset:0;background:var(--diamond);background-size:22px 22px;opacity:.5}
+.msgbox-icon{font-size:44px;margin-bottom:12px;position:relative}
+.msgbox-title{font-size:20px;font-weight:800;margin-bottom:10px;position:relative}
+.msgbox-text{font-size:14px;line-height:1.6;opacity:.92;margin-bottom:18px;position:relative}
+.msgbox-btn{display:inline-flex;align-items:center;gap:8px;background:var(--green);color:#fff;padding:14px 26px;border-radius:26px;font-size:15px;font-weight:700;text-decoration:none;position:relative;box-shadow:0 4px 16px rgba(22,163,74,.4);transition:.2s;border:none;cursor:pointer;font-family:inherit}
+.msgbox-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(22,163,74,.5)}
+
+/* RESULT */
+.result-hd{text-align:center;margin-bottom:18px}
+.result-hd .em{font-size:44px;margin-bottom:8px;display:block}
+.result-hd h2{font-size:24px;font-weight:800;color:var(--navy);margin-bottom:4px}
+.result-hd p{font-size:14px;color:var(--muted)}
+.rline{display:flex;justify-content:space-between;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border);gap:12px}
+.rline:last-of-type{border-bottom:none}
+.rline-info{flex:1;min-width:0}
+.rline-name{font-size:14.5px;font-weight:600;color:var(--navy)}
+.rline-detail{font-size:12px;color:var(--muted);margin-top:2px}
+.rline-val{font-size:15px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rline-val.est{color:var(--orange)}
+.rtotal{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:18px 20px;background:linear-gradient(135deg,var(--navy),var(--blue-d));border-radius:var(--r-md);color:#fff}
+.rtotal-lbl{font-size:15px;font-weight:600;opacity:.9}
+.rtotal-val{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
+.result-actions{display:grid;gap:12px;margin-top:20px}
+.btn-wa{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--green);color:#fff;padding:16px;border-radius:var(--r-md);font-size:16px;font-weight:700;text-decoration:none;border:none;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(22,163,74,.35);transition:.2s}
+.btn-wa:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(22,163,74,.45)}
+.btn-pdf{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--card);color:var(--navy);padding:15px;border-radius:var(--r-md);font-size:15px;font-weight:600;border:1.5px solid var(--border);cursor:pointer;font-family:inherit;transition:.2s}
+.btn-pdf:hover{border-color:var(--blue);background:rgba(0,61,165,.04)}
+.disclaimer{font-size:11.5px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.5}
+
+/* SITE FOOT (solo dominio) */
+.site-foot{margin-top:32px;text-align:center;font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.02em;padding:16px 0}
+.site-foot::before{content:'';display:block;width:40px;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);margin:0 auto 14px;border-radius:2px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-inner">
+    <a href="/" class="hdr-logo" aria-label="Trasteos Ya"><img src="/assets/img/logo.png" alt="Trasteos Ya"></a>
+    <a href="/cotizador.html" class="hdr-empresa">Soy empresa</a>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <h1 class="hero-title">Cotiza tu trasteo en <span class="accent">menos de 2 minutos</span></h1>
+    <div class="badges">
+      <span class="badge"><span class="chk">✔</span> Precio estimado inmediato</span>
+      <span class="badge"><span class="chk">✔</span> Sin compromiso</span>
+      <span class="badge"><span class="chk">✔</span> Atención por WhatsApp</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- 1 DATOS -->
+  <div class="card show" id="c-datos">
+    <div class="card-hd">
+      <h2 class="card-title"><span class="num">1</span>Tus datos</h2>
+      <p class="card-desc">Para comenzar tu cotización</p>
+    </div>
+    <div class="field"><label for="ur-nombre">Tu nombre</label><input type="text" id="ur-nombre" placeholder="Ej: María López" autocomplete="name"></div>
+    <div class="field"><label for="ur-whatsapp">Tu WhatsApp</label><input type="tel" id="ur-whatsapp" placeholder="Ej: 3001234567" inputmode="numeric" autocomplete="tel"></div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress" id="progress">
+    <div class="progress-steps">
+      <div class="progress-fill" id="progress-fill"></div>
+      <div class="step" data-step="vivienda"><div class="step-icon">🏠</div><div class="step-label">Vivienda</div></div>
+      <div class="step" data-step="ruta"><div class="step-icon">📍</div><div class="step-label">Ruta</div></div>
+      <div class="step" data-step="empaque"><div class="step-icon">📦</div><div class="step-label">Empaque</div></div>
+      <div class="step" data-step="servicio"><div class="step-icon">🚚</div><div class="step-label">Servicio</div></div>
+      <div class="step" data-step="cotizacion"><div class="step-icon">💰</div><div class="step-label">Total</div></div>
+    </div>
+  </div>
+
+  <!-- 2 VIVIENDA -->
+  <div class="card" id="c-vivienda">
+    <div class="card-hd"><h2 class="card-title"><span class="num">2</span>Mi vivienda es</h2><p class="card-desc">Selecciona el tipo de vivienda que vas a mudar</p></div>
+    <div class="opt-grid" id="viv-grid">
+      <div class="opt" data-viv="pequeno"><div class="opt-icon">🏢</div><div class="opt-name">Apartaestudio o pequeño</div><div class="opt-rule">Menos de 60 m²</div></div>
+      <div class="opt" data-viv="mediano"><div class="opt-icon">🏬</div><div class="opt-name">Apartamento mediano</div><div class="opt-rule">60 a 85 m²</div></div>
+      <div class="opt" data-viv="familiar"><div class="opt-icon">🏘️</div><div class="opt-name">Apartamento familiar</div><div class="opt-rule">Más de 85 m²</div></div>
+      <div class="opt" data-viv="casa"><div class="opt-icon">🏡</div><div class="opt-name">Casa</div><div class="opt-rule">Más de 85 m²</div></div>
+      <div class="opt oficina" data-viv="oficina"><div class="opt-icon">🏢</div><div class="opt-name">Oficina</div><div class="opt-rule">Te contactamos por WhatsApp</div></div>
+    </div>
+    <div id="casa-extra" style="display:none;margin-top:14px"></div>
+  </div>
+
+  <!-- 3 RUTA -->
+  <div class="card" id="c-ruta">
+    <div class="card-hd"><h2 class="card-title"><span class="num">3</span>¿A dónde te mudas?</h2><p class="card-desc">Indícanos origen y destino</p></div>
+    <div class="field-2">
+      <div class="field"><label>📍 Origen</label><select id="ur-origen"></select></div>
+      <div class="field"><label>🏠 Destino</label><select id="ur-destino"></select></div>
+    </div>
+    <div id="ruta-nacional"></div>
+  </div>
+
+  <!-- 4 EMPAQUE -->
+  <div class="card" id="c-empaque">
+    <div class="card-hd"><h2 class="card-title"><span class="num">4</span>Empaque</h2><p class="card-desc">Selecciona los materiales que deseas</p></div>
+    <div class="tabs">
+      <button class="tab active" id="tab-express" data-emp="express">Express (mismo día)</button>
+      <button class="tab" id="tab-full" data-emp="full">Full (materiales + M.O.)</button>
+    </div>
+    <div id="emp-body"></div>
+    <div id="emp-empacadores"></div>
+    <div class="note ref">Empaque estimado — consultar con asesor. Los valores son de referencia y pueden ajustarse según validación.</div>
+    <button class="btn-continue" id="cont-empaque">Continuar con instalaciones →</button>
+  </div>
+
+  <!-- 5 INSTALACIONES -->
+  <div class="card" id="c-inst">
+    <div class="card-hd"><h2 class="card-title"><span class="num">5</span>Instalaciones</h2><p class="card-desc">¿Necesitas instalar electrodomésticos o muebles?</p></div>
+    <div id="inst-body"></div>
+    <button class="btn-continue" id="cont-inst">Continuar →</button>
+  </div>
+
+  <!-- 6 DESEMPAQUE -->
+  <div class="card" id="c-desempaque">
+    <div class="card-hd"><h2 class="card-title"><span class="num">6</span>Desempaque</h2><p class="card-desc">¿Quieres que desempaquemos por ti en el destino?</p></div>
+    <div class="yn" id="desempaque-yn"><button data-v="si">Sí, desempaquen</button><button data-v="no">No, gracias</button></div>
+  </div>
+
+  <!-- 7 ADICIONALES -->
+  <div class="card" id="c-adicionales">
+    <div class="card-hd"><h2 class="card-title"><span class="num">7</span>Condiciones del lugar</h2><p class="card-desc">Para detallar tu cotización y evitar cambios el día del servicio</p></div>
+    <div id="adic-body"></div>
+  </div>
+
+  <!-- 8 BODEGAJE -->
+  <div class="card" id="c-bodegaje">
+    <div class="card-hd"><h2 class="card-title"><span class="num">8</span>Bodegaje</h2><p class="card-desc">¿Necesitas guardar tus cosas en bodega?</p></div>
+    <div class="yn" id="bodegaje-yn"><button data-v="si">Sí, necesito</button><button data-v="no">No, gracias</button></div>
+    <div id="bod-body"></div>
+  </div>
+
+  <!-- 9 RESULTADO -->
+  <div class="card" id="c-resultado">
+    <div class="result-hd"><span class="em">🎉</span><h2>Tu cotización está lista</h2><p id="result-name">Estimado cliente</p></div>
+    <div id="result-lines"></div>
+    <div class="rtotal"><span class="rtotal-lbl">Total estimado</span><span class="rtotal-val" id="result-total">$ 0</span></div>
+    <div class="result-actions">
+      <button class="btn-wa" id="btn-wa"><span>📲</span> Enviar a mi WhatsApp</button>
+      <button class="btn-pdf" id="btn-pdf"><span>📄</span> Descargar PDF</button>
+    </div>
+    <p class="disclaimer">Los valores son estimados y pueden ajustarse según validación en sitio (condiciones de origen y/o destino). Sin compromiso. Trasteos Ya · trasteosya.online</p>
+  </div>
+
+  <div class="site-foot">trasteosya.online</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+/* ========= CONFIG (mismo backend que cotizador admin) ========= */
+const COT_SHEET_URL='https://script.google.com/macros/s/AKfycbxiGsi4MbySxkzUEeV2APSutpJhm-DR_a6Q0PGhkLXIXbTbSkA0mEJm-Hi3EW-LRfw8/exec';
+const BACKUP_APIKEY='TrasteosYa-2026-Backup';
+const NOTIFY={TG_TOKEN:'8815751812:AAEGlCiQAZKSamRUfD5r0lmzjLTRAaFcdqw',TG_CHAT:'1081707115',CMB_PHONE:'573143095194',CMB_KEY:'9452184'};
+const OPERADOR_WA='573143095194';
+
+/* ========= PRECIOS (venta que el cliente ve al final; costo para admin) ========= */
+const CAMION={pequeno:{l:'Camión pequeño',v:580000,c:420000},mediano:{l:'Camión mediano',v:730000,c:570000},grande:{l:'Camión grande',v:870000,c:710000}};
+const MAT={vinipel:{l:'Vinipel',v:130000,c:30000},burbuja:{l:'Burbuja',v:160000,c:70000},cajas:{l:'Cajas',v:13000,c:6000},craft:{l:'Craft',v:40000,c:30000}};
+const INSTP={nevecon:{l:'Nevecón',v:120000,c:100000},secadora:{l:'Secadora',v:90000,c:80000},tv:{l:'TV',v:90000,c:80000}};
+const BOD={m10:{l:'Bodegaje 10 m³',v:350000,c:280000},m20:{l:'Bodegaje 20 m³',v:550000,c:410000},m30:{l:'Bodegaje 30 m³',v:700000,c:550000}};
+const CAMINADO={v:100000};
+const ESCALERA={3:120000,4:150000,5:180000};
+const VIV_LABEL={pequeno:'Apartaestudio o pequeño',mediano:'Apartamento mediano',familiar:'Apartamento familiar',casa:'Casa'};
+const VIV_CAMION={pequeno:'pequeno',mediano:'mediano',familiar:'grande',casa:'grande'};
+
+/* ========= STATE ========= */
+const S={nombre:'',whatsapp:'',vivienda:null,origen:'Bogotá',destino:'Bogotá',
+  camionExtra:false,
+  empaque:{tipo:'express',mat:{}},
+  inst:{nevecon:0,secadora:0,tv:0,otro:''},
+  desempaque:null,
+  caminado:null,ascensor:null,pisos:null,
+  bodegaje:null,bodSize:null};
+
+/* ========= HELPERS ========= */
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const COP=n=>'$ '+Math.round(n||0).toLocaleString('es-CO');
+const CIUDADES=['Bogotá','Chía','Cajicá','Cota','Madrid','Otra ciudad'];
+const CERCANAS={'Chía':1,'Cajicá':1,'Cota':1,'Madrid':1};
+const CERCANA_SURCHARGE={v:140000,c:100000};
+function reveal(id){const el=$('#'+id);if(!el||el.classList.contains('show'))return;el.classList.add('show');setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),150);}
+function stepDone(n){const s=document.querySelector('.step[data-step="'+n+'"]');if(s){s.classList.remove('current');s.classList.add('done');}fill();}
+function stepCurrent(n){$$('.step').forEach(s=>s.classList.remove('current'));const s=document.querySelector('.step[data-step="'+n+'"]');if(s&&!s.classList.contains('done'))s.classList.add('current');fill();}
+function fill(){const done=$$('.step.done').length;$('#progress-fill').style.width=Math.min(100,done/4*100)+'%';}
+function toast(msg,ms){
+  const t=$('#toast');t.textContent=msg;
+  t.classList.remove('show','rebote');void t.offsetWidth; // reset animation
+  t.classList.add('show');
+  clearTimeout(t._t);clearTimeout(t._r);
+  // Rebote de recordatorio a los 5s
+  t._r=setTimeout(()=>{
+    t.classList.remove('rebote');void t.offsetWidth;
+    t.classList.add('rebote');
+  },5000);
+  t._t=setTimeout(()=>{t.classList.remove('show','rebote');t.style.opacity='';t.style.transform='';},ms||8500);
+}
+
+/* Shake numeros al entrar en viewport (IntersectionObserver) */
+function setupCardShake(){
+  if(!('IntersectionObserver' in window))return;
+  const io=new IntersectionObserver((ents)=>{
+    ents.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.remove('in-view');void e.target.offsetWidth;
+        e.target.classList.add('in-view');
+      } else {
+        e.target.classList.remove('in-view');
+      }
+    });
+  },{threshold:.35});
+  document.querySelectorAll('.card').forEach(c=>io.observe(c));
+}
+setupCardShake();
+/* Re-observar cards recien mostradas */
+const _revealObs=setInterval(()=>{document.querySelectorAll('.card.show').forEach(c=>{if(!c._obsAdded){c._obsAdded=true;}});},600);
+
+/* ========= TIMER (10s prompt → mover mouse/click abre siguiente) ========= */
+let _pending=null;
+function timerNext(sectionId,revealId,stepName,msg,secs){
+  clearTimeout(_pending);
+  const sec=$('#'+sectionId);
+  let hint=sec.querySelector('.hint');
+  if(!hint){hint=document.createElement('div');hint.className='hint';sec.appendChild(hint);}
+  hint.innerHTML='<span>👇</span><span>'+(msg||'Sigue con tu cotización')+'</span><span class="arrow">↓</span>';
+  const go=()=>{clearTimeout(_pending);hint.classList.remove('show');document.removeEventListener('mousemove',go);document.removeEventListener('touchstart',go);hint.removeEventListener('click',go);stepCurrent(stepName);reveal(revealId);};
+  hint.onclick=go;
+  _pending=setTimeout(()=>{
+    hint.classList.add('show');
+    document.addEventListener('mousemove',go,{once:true,passive:true});
+    document.addEventListener('touchstart',go,{once:true,passive:true});
+  },(secs||10)*1000);
+}
+
+/* ========= STEP 1: DATOS → VIVIENDA ========= */
+function checkDatos(){
+  const n=$('#ur-nombre').value.trim(),w=$('#ur-whatsapp').value.replace(/\D/g,'');
+  if(n.length>=2&&w.length>=10){S.nombre=n;S.whatsapp=w;
+    if(!S._ready){S._ready=true;$('#progress').classList.add('show');stepCurrent('vivienda');setTimeout(()=>reveal('c-vivienda'),400);}}
+}
+$('#ur-nombre').addEventListener('input',checkDatos);
+$('#ur-whatsapp').addEventListener('input',function(){this.value=this.value.replace(/\D/g,'').slice(0,10);checkDatos();});
+
+/* ========= STEP 2: VIVIENDA ========= */
+$$('#viv-grid .opt').forEach(o=>o.addEventListener('click',()=>{
+  $$('#viv-grid .opt').forEach(x=>x.classList.remove('sel'));
+  o.classList.add('sel');S.vivienda=o.dataset.viv;
+  if(S.vivienda==='oficina'){oficinaFlow();return;}
+  stepDone('vivienda');
+  // Casa: opcion camion extra removible
+  const ce=$('#casa-extra');
+  if(S.vivienda==='casa'){
+    ce.style.display='block';
+    ce.innerHTML='<div class="mat-row"><div class="mat-info"><div class="mat-name">¿Tu casa tiene mucha carga?</div><div class="mat-hint">Podemos añadir un camión pequeño adicional</div></div><div class="stepper"><button type="button" id="ce-toggle">Añadir</button></div></div>';
+    $('#ce-toggle').onclick=function(){S.camionExtra=!S.camionExtra;this.textContent=S.camionExtra?'Quitar':'Añadir';this.style.background=S.camionExtra?'rgba(0,61,165,.08)':'';this.style.borderColor=S.camionExtra?'var(--blue)':'';};
+  } else {ce.style.display='none';S.camionExtra=false;}
+  buildEmpaque();
+  reveal('c-ruta');stepCurrent('ruta');
+  timerNext('c-ruta','c-empaque','empaque','Sigue con tu empaque',10);
+}));
+
+/* ========= OFICINA ========= */
+function oficinaFlow(){
+  stepDone('vivienda');
+  const msg='Hola, soy '+(S.nombre||'un cliente')+'. Necesito una cotización para un servicio de OFICINA. Adjunto fotos/video del detalle.';
+  const waClient='https://wa.me/'+OPERADOR_WA+'?text='+encodeURIComponent(msg);
+  // dispara notificacion automatica al operador
+  notifyOperador('🏢 *Nueva solicitud de OFICINA*\n👤 '+(S.nombre||'-')+'\n📱 '+(S.whatsapp||'-')+'\n\nRequiere contacto para servicio de oficina.');
+  // reemplaza contenido de la card vivienda por mensaje
+  const c=$('#c-vivienda');
+  c.innerHTML='<div class="msgbox"><div class="msgbox-icon">🏢</div><div class="msgbox-title">Servicio de oficina</div><div class="msgbox-text">Envíanos tu WhatsApp con el detalle específico de tu servicio de oficina. Requerimos, en principio, <b>fotos o video</b> del lugar. Así te contactaremos ya con avances y una propuesta ajustada a tu requerimiento.</div><a class="msgbox-btn" href="'+waClient+'" target="_blank" rel="noopener">📲 Escríbenos por WhatsApp</a></div>';
+  c.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* ========= STEP 3: RUTA ========= */
+function buildRuta(){
+  const opt=v=>CIUDADES.map(c=>'<option'+(c===v?' selected':'')+'>'+c+'</option>').join('');
+  $('#ur-origen').innerHTML=opt('Bogotá');
+  $('#ur-destino').innerHTML=opt('Bogotá');
+  $('#ur-origen').onchange=$('#ur-destino').onchange=checkNacional;
+}
+function checkNacional(){
+  S.origen=$('#ur-origen').value;S.destino=$('#ur-destino').value;
+  const otra=S.origen==='Otra ciudad'||S.destino==='Otra ciudad';
+  const box=$('#ruta-nacional');
+  if(otra){
+    clearTimeout(_pending);
+    stepDone('ruta');
+    const msg='Hola, soy '+(S.nombre||'un cliente')+'. Necesito cotizar un trasteo a otra ciudad ('+S.origen+' → '+S.destino+').';
+    const wa='https://wa.me/'+OPERADOR_WA+'?text='+encodeURIComponent(msg);
+    notifyOperador('🚚 *Solicitud trasteo OTRA CIUDAD*\n👤 '+(S.nombre||'-')+'\n📱 '+(S.whatsapp||'-')+'\n📍 '+S.origen+' → '+S.destino);
+    box.innerHTML='<div class="msgbox" style="margin-top:16px"><div class="msgbox-icon">🚚</div><div class="msgbox-title">Trasteo a otra ciudad</div><div class="msgbox-text">Los trasteos hacia otras ciudades los cotizamos de forma personalizada para darte el mejor precio. Escríbenos y te atendemos de inmediato.</div><a class="msgbox-btn" href="'+wa+'" target="_blank" rel="noopener">📲 Cotizar por WhatsApp</a></div>';
+    box.scrollIntoView({behavior:'smooth',block:'center'});
+  } else {box.innerHTML='';}
+}
+
+/* ========= STEP 4: EMPAQUE ========= */
+function empDefaults(tipo){
+  const chico=(S.vivienda==='pequeno'||S.vivienda==='mediano');
+  if(tipo==='express'){return {vinipel:chico?2:3};}
+  return chico?{cajas:20,vinipel:2,burbuja:1,craft:1}:{cajas:45,vinipel:5,burbuja:2,craft:1};
+}
+function buildEmpaque(){
+  S.empaque.mat=empDefaults(S.empaque.tipo);
+  renderEmpaque();
+}
+function renderEmpaque(){
+  const tipo=S.empaque.tipo,body=$('#emp-body');
+  let mats=tipo==='express'?['vinipel']:['cajas','vinipel','burbuja','craft'];
+  let html='';
+  mats.forEach(k=>{
+    const q=S.empaque.mat[k]||0;
+    const unit=(k==='cajas')?'unidades':'rollos';
+    html+='<div class="mat-row"><div class="mat-info"><div class="mat-name">'+MAT[k].l+'</div><div class="mat-hint">'+unit+'</div></div><div class="stepper"><button type="button" onclick="empChg(\''+k+'\',-1)">−</button><span class="qv" id="q-'+k+'">'+q+'</span><button type="button" onclick="empChg(\''+k+'\',1)">+</button></div></div>';
+  });
+  body.innerHTML=html;
+  renderEmpacadores();
+}
+function renderEmpacadores(){
+  const cajas=S.empaque.mat.cajas||0;
+  const emp=$('#emp-empacadores');
+  if(S.empaque.tipo==='full'){
+    const dias=cajas>=45?2:1;
+    emp.innerHTML='<div class="note">👷 Empaque estimado: <b>2 empacadores</b> · <b>'+dias+' día'+(dias>1?'s':'')+'</b> (según cantidad de cajas).</div>';
+  } else {emp.innerHTML='';}
+}
+window.empChg=function(k,d){
+  let q=(S.empaque.mat[k]||0)+d;if(q<0)q=0;S.empaque.mat[k]=q;
+  const el=$('#q-'+k);if(el)el.textContent=q;
+  renderEmpacadores();
+  // aviso si sale de lo predeterminado
+  const def=empDefaults(S.empaque.tipo);
+  if(def[k]!==undefined&&q!==def[k]){
+    toast('Te sugerimos '+def[k]+' '+(k==='cajas'?'cajas':'rollos')+' para tu tipo de vivienda. Puedes ajustarlo, pero cambios posteriores pueden afectar tu tarifa.');
+  }
+};
+$$('.tab[data-emp]').forEach(t=>t.addEventListener('click',()=>{
+  $$('.tab[data-emp]').forEach(x=>x.classList.remove('active'));t.classList.add('active');
+  S.empaque.tipo=t.dataset.emp;
+  if(S.empaque.tipo==='express')toast('Escoge los rollos de vinipel para empaque el mismo día.');
+  else toast('El empaque Full toma entre 1 y 2 días en realizarse.');
+  buildEmpaque();
+}));
+
+/* ========= STEP 5: INSTALACIONES ========= */
+function buildInst(){
+  const body=$('#inst-body');
+  let html='';
+  ['nevecon','secadora','tv'].forEach(k=>{
+    html+='<div class="mat-row"><div class="mat-info"><div class="mat-name">'+INSTP[k].l+'</div><div class="mat-hint">cantidad</div></div><div class="stepper"><button type="button" onclick="instChg(\''+k+'\',-1)">−</button><span class="qv" id="qi-'+k+'">0</span><button type="button" onclick="instChg(\''+k+'\',1)">+</button></div></div>';
+  });
+  html+='<div class="field" style="margin-top:8px"><label>¿Otra instalación? (opcional)</label><input type="text" id="inst-otro" placeholder="Cuéntanos qué más necesitas instalar"></div>';
+  body.innerHTML=html;
+  $('#inst-otro').addEventListener('input',function(){S.inst.otro=this.value;});
+}
+window.instChg=function(k,d){let q=(S.inst[k]||0)+d;if(q<0)q=0;S.inst[k]=q;const el=$('#qi-'+k);if(el)el.textContent=q;};
+
+/* ========= STEP 6: DESEMPAQUE ========= */
+$$('#desempaque-yn button').forEach(b=>b.addEventListener('click',()=>{
+  $$('#desempaque-yn button').forEach(x=>x.classList.remove('sel-yes','sel-no'));
+  const v=b.dataset.v;S.desempaque=(v==='si');
+  b.classList.add(v==='si'?'sel-yes':'sel-no');
+  stepDone('servicio');
+  reveal('c-adicionales');buildAdic();
+  timerAdic();
+}));
+
+/* ========= STEP 7: ADICIONALES (12s auto) ========= */
+function buildAdic(){$('#adic-body').innerHTML='';}
+function timerAdic(){
+  clearTimeout(_pending);
+  _pending=setTimeout(()=>{
+    $('#adic-body').innerHTML=
+      '<div style="margin-bottom:16px"><label style="display:block;font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px">¿Hay caminados largos? (distancia entre el camión y la puerta)</label><div class="yn" id="caminado-yn"><button data-v="si">Sí</button><button data-v="no">No</button></div></div>'
+      +'<div id="escalera-block"></div>';
+    $$('#caminado-yn button').forEach(b=>b.addEventListener('click',()=>{
+      $$('#caminado-yn button').forEach(x=>x.classList.remove('sel-yes','sel-no'));
+      S.caminado=(b.dataset.v==='si');b.classList.add(S.caminado?'sel-yes':'sel-no');
+      buildEscalera();
+    }));
+    $('#adic-body').scrollIntoView({behavior:'smooth',block:'center'});
+  },12000);
+}
+function buildEscalera(){
+  $('#escalera-block').innerHTML=
+    '<div style="margin-top:8px"><label style="display:block;font-size:14px;font-weight:600;color:var(--navy);margin-bottom:8px">¿Tienes ascensor o todo es por escalera?</label><div class="yn" id="asc-yn"><button data-v="si">Tengo ascensor</button><button data-v="no">Todo por escalera</button></div><div id="pisos-block"></div></div>';
+  $$('#asc-yn button').forEach(b=>b.addEventListener('click',()=>{
+    $$('#asc-yn button').forEach(x=>x.classList.remove('sel-yes','sel-no'));
+    S.ascensor=(b.dataset.v==='si');b.classList.add(S.ascensor?'sel-yes':'sel-no');
+    if(S.ascensor){S.pisos=null;$('#pisos-block').innerHTML='';adicDone();}
+    else{
+      $('#pisos-block').innerHTML='<div style="margin-top:12px"><label style="display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px">¿A partir de qué piso? (superior a 3er piso)</label><div class="pills" id="pisos-pills"><span class="pill" data-p="3">3er piso</span><span class="pill" data-p="4">4to piso</span><span class="pill" data-p="5">5to+ piso</span></div><div class="note ref">Valor estimado — puede ajustarse por condiciones del lugar (origen y/o destino).</div></div>';
+      $$('#pisos-pills .pill').forEach(p=>p.addEventListener('click',()=>{
+        $$('#pisos-pills .pill').forEach(x=>x.classList.remove('sel'));p.classList.add('sel');
+        S.pisos=parseInt(p.dataset.p,10);adicDone();
+      }));
+    }
+  }));
+}
+function adicDone(){reveal('c-bodegaje');}
+
+/* ========= STEP 8: BODEGAJE ========= */
+$$('#bodegaje-yn button').forEach(b=>b.addEventListener('click',()=>{
+  $$('#bodegaje-yn button').forEach(x=>x.classList.remove('sel-yes','sel-no'));
+  const v=b.dataset.v;S.bodegaje=(v==='si');
+  b.classList.add(v==='si'?'sel-yes':'sel-no');
+  const body=$('#bod-body');
+  if(S.bodegaje){
+    let html='<div style="margin-top:14px"><label style="display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px">¿Cuánto espacio necesitas?</label><div class="pills" id="bod-pills">';
+    Object.keys(BOD).forEach(k=>{html+='<span class="pill" data-b="'+k+'">'+BOD[k].l.replace('Bodegaje ','')+'</span>';});
+    html+='</div></div>';
+    body.innerHTML=html;
+    $$('#bod-pills .pill').forEach(p=>p.addEventListener('click',()=>{
+      $$('#bod-pills .pill').forEach(x=>x.classList.remove('sel'));p.classList.add('sel');
+      S.bodSize=p.dataset.b;finalizar();
+    }));
+  } else {body.innerHTML='';S.bodSize=null;finalizar();}
+}));
+
+/* ========= CALCULAR LINEAS ========= */
+function buildLines(){
+  const lines=[];
+  // Camion (por vivienda) — recargo municipio integrado en un solo valor
+  const ck=VIV_CAMION[S.vivienda];
+  const muni=CERCANAS[S.origen]?S.origen:(CERCANAS[S.destino]?S.destino:null);
+  if(ck){
+    const c=CAMION[ck];
+    let v=c.v,cost=c.c;
+    if(muni){v+=CERCANA_SURCHARGE.v;cost+=CERCANA_SURCHARGE.c;}
+    lines.push({cat:'trasteo',l:'Trasteo — '+c.l+' - Destino '+S.destino,detail:VIV_LABEL[S.vivienda]+' · '+S.origen+' → '+S.destino,v:v,c:cost,qty:1});
+  }
+  if(S.camionExtra){const c=CAMION.pequeno;lines.push({cat:'trasteo',l:'Camión adicional (pequeño)',detail:'Carga extra',v:c.v,c:c.c,qty:1});}
+  // Empaque
+  Object.keys(S.empaque.mat).forEach(k=>{
+    const q=S.empaque.mat[k]||0;if(q>0&&MAT[k]){lines.push({cat:'empaque',l:MAT[k].l+' × '+q,detail:S.empaque.tipo==='express'?'Empaque express':'Empaque full',v:MAT[k].v*q,c:MAT[k].c*q,qty:q});}
+  });
+  // Instalaciones
+  ['nevecon','secadora','tv'].forEach(k=>{
+    const q=S.inst[k]||0;if(q>0){lines.push({cat:'inst',l:INSTP[k].l+' × '+q,detail:'Instalación',v:INSTP[k].v*q,c:INSTP[k].c*q,qty:q});}
+  });
+  // Adicionales
+  if(S.caminado){lines.push({cat:'adicionales',l:'Caminado largo',detail:'Valor estimado',v:CAMINADO.v,c:0,qty:1,est:true});}
+  if(!S.ascensor&&S.pisos){
+    let vEsc=ESCALERA[S.pisos]||120000;
+    const cajas=S.empaque.mat.cajas||0;
+    if(cajas>45)vEsc+=60000;else if(cajas>=20)vEsc+=30000;
+    lines.push({cat:'adicionales',l:'Escaleras (piso '+S.pisos+(S.pisos>=5?'+':'')+')',detail:'Valor estimado — ajustable según lugar',v:vEsc,c:0,qty:1,est:true});
+  }
+  // Bodegaje
+  if(S.bodegaje&&S.bodSize&&BOD[S.bodSize]){const b=BOD[S.bodSize];lines.push({cat:'bodegaje',l:b.l,detail:'Almacenamiento mensual',v:b.v,c:b.c,qty:1});}
+  return lines;
+}
+
+/* ========= FINALIZAR ========= */
+function finalizar(){
+  stepDone('cotizacion');stepCurrent('cotizacion');
+  const lines=buildLines();
+  const total=lines.reduce((a,l)=>a+l.v,0);
+  S._lines=lines;S._total=total;
+  $('#result-name').textContent='Estimado '+S.nombre;
+  let html='';
+  lines.forEach(l=>{
+    html+='<div class="rline"><div class="rline-info"><div class="rline-name">'+l.l+'</div><div class="rline-detail">'+(l.detail||'')+'</div></div><div class="rline-val'+(l.est?' est':'')+'">'+COP(l.v)+'</div></div>';
+  });
+  // empacadores (referencia, sin valor)
+  if(S.empaque.tipo==='full'){const cajas=S.empaque.mat.cajas||0;const dias=cajas>=45?2:1;
+    html+='<div class="rline"><div class="rline-info"><div class="rline-name">👷 Empacadores</div><div class="rline-detail">2 empacadores · '+dias+' día'+(dias>1?'s':'')+' (incluido en empaque)</div></div><div class="rline-val" style="color:var(--muted);font-size:12px">referencia</div></div>';}
+  if(S.inst.otro)html+='<div class="rline"><div class="rline-info"><div class="rline-name">Otra instalación</div><div class="rline-detail">'+S.inst.otro+'</div></div><div class="rline-val" style="color:var(--muted);font-size:12px">a confirmar</div></div>';
+  $('#result-lines').innerHTML=html;
+  $('#result-total').textContent=COP(total);
+  reveal('c-resultado');
+  saveBackend(lines,total);
+}
+
+/* ========= BACKEND (sheet + telegram, mismo flujo admin) ========= */
+function saveBackend(lines,total){
+  const fecha=new Date().toISOString().substring(0,10);
+  const meta={cliente:S.nombre,telefono:S.whatsapp,fecha:fecha,tipo:'Web cliente',estado:'COTIZADO',
+    total:total,subtotal:total,descuento:0,
+    costo:lines.reduce((a,l)=>a+(l.c||0),0),
+    items:lines.map(l=>({cat:l.cat,l:l.l,v:l.v,c:l.c||0,qty:l.qty}))};
+  fetch(COT_SHEET_URL,{method:'POST',body:JSON.stringify({type:'cotizacion',apikey:BACKUP_APIKEY,meta:meta}),redirect:'follow'}).catch(()=>{});
+  const tg='💰 *Nueva cotización WEB*\n👤 '+S.nombre+'\n📱 '+S.whatsapp+'\n🏠 '+VIV_LABEL[S.vivienda]+'\n📍 '+S.origen+' → '+S.destino+'\n📦 Empaque '+S.empaque.tipo+'\n💵 Total: '+COP(total);
+  notifyOperador(tg);
+}
+function notifyOperador(text){
+  fetch('https://api.telegram.org/bot'+NOTIFY.TG_TOKEN+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:NOTIFY.TG_CHAT,text:text,parse_mode:'Markdown'})}).catch(()=>{});
+}
+
+/* ========= WHATSAPP (texto) ========= */
+$('#btn-wa').addEventListener('click',()=>{
+  const lines=S._lines||[];let msg='*Cotización Trasteos Ya*\n\nHola '+S.nombre+', esta es tu cotización estimada:\n\n';
+  lines.forEach(l=>{msg+='• '+l.l+': '+COP(l.v)+(l.est?' (estimado)':'')+'\n';});
+  msg+='\n*Total estimado: '+COP(S._total)+'*\n\nValores sujetos a validación en sitio. Sin compromiso.\ntrasteosya.online';
+  const wa='https://wa.me/57'+S.whatsapp+'?text='+encodeURIComponent(msg);
+  window.open(wa,'_blank','noopener');
+});
+
+/* ========= PDF ========= */
+function loadLogo(){
+  return new Promise(res=>{
+    const img=new Image();img.crossOrigin='anonymous';
+    img.onload=function(){
+      try{
+        const maxW=380;const scale=Math.min(1,maxW/(img.naturalWidth||maxW));
+        const w=Math.round((img.naturalWidth||maxW)*scale),h=Math.round((img.naturalHeight||100)*scale);
+        const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+        const ctx=cv.getContext('2d');
+        ctx.fillStyle='#ffffff';ctx.fillRect(0,0,w,h); // aplana sobre blanco (header PDF es blanco)
+        ctx.drawImage(img,0,0,w,h);
+        res({data:cv.toDataURL('image/jpeg',0.85),w:w,h:h,fmt:'JPEG'});
+      }catch(e){res(null);}
+    };
+    img.onerror=function(){res(null);};
+    img.src='/assets/img/logo.png';
+    setTimeout(()=>res(null),1500);
+  });
+}
+$('#btn-pdf').addEventListener('click',async()=>{
+  const {jsPDF}=window.jspdf;const doc=new jsPDF();
+  const lines=S._lines||[];
+  const fecha=new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});
+  const ciudad=S.origen==='Otra ciudad'?S.destino:S.origen;
+  // Header blanco con patrón ajedrez fino y difuminado (ligero)
+  doc.setFillColor(255,255,255);doc.rect(0,0,210,36,'F');
+  const sz=3.4,cols=Math.ceil(210/sz),rows=Math.ceil(36/sz);
+  try{doc.setGState(new doc.GState({opacity:0.16}));}catch(e){}
+  doc.setFillColor(200,208,224);
+  for(let i=0;i<cols;i++){
+    // difuminado: solo dibuja en el 55% izquierdo, se desvanece hacia la derecha
+    if((i*sz)/210>0.55)continue;
+    for(let j=0;j<rows;j++){if((i+j)%2===0)doc.rect(i*sz,j*sz,sz,sz,'F');}
+  }
+  try{doc.setGState(new doc.GState({opacity:1}));}catch(e){}
+  const logo=await loadLogo();
+  if(logo){const lw=46,lh=lw*(logo.h/logo.w);doc.addImage(logo.data,logo.fmt||'JPEG',14,(36-lh)/2,lw,lh);}
+  else{doc.setTextColor(10,24,69);doc.setFont('helvetica','bold');doc.setFontSize(20);doc.text('TRASTEOS YA',14,22);}
+  doc.setTextColor(10,24,69);doc.setFont('helvetica','bold');doc.setFontSize(11);
+  doc.text('Cotización de mudanza',196,16,{align:'right'});
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(90,100,120);
+  doc.text('trasteosya.online',196,22,{align:'right'});
+  // Línea de acento navy
+  doc.setDrawColor(10,24,69);doc.setLineWidth(0.8);doc.line(0,36,210,36);
+  // Meta
+  let y=46;doc.setTextColor(90,100,120);doc.setFontSize(9);
+  doc.text('Fecha: '+fecha,14,y);doc.text('Ciudad: '+ciudad,196,y,{align:'right'});y+=10;
+  // Saludo
+  doc.setTextColor(15,23,42);doc.setFont('helvetica','bold');doc.setFontSize(13);
+  doc.text('Estimado(a) '+S.nombre+',',14,y);y+=7;
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(70,80,100);
+  const intro=doc.splitTextToSize('Gracias por confiar en Trasteos Ya. A continuación encuentras el detalle estimado de tu servicio de mudanza. Estos valores son de referencia y pueden ajustarse según validación en sitio.',182);
+  doc.text(intro,14,y);y+=intro.length*5+6;
+  // Detalle header
+  doc.setDrawColor(220,225,235);doc.line(14,y,196,y);y+=8;
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(10,24,69);
+  doc.text('Detalle del servicio',14,y);y+=8;
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(15,23,42);
+  lines.forEach(l=>{
+    doc.text(l.l+(l.est?' (estimado)':''),14,y);
+    doc.text(COP(l.v),196,y,{align:'right'});y+=7;if(y>262){doc.addPage();y=20;}
+  });
+  y+=3;doc.setDrawColor(220,225,235);doc.line(14,y,196,y);y+=10;
+  // Total
+  doc.setFillColor(10,24,69);doc.roundedRect(14,y-7,182,14,2,2,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(255,255,255);
+  doc.text('Total estimado',18,y+2);doc.text(COP(S._total),192,y+2,{align:'right'});y+=18;
+  // Firma
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(70,80,100);
+  doc.text('Cordialmente,',14,y);y+=6;
+  doc.setFont('helvetica','bold');doc.setTextColor(10,24,69);doc.setFontSize(12);
+  doc.text('Equipo Trasteos Ya',14,y);y+=5;
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(120,130,150);
+  doc.text('WhatsApp +57 314 309 5194  ·  trasteosya.online',14,y);y+=10;
+  doc.setFont('helvetica','italic');doc.setFontSize(8);
+  doc.text('Valores estimados, sujetos a validación en sitio (condiciones de origen y/o destino). Sin compromiso.',14,y);
+  doc.save('cotizacion_'+S.nombre.replace(/[^a-z0-9]/gi,'_')+'.pdf');
+});
+
+/* ========= CONTINUE BUTTONS ========= */
+$('#cont-empaque').addEventListener('click',()=>{stepDone('empaque');stepCurrent('servicio');reveal('c-inst');});
+$('#cont-inst').addEventListener('click',()=>{reveal('c-desempaque');});
+
+/* ========= INIT ========= */
+buildRuta();buildInst();
+</script>
+</body>
+</html>
