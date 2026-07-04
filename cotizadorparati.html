@@ -736,7 +736,7 @@ function checkNacional(){
   } else {box.innerHTML='';}
 }
 
-$('#cont-ruta').addEventListener('click',()=>{cancelAutoPrompt();stepDone('ruta');stepCurrent('empaque');reveal('c-empaque');armAutoPrompt('empaque',30,'¿Deseas continuar con instalaciones?',()=>{stepDone('empaque');stepCurrent('servicio');reveal('c-inst');});persistNow();});
+$('#cont-ruta').addEventListener('click',()=>{cancelAutoPrompt();stepDone('ruta');stepCurrent('empaque');reveal('c-empaque');setTimeout(()=>{var p=$('#progress'),c=$('#c-empaque');if(p&&c){var gap=c.getBoundingClientRect().top-p.getBoundingClientRect().bottom;if(gap<4)window.scrollBy({top:gap-8,behavior:'smooth'});}},500);armAutoPrompt('empaque',30,'¿Deseas continuar con instalaciones?',()=>{stepDone('empaque');stepCurrent('servicio');reveal('c-inst');});persistNow();});
 
 /* ========= STEP 4: EMPAQUE ========= */
 function empDefaults(tipo){
