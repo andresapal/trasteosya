@@ -428,6 +428,7 @@ body{padding-top:68px}
       <div class="field"><label>🏠 Destino</label><select id="ur-destino"></select></div>
     </div>
     <div id="ruta-nacional"></div>
+    <button class="btn-continue" id="cont-ruta">Confirmar ruta y continuar →</button>
   </div>
 
   <!-- 4 EMPAQUE -->
@@ -734,6 +735,8 @@ function checkNacional(){
     box.scrollIntoView({behavior:'smooth',block:'center'});
   } else {box.innerHTML='';}
 }
+
+$('#cont-ruta').addEventListener('click',()=>{cancelAutoPrompt();stepDone('ruta');stepCurrent('empaque');reveal('c-empaque');armAutoPrompt('empaque',30,'¿Deseas continuar con instalaciones?',()=>{stepDone('empaque');stepCurrent('servicio');reveal('c-inst');});persistNow();});
 
 /* ========= STEP 4: EMPAQUE ========= */
 function empDefaults(tipo){
