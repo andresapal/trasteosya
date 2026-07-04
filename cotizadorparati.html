@@ -40,7 +40,10 @@ h1,h2,h3{font-family:'Plus Jakarta Sans','Inter',sans-serif;letter-spacing:-.02e
   --diamond:linear-gradient(45deg,rgba(255,255,255,.05) 25%,transparent 25%),linear-gradient(-45deg,rgba(255,255,255,.05) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,rgba(255,255,255,.05) 75%),linear-gradient(-45deg,transparent 75%,rgba(255,255,255,.05) 75%);
 }
 
-/* HEADER — uses external nav CSS from tokens/components/effects */
+/* HEADER — fixed at top, overrides sticky from components.css */
+.nav{position:fixed!important;top:0;left:0;right:0;z-index:200}
+body{padding-top:68px}
+@media(min-width:1024px){body{padding-top:82px}}
 
 /* HERO */
 .hero{padding:30px 20px 16px;text-align:center}
@@ -455,7 +458,7 @@ h1,h2,h3{font-family:'Plus Jakarta Sans','Inter',sans-serif;letter-spacing:-.02e
     <p class="disclaimer">Los valores son estimados y pueden ajustarse según validación en sitio (condiciones de origen y/o destino). Sin compromiso. Trasteos Ya · trasteosya.online</p>
   </div>
 
-  <div class="site-foot">trasteosya.online</div>
+  <div class="site-foot"><a href="https://trasteosya.online" style="color:var(--muted);text-decoration:none">trasteosya.online</a></div>
 
 </div>
 
@@ -853,8 +856,10 @@ function finalizar(){
   reveal('c-resultado');
   launchConfetti();
   saveBackend(lines,total);
+  armResultPrompt();
 }
 function animateCounter(el,target,dur,delaySec){
+  const delay=(delaySec||0)*1000;
   setTimeout(()=>{
     const start=performance.now();
     function tick(now){
@@ -864,7 +869,8 @@ function animateCounter(el,target,dur,delaySec){
       if(p<1)requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
-  },(delaySec||0)*1000);
+  },delay);
+  setTimeout(()=>{el.textContent=COP(target);},delay+dur+50);
 }
 function launchConfetti(){
   const cv=document.getElementById('confetti-canvas');if(!cv)return;
@@ -897,6 +903,25 @@ function launchConfetti(){
   }
   draw();
 }
+
+/* ========= RESULT PROMPT (10s si no toma acción) ========= */
+let _resultActioned=false;
+let _resultPromptTimer=null;
+function armResultPrompt(){
+  _resultActioned=false;
+  clearTimeout(_resultPromptTimer);
+  _resultPromptTimer=setTimeout(()=>{
+    if(!_resultActioned){
+      showPrompt('Tu cotización está lista. Envíala a tu WhatsApp o descárgala en PDF.',()=>{
+        document.querySelector('#btn-wa').scrollIntoView({behavior:'smooth',block:'center'});
+      });
+    }
+  },10000);
+}
+['#btn-wa','#btn-inq','#btn-pdf'].forEach(sel=>{
+  const el=document.querySelector(sel);
+  if(el)el.addEventListener('click',()=>{_resultActioned=true;clearTimeout(_resultPromptTimer);},{once:true});
+});
 
 /* ========= BACKEND (sheet + telegram, mismo flujo admin) ========= */
 function saveBackend(lines,total){
