@@ -264,6 +264,18 @@ body{padding-top:68px}
 .result-actions.anim{animation:celebSlideUp .5s both}
 .result-actions .btn-wa{animation:btnPulse 2s 1.5s infinite}
 
+/* TOUCH: disable hover effects that cause double-tap on iOS */
+@media(hover:none){
+  .opt:hover{border-color:var(--border);background:#fafafa;transform:none}
+  .yn button:hover{border-color:var(--border)}
+  .stepper button:hover{border-color:var(--border);background:var(--card)}
+  .btn-continue:hover{transform:none}
+  .tab:hover{background:transparent}
+  .pill:hover{border-color:var(--border)}
+  .btn-wa:hover,.btn-inq:hover,.btn-pdf:hover,.pmodal-ok:hover,.pmodal-cancel:hover,.msgbox-btn:hover{transform:none;box-shadow:none}
+  .card:hover .card-title .num{animation:none}
+}
+
 /* PROGRESS FADE (after result shown 5s) */
 .progress.progress--faded{opacity:0!important;pointer-events:none;transition:opacity 1s ease}
 
@@ -605,8 +617,7 @@ function cancelAutoPrompt(){clearTimeout(_autoPromptTimer);}
   }
   window.addEventListener('scroll',function(){
     var y=window.scrollY;
-    if(y<THRESH){if(hiddenNav)navShow();lastY=y;return;}
-    if(y>lastY+5)navHide();
+    if(!hiddenNav&&y>THRESH)navHide();
     if(y<lastY-10){
       var p=$('#progress');
       if(p&&p.classList.contains('progress--faded'))p.classList.remove('progress--faded');
@@ -807,7 +818,7 @@ function buildAdic(){
     buildEscalera();persistNow();
   }));
   // Auto-prompt 5s si no toca nada
-  armAutoPrompt('adic',20,'¿Deseas continuar sin condiciones especiales?',()=>{
+  armAutoPrompt('adic',30,'¿Deseas continuar sin condiciones especiales?',()=>{
     if(S.caminado===null)S.caminado=false;if(S.ascensor===null)S.ascensor=true;
     adicDone();
   });
@@ -829,7 +840,7 @@ function buildEscalera(){
     }
   }));
 }
-function adicDone(){reveal('c-bodegaje');armAutoPrompt('bod',15,'¿Deseas continuar sin bodegaje?',()=>{S.bodegaje=false;confirmAndFinalize();});persistNow();}
+function adicDone(){reveal('c-bodegaje');armAutoPrompt('bod',30,'¿Deseas continuar sin bodegaje?',()=>{S.bodegaje=false;confirmAndFinalize();});persistNow();}
 
 /* ========= STEP 8: BODEGAJE ========= */
 $$('#bodegaje-yn button').forEach(b=>b.addEventListener('click',()=>{
@@ -981,7 +992,7 @@ function armResultPrompt(){
         document.querySelector('#btn-wa').scrollIntoView({behavior:'smooth',block:'center'});
       });
     }
-  },25000);
+  },60000);
 }
 ['#btn-wa','#btn-inq','#btn-pdf'].forEach(sel=>{
   const el=document.querySelector(sel);
@@ -1136,8 +1147,8 @@ $('#btn-pdf').addEventListener('click',async()=>{
 });
 
 /* ========= CONTINUE BUTTONS ========= */
-$('#cont-empaque').addEventListener('click',()=>{cancelAutoPrompt();stepDone('empaque');stepCurrent('servicio');reveal('c-inst');armAutoPrompt('inst',30,'¿Deseas continuar sin instalaciones?',()=>{reveal('c-desempaque');armAutoPrompt('desempaque',25,'¿Deseas continuar?',()=>{S.desempaque=false;stepDone('servicio');reveal('c-adicionales');buildAdic();});});persistNow();});
-$('#cont-inst').addEventListener('click',()=>{cancelAutoPrompt();reveal('c-desempaque');persistNow();armAutoPrompt('desempaque',25,'¿Deseas continuar?',()=>{S.desempaque=false;stepDone('servicio');reveal('c-adicionales');buildAdic();});});
+$('#cont-empaque').addEventListener('click',()=>{cancelAutoPrompt();stepDone('empaque');stepCurrent('servicio');reveal('c-inst');armAutoPrompt('inst',30,'¿Deseas continuar sin instalaciones?',()=>{reveal('c-desempaque');armAutoPrompt('desempaque',30,'¿Deseas continuar?',()=>{S.desempaque=false;stepDone('servicio');reveal('c-adicionales');buildAdic();});});persistNow();});
+$('#cont-inst').addEventListener('click',()=>{cancelAutoPrompt();reveal('c-desempaque');persistNow();armAutoPrompt('desempaque',30,'¿Deseas continuar?',()=>{S.desempaque=false;stepDone('servicio');reveal('c-adicionales');buildAdic();});});
 
 /* ========= PERSISTENCIA 10 MIN (localStorage) ========= */
 const STORE_KEY='ty_cotpt_state';
