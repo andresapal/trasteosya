@@ -607,7 +607,7 @@ function handleNumInput(el){
   recalc();
 }
 
-let state={showCosts:false,mods:{trasteo:false,empaque:false,inst:false,desempaque:false,bodegaje:false,adicionales:false},trasteoSize:"mediano",trasteoQty:{pequeno:1,mediano:1,grande:1},empTab:"express",bodSize:"m10",cobertura:"urbano",modalidad:"expreso"};
+let state={showCosts:false,mods:{trasteo:false,empaque:false,inst:false,desempaque:false,bodegaje:false,adicionales:false},trasteoSize:"mediano",trasteoQty:{pequeno:0,mediano:0,grande:0},empTab:"express",bodSize:"m10",cobertura:"urbano",modalidad:"expreso"};
 
 // ============ BUILD UI, only rebuilds non-input elements, preserves input values ============
 function buildStaticUI(){
