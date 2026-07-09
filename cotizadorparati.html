@@ -298,11 +298,23 @@ body{padding-top:68px}
 .cta-glow-pdf{animation:ctaGlowBorder 1.2s ease-in-out infinite!important}
 
 /* SITE FOOT (solo dominio) */
-.site-foot{margin-top:32px;text-align:center;font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.02em;padding:16px 0}
+.site-foot{margin-top:32px;text-align:center;font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.02em;padding:16px 0;display:none}
 .site-foot::before{content:'';display:block;width:40px;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);margin:0 auto 14px;border-radius:2px}
+body.result-shown .site-foot{display:block}
+body.result-shown .seo{display:block}
+
+/* T&C */
+.tyc{max-width:680px;margin:0 auto;padding:24px 20px 32px;display:none}
+body.result-shown .tyc{display:block}
+.tyc-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.tyc-list{list-style:none;padding:0;margin:0;counter-reset:tyc}
+.tyc-list li{counter-increment:tyc;position:relative;padding:8px 0 8px 28px;font-size:12.5px;line-height:1.6;color:#4a5568;border-bottom:1px solid #edf0f4}
+.tyc-list li:last-child{border-bottom:none}
+.tyc-list li::before{content:counter(tyc)'.';position:absolute;left:0;font-weight:700;color:var(--navy);font-size:12px}
+.tyc-note{font-size:11.5px;color:var(--muted);margin-top:14px;line-height:1.5;font-style:italic}
 
 /* SEO CONTENT SECTION */
-.seo{max-width:680px;margin:0 auto;padding:48px 20px 32px;color:#3d4654}
+.seo{max-width:680px;margin:0 auto;padding:48px 20px 32px;color:#3d4654;display:none}
 .seo h2{font-size:22px;color:var(--navy);margin:0 0 12px;font-weight:700}
 .seo h3{font-size:17px;color:var(--navy);margin:24px 0 8px;font-weight:600}
 .seo p{font-size:14px;line-height:1.7;margin:0 0 12px}
@@ -510,6 +522,25 @@ body{padding-top:68px}
 
 </div>
 
+<div class="tyc">
+  <div class="tyc-title">Terminos y condiciones de esta cotizacion</div>
+  <ol class="tyc-list">
+    <li><strong>Cotizacion estimada:</strong> los valores presentados son un estimado generado automaticamente con base en la informacion proporcionada por el usuario. No constituyen una oferta comercial vinculante ni un precio final.</li>
+    <li><strong>Sujeta a validacion:</strong> toda cotizacion debe ser verificada y validada por un asesor de servicio de Trasteos Ya mediante inspeccion visual (presencial, por fotos o video) de las condiciones reales del lugar de origen y destino.</li>
+    <li><strong>Datos no definitivos:</strong> los datos aqui indicados (volumenes, cantidades, materiales, distancias y condiciones de acceso) son declarados por el usuario y pueden ser modificados, corregidos o ajustados por un experto tras la revision en sitio.</li>
+    <li><strong>Variacion de precio:</strong> el valor final del servicio puede variar si las condiciones reales difieren de las informadas: mayor volumen de enseres, pisos sin ascensor no declarados, caminados largos, objetos especiales, o cualquier condicion no prevista al momento de cotizar.</li>
+    <li><strong>Objetos especiales y de valor:</strong> el cliente debe declarar previamente objetos fragiles, de alto valor, peso excesivo o dimensiones especiales (pianos, cajas fuertes, obras de arte, etc.). Trasteos Ya no se responsabiliza por danos en articulos no declarados.</li>
+    <li><strong>Acceso y estacionamiento:</strong> el cliente debe garantizar condiciones de acceso adecuadas para el vehiculo en origen y destino. Restricciones de parqueo, vias sin pavimentar, porteria o permisos de edificio que generen demoras podran ocasionar cargos adicionales.</li>
+    <li><strong>Empaque y materiales:</strong> las cantidades de materiales de empaque son una estimacion basada en el tipo de vivienda. El consumo real puede variar segun el volumen y fragilidad de los enseres; cualquier diferencia sera ajustada en el valor final.</li>
+    <li><strong>Disponibilidad:</strong> las fechas y horarios estan sujetos a disponibilidad operativa. La confirmacion del servicio se realiza una vez el asesor valide la cotizacion y se acuerde la fecha con el cliente.</li>
+    <li><strong>Cancelacion:</strong> el cliente puede cancelar sin costo antes de la confirmacion del servicio. Una vez confirmado, aplican las condiciones de cancelacion vigentes informadas por el asesor.</li>
+    <li><strong>Responsabilidad:</strong> Trasteos Ya responde por danos atribuibles a la operacion del servicio. No se asume responsabilidad por danos preexistentes, contenido de cajas empacadas por el cliente, ni por objetos no declarados.</li>
+    <li><strong>Vigencia:</strong> esta cotizacion tiene una vigencia de 15 dias calendario a partir de su generacion. Pasado este plazo, los valores pueden cambiar sin previo aviso.</li>
+    <li><strong>Uso de datos:</strong> la informacion proporcionada sera utilizada exclusivamente para la elaboracion de la cotizacion y la prestacion del servicio. Trasteos Ya no comparte datos personales con terceros.</li>
+  </ol>
+  <p class="tyc-note">Al enviar, descargar o compartir esta cotizacion, el usuario declara haber leido y aceptado estos terminos. Para cualquier aclaracion, comuniquese con nuestro equipo por WhatsApp al +57 314 309 5194.</p>
+</div>
+
 <section class="seo" aria-label="Información sobre mudanzas en Bogotá">
   <h2>Mudanzas en Bogota: cotiza tu trasteo en linea</h2>
   <div class="seo-divider"></div>
@@ -595,11 +626,14 @@ function reveal(id){
   const el=$('#'+id);if(!el)return;
   if(!el.classList.contains('show'))el.classList.add('show');
   setTimeout(()=>{
-    const nav=document.querySelector('.nav');
     const prog=$('#progress');
-    const navH=(nav&&!nav.classList.contains('nav--hidden'))?nav.offsetHeight:0;
-    const progH=(prog&&prog.classList.contains('show')&&!prog.classList.contains('progress--faded'))?prog.offsetHeight+12:0;
-    const offset=navH+progH+8;
+    let offset=8;
+    if(prog&&prog.classList.contains('show')&&!prog.classList.contains('progress--faded')){
+      offset=prog.getBoundingClientRect().bottom+12;
+    }else{
+      const nav=document.querySelector('.nav');
+      offset=(nav&&!nav.classList.contains('nav--hidden'))?nav.offsetHeight+8:8;
+    }
     const top=el.getBoundingClientRect().top+window.scrollY-offset;
     window.scrollTo({top:Math.max(0,top),behavior:'smooth'});
   },150);
@@ -722,17 +756,18 @@ function timerNext(sectionId,revealId,stepName,msg,secs){
 /* ========= STEP 1: DATOS → VIVIENDA ========= */
 function checkDatos(){
   const n=$('#ur-nombre').value.trim(),raw=$('#ur-whatsapp').value.replace(/\D/g,'');
-  const w=(raw.startsWith('57')&&raw.length>=12)?raw.slice(2):raw;
-  if(n.length>=2&&w.length>=10){S.nombre=n;S.whatsapp=w;
+  if(n.length>=2&&raw.length>=7){S.nombre=n;S.whatsapp=raw;
     if(!S._ready){S._ready=true;$('#progress').classList.add('show');stepCurrent('vivienda');setTimeout(()=>reveal('c-vivienda'),400);}}
 }
 $('#ur-nombre').addEventListener('input',checkDatos);
-$('#ur-whatsapp').addEventListener('input',function(){this.value=this.value.replace(/\D/g,'');this.value=this.value.startsWith('57')?this.value.slice(0,12):this.value.slice(0,10);checkDatos();});
+$('#ur-whatsapp').addEventListener('input',function(){this.value=this.value.replace(/\D/g,'').slice(0,15);checkDatos();});
 
 /* ========= STEP 2: VIVIENDA ========= */
 $$('#viv-grid .opt').forEach(o=>o.addEventListener('click',()=>{
   $$('#viv-grid .opt').forEach(x=>x.classList.remove('sel'));
   o.classList.add('sel');S.vivienda=o.dataset.viv;
+  var vivIcons={pequeno:'🏢',mediano:'🏬',familiar:'🏘️',casa:'🏡',oficina:'🏢'};
+  var vivStep=$('.step[data-step="vivienda"] .step-icon');if(vivStep)vivStep.textContent=vivIcons[S.vivienda]||'🏠';
   if(S.vivienda==='oficina'){oficinaFlow();return;}
   stepDone('vivienda');
   const ce=$('#casa-extra');
@@ -986,6 +1021,7 @@ function finalizar(){
   if(actionsBox){actionsBox.classList.add('anim');actionsBox.style.animationDelay=(0.5+idx*0.1)+'s';}
   animateCounter(totalEl,total,1200,0.4+idx*0.1);
   reveal('c-resultado');
+  document.body.classList.add('result-shown');
   launchConfetti();
   saveBackend(lines,total);
   armResultPrompt();
@@ -1072,17 +1108,16 @@ function startCtaGlow(){
 function showSentConfirm(){
   if(_promptActive)return;
   _promptActive=true;
-  const m=$('#pmodal'),icon=m.querySelector('.pmodal-icon'),cancel=$('#pmodal-cancel');
+  const m=$('#pmodal'),icon=m.querySelector('.pmodal-icon'),cancel=$('#pmodal-cancel'),ok=$('#pmodal-ok');
   icon.textContent='✅';
   $('#pmodal-title').textContent='Tu cotización ha sido enviada correctamente';
-  $('#pmodal-ok').textContent='OK';
-  cancel.style.display='none';
+  ok.textContent='Ir al menú';
+  cancel.textContent='Volver a mi cotización';
+  cancel.style.display='';
   m.classList.add('show');
-  $('#pmodal-ok').onclick=()=>{
-    m.classList.remove('show');_promptActive=false;
-    icon.textContent='👉';$('#pmodal-ok').textContent='Sí, continuar';cancel.style.display='';
-    window.location.href='index.html';
-  };
+  function reset(){m.classList.remove('show');_promptActive=false;icon.textContent='👉';ok.textContent='Sí, continuar';cancel.textContent='Todavía no';}
+  ok.onclick=()=>{reset();window.location.href='index.html';};
+  cancel.onclick=()=>{reset();$('#c-result').scrollIntoView({behavior:'smooth',block:'start'});};
 }
 
 /* ========= BACKEND (sheet + telegram, mismo flujo admin) ========= */
@@ -1111,7 +1146,8 @@ function buildCotMsg(prefix){
   return msg;
 }
 $('#btn-wa').addEventListener('click',()=>{
-  const wa='https://wa.me/57'+S.whatsapp+'?text='+encodeURIComponent(buildCotMsg());
+  const waTel=(S.whatsapp.length===10&&S.whatsapp.startsWith('3'))?'57'+S.whatsapp:S.whatsapp;
+  const wa='https://wa.me/'+waTel+'?text='+encodeURIComponent(buildCotMsg());
   window.open(wa,'_blank','noopener');
   setTimeout(showSentConfirm,800);
 });
@@ -1185,7 +1221,7 @@ $('#btn-pdf').addEventListener('click',async()=>{
   doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(15,23,42);
   var pdfCats={trasteo:{label:'Trasteo',items:[],t:0},empaque:{label:'Empaque',items:[],t:0},inst:{label:'Instalaciones',items:[],t:0},adicionales:{label:'Otros servicios',items:[],t:0},bodegaje:{label:'Bodegaje',items:[],t:0}};
   lines.forEach(function(l){var c=pdfCats[l.cat]||pdfCats.adicionales;c.items.push(l);c.t+=l.v;});
-  Object.keys(pdfCats).forEach(function(k){var c=pdfCats[k];if(!c.items.length)return;doc.setFont('helvetica','bold');doc.setTextColor(10,24,69);doc.text(c.label,14,y);doc.text(COP(c.t),196,y,{align:'right'});y+=6;doc.setFont('helvetica','normal');doc.setTextColor(15,23,42);c.items.forEach(function(l){doc.text('   '+l.l+(l.est?' (estimado)':''),14,y);doc.text(COP(l.v),196,y,{align:'right'});y+=6;if(y>262){doc.addPage();y=20;}});y+=3;});
+  Object.keys(pdfCats).forEach(function(k){var c=pdfCats[k];if(!c.items.length)return;doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(10,24,69);doc.text(c.label,14,y);doc.text(COP(c.t),196,y,{align:'right'});y+=6;doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(100,110,130);c.items.forEach(function(l){doc.text('     '+l.l+(l.est?' (estimado)':''),14,y);doc.text(COP(l.v),196,y,{align:'right'});y+=5;});y+=3;});
   y+=3;doc.setDrawColor(220,225,235);doc.line(14,y,196,y);y+=10;
   // Total
   doc.setFillColor(10,24,69);doc.roundedRect(14,y-7,182,14,2,2,'F');
