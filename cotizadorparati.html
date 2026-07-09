@@ -53,7 +53,7 @@ h1,h2,h3{font-family:'Plus Jakarta Sans','Inter',sans-serif;letter-spacing:-.02e
 /* HEADER — fixed at top, overrides sticky from components.css */
 .nav{position:fixed!important;top:0;left:0;right:0;z-index:200;transition:opacity .4s ease,transform .4s ease}
 .nav.nav--hidden{opacity:0;transform:translateY(-100%)!important;pointer-events:none}
-body{padding-top:68px}
+body{padding-top:68px;transition:padding-top .4s ease}
 @media(min-width:1024px){body{padding-top:82px}}
 
 /* HERO */
@@ -629,7 +629,7 @@ function reveal(id){
     const prog=$('#progress');
     let offset=8;
     if(prog&&prog.classList.contains('show')&&!prog.classList.contains('progress--faded')){
-      offset=prog.getBoundingClientRect().bottom+12;
+      offset=prog.getBoundingClientRect().bottom+2;
     }else{
       const nav=document.querySelector('.nav');
       offset=(nav&&!nav.classList.contains('nav--hidden'))?nav.offsetHeight+8:8;
@@ -698,10 +698,12 @@ function cancelAutoPrompt(){clearTimeout(_autoPromptTimer);}
     var mob=document.getElementById('nav-mobile');
     if(mob&&mob.getAttribute('aria-hidden')==='false')return;
     hiddenNav=true;nav.classList.add('nav--hidden');
+    document.body.style.paddingTop='0';
     var p=$('#progress');if(p&&p.classList.contains('show'))p.style.top='0';
   }
   function navShow(){
     hiddenNav=false;nav.classList.remove('nav--hidden');
+    document.body.style.paddingTop='';
     var p=$('#progress');if(p&&p.classList.contains('show'))p.style.top=(nav.offsetHeight+8)+'px';
   }
   window.addEventListener('scroll',function(){
