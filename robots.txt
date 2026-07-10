@@ -1,14 +1,14 @@
 User-agent: *
 Allow: /
 
-# Herramientas internas y Cotizador Corporativo (Uso operador / Gated con PIN)
-Disallow: /cotizador.html
-Disallow: /orden-servicio.html
-Disallow: /gracias.html
-Disallow: /kpis.html
-Disallow: /kpi-empresa.html
-Disallow: /campanas.html
-Disallow: /servicios.html
+# Herramientas internas y Cotizador Corporativo (noindex + PIN-gated)
+Disallow: /cotizador
+Disallow: /orden-servicio
+Disallow: /gracias
+Disallow: /kpis
+Disallow: /kpi-empresa
+Disallow: /campanas
+Disallow: /servicios
 
 # Permitir que Google indexe imagenes
 User-agent: Googlebot-Image

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Video Comercial — Trasteos Ya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;font-family:'Plus Jakarta Sans',sans-serif;overflow:hidden;height:100vh;display:flex;align-items:center;justify-content:center;-webkit-font-smoothing:antialiased}
+
+/* === STAGE 9:16 === */
+.stage{position:relative;height:100vh;width:56.25vh;max-width:100vw;background:linear-gradient(160deg,#050c22 0%,#0d2266 35%,#091a4a 65%,#070e2a 100%);overflow:hidden}
+
+/* BG animated orbs */
+.stage::before,.stage::after{content:'';position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;will-change:transform}
+.stage::before{width:45vh;height:45vh;background:rgba(0,61,165,.22);top:-12vh;right:-12vh;animation:orb 9s ease-in-out infinite}
+.stage::after{width:35vh;height:35vh;background:rgba(227,24,55,.15);bottom:8vh;left:-8vh;animation:orb 11s ease-in-out infinite reverse}
+@keyframes orb{0%,100%{transform:translate(0,0)}50%{transform:translate(4vh,6vh)}}
+
+/* Light sweep */
+.sweep{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.sweep::after{content:'';position:absolute;top:-50%;left:-80%;width:200%;height:200%;background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.025) 46%,rgba(255,255,255,.06) 50%,rgba(255,255,255,.025) 54%,transparent 58%);animation:sweepMove 6s 1.5s ease-in-out infinite}
+@keyframes sweepMove{0%,100%{transform:translateX(-30%)}50%{transform:translateX(30%)}}
+
+/* === CONTROLS === */
+.controls{position:absolute;top:1.8vh;left:50%;transform:translateX(-50%);z-index:90;display:flex;gap:1.2vh;transition:opacity .5s}
+.controls.hidden{opacity:0;pointer-events:none}
+.ctrl-btn{background:rgba(255,255,255,.1);border:.1vh solid rgba(255,255,255,.15);color:#fff;padding:.7vh 2vh;border-radius:1vh;font-size:1.2vh;font-weight:600;font-family:inherit;cursor:pointer;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:background .2s;white-space:nowrap}
+.ctrl-btn:hover{background:rgba(255,255,255,.2)}
+.ctrl-btn.off{color:rgba(255,255,255,.3)}
+.ctrl-rec{background:rgba(227,24,55,.18);border-color:rgba(227,24,55,.3)}
+.ctrl-rec:hover{background:rgba(227,24,55,.32)}
+.ctrl-rec.recording{background:rgba(227,24,55,.5);animation:recBlink 1s infinite}
+@keyframes recBlink{50%{opacity:.5}}
+.hint{position:absolute;bottom:1.2vh;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.2);font-size:.9vh;white-space:nowrap;z-index:90;transition:opacity .5s;font-weight:500}
+.hint.hidden{opacity:0}
+
+/* === INTRO OVERLAY === */
+.intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:15;transition:opacity 1s}
+.intro.hidden{opacity:0;pointer-events:none}
+.intro-logo{width:38vh;opacity:0;transform:scale(.8);transition:opacity 1.2s cubic-bezier(.4,0,.2,1),transform 1.2s cubic-bezier(.4,0,.2,1)}
+.intro-logo.show{opacity:1;transform:scale(1)}
+.intro-logo img{width:100%;filter:drop-shadow(0 .5vh 3vh rgba(0,61,165,.5))}
+.intro-title{color:#fff;font-size:2.6vh;font-weight:800;text-align:center;line-height:1.35;margin-top:3vh;opacity:0;filter:blur(6px);transform:translateY(2vh);transition:all .8s .2s cubic-bezier(.4,0,.2,1)}
+.intro-title.show{opacity:1;filter:blur(0);transform:translateY(0)}
+.intro-pills{display:flex;gap:1.2vh;margin-top:2.5vh;opacity:0;transition:opacity .8s .5s}
+.intro-pills.show{opacity:1}
+.intro-pill{background:rgba(255,255,255,.08);border:.1vh solid rgba(255,255,255,.12);color:rgba(255,255,255,.7);padding:.5vh 1.5vh;border-radius:5vh;font-size:1.1vh;font-weight:600;backdrop-filter:blur(6px)}
+
+/* === PHONE === */
+.phone-wrap{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%) translateY(20vh);opacity:0;z-index:10;transition:all 1s cubic-bezier(.4,0,.2,1)}
+.phone-wrap.show{opacity:1;transform:translate(-50%,-50%)}
+.phone-wrap.show.closing{top:56%;transform:translate(-50%,-50%) scale(.58)}
+.phone{width:33vh;height:66vh;background:#1a1a1c;border-radius:5vh;padding:.5vh;position:relative;box-shadow:0 0 0 .1vh rgba(255,255,255,.06),0 2vh 8vh rgba(0,0,0,.6)}
+.phone-wrap.show .phone{animation:phoneGlow 4s 1s ease-in-out infinite}
+@keyframes phoneGlow{0%,100%{box-shadow:0 0 0 .1vh rgba(255,255,255,.06),0 0 5vh rgba(0,61,165,.2),0 2vh 8vh rgba(0,0,0,.6)}50%{box-shadow:0 0 0 .1vh rgba(255,255,255,.1),0 0 8vh rgba(0,61,165,.35),0 2vh 8vh rgba(0,0,0,.6)}}
+.phone-notch{position:absolute;top:.5vh;left:50%;transform:translateX(-50%);width:9vh;height:2.4vh;background:#1a1a1c;border-radius:0 0 1.6vh 1.6vh;z-index:4}
+.phone-screen{width:100%;height:100%;background:#f4f6fa;border-radius:4.6vh;overflow:hidden;position:relative}
+.phone-home{position:absolute;bottom:.7vh;left:50%;transform:translateX(-50%);width:7.5vh;height:.35vh;background:rgba(0,0,0,.18);border-radius:.2vh;z-index:4}
+
+/* Phone status bar */
+.ph-status{height:4.2vh;display:flex;align-items:flex-end;justify-content:space-between;padding:0 2.5vh .4vh;font-size:1vh;color:#333;font-weight:600;position:relative;z-index:3}
+
+/* Phone app header (with official logo) */
+.ph-hdr{height:4.5vh;background:#fff;display:flex;align-items:center;justify-content:center;border-bottom:.08vh solid #e8eaef;position:relative;z-index:3}
+.ph-hdr img{height:2.8vh}
+
+/* Phone body */
+.ph-body{position:relative;height:calc(100% - 4.2vh - 4.5vh - 1.5vh);overflow:hidden}
+
+/* === SLIDES === */
+.slide{position:absolute;inset:0;padding:1.6vh 2vh;opacity:0;transform:translateX(5vh);transition:opacity .5s,transform .5s;display:flex;flex-direction:column}
+.slide.active{opacity:1;transform:translateX(0)}
+
+.sl-step{font-size:1.1vh;color:#003DA5;font-weight:700;text-transform:uppercase;letter-spacing:.08vh;margin-bottom:.3vh}
+.sl-title{font-size:2.1vh;color:#0A1845;font-weight:800;margin-bottom:1.4vh}
+.sl-label{font-size:1.15vh;color:#888;margin-bottom:.35vh;font-weight:500}
+.sl-input{width:100%;height:3.8vh;border:.12vh solid #dde1e8;border-radius:1vh;padding:0 1.2vh;font-size:1.4vh;font-family:inherit;background:#fff;color:#0A1845;display:flex;align-items:center;margin-bottom:1.2vh;transition:border-color .3s,box-shadow .3s}
+.sl-input.typing{border-color:#003DA5;box-shadow:0 0 0 .25vh rgba(0,61,165,.1)}
+.cursor{display:inline-block;width:1px;height:1.6vh;background:#003DA5;animation:blink .5s step-end infinite;margin-left:1px}
+@keyframes blink{50%{opacity:0}}
+
+.sl-opts{display:flex;gap:.7vh;margin-bottom:1.4vh}
+.sl-opt{flex:1;background:#fff;border:.14vh solid #dde1e8;border-radius:1.2vh;padding:1vh .4vh;text-align:center;font-weight:600;color:#0A1845;transition:all .4s}
+.sl-opt .ico{font-size:2.2vh;margin-bottom:.2vh}
+.sl-opt .lbl{font-size:1.1vh;display:block}
+.sl-opt.sel{border-color:#003DA5;background:rgba(0,61,165,.06);box-shadow:0 0 0 .2vh rgba(0,61,165,.1);transform:scale(1.04)}
+.sl-m2{background:#fff;border-radius:1vh;padding:.9vh;text-align:center;font-size:1.3vh;color:#0A1845;font-weight:700;border:.12vh solid #dde1e8;margin-bottom:1.2vh}
+
+.sl-route{display:flex;align-items:center;gap:.5vh;margin-bottom:1.4vh}
+.sl-rcity{flex:1;background:#fff;border:.14vh solid #003DA5;border-radius:1vh;padding:.9vh .4vh;text-align:center}
+.sl-rcity .city{font-size:1.5vh;font-weight:700;color:#0A1845}
+.sl-rcity .dept{font-size:.95vh;color:#888}
+.sl-arrow{font-size:2.2vh;color:#003DA5;font-weight:800}
+
+.sl-tabs{display:flex;gap:.4vh;margin-bottom:1vh;background:#eef0f5;border-radius:1vh;padding:.3vh}
+.sl-tab{flex:1;padding:.65vh;text-align:center;font-size:1.1vh;font-weight:600;border-radius:.8vh;color:#888;transition:all .3s}
+.sl-tab.on{background:#fff;color:#003DA5;box-shadow:0 .1vh .4vh rgba(0,0,0,.07)}
+.sl-emp{display:flex;justify-content:space-between;padding:.6vh 0;border-bottom:.08vh solid #eef0f5;font-size:1.1vh}
+.sl-emp .n{color:#555}.sl-emp .q{color:#003DA5;font-weight:700}
+
+.sl-rcat{font-size:1vh;color:#003DA5;font-weight:700;margin-top:.7vh;margin-bottom:.1vh;text-transform:uppercase;letter-spacing:.04vh}
+.sl-rline{display:flex;justify-content:space-between;padding:.5vh 0;font-size:1.1vh;border-bottom:.08vh solid #eef0f5}
+.sl-rline .n{color:#666}.sl-rline .v{color:#0A1845;font-weight:600}
+.sl-rtotal{display:flex;justify-content:space-between;padding:.9vh 0;font-size:1.7vh;font-weight:800;color:#0A1845;border-top:.2vh solid #003DA5;margin-top:.7vh}
+.sl-wa{display:block;width:100%;padding:1vh;background:#16a34a;color:#fff;border:none;border-radius:1vh;font-size:1.3vh;font-weight:700;font-family:inherit;text-align:center;margin-top:auto}
+.sl-wa.pulse{animation:waPulse 1.2s ease-in-out infinite}
+@keyframes waPulse{0%,100%{box-shadow:0 .3vh 1vh rgba(22,163,74,.25)}50%{box-shadow:0 0 2.5vh rgba(22,163,74,.6),0 0 5vh rgba(22,163,74,.15)}}
+
+.sl-btn{display:block;width:100%;padding:.9vh;background:#003DA5;color:#fff;border:none;border-radius:1vh;font-size:1.2vh;font-weight:700;font-family:inherit;text-align:center;margin-top:auto}
+
+/* === CAPTION (below phone during demo) === */
+.caption{position:absolute;bottom:4.5vh;left:0;right:0;text-align:center;z-index:12;padding:0 2.5vh}
+.cap-text{color:#fff;font-size:2.3vh;font-weight:700;opacity:0;filter:blur(4px);transform:translateY(1.5vh);transition:all .5s cubic-bezier(.4,0,.2,1);text-shadow:0 .2vh 2vh rgba(0,0,0,.6);line-height:1.35}
+.cap-text.show{opacity:1;filter:blur(0);transform:translateY(0)}
+
+/* === CLOSING ELEMENTS === */
+.cl-logo{position:absolute;top:6vh;left:50%;transform:translateX(-50%);width:34vh;z-index:20;opacity:0;filter:blur(6px);transform:translateX(-50%) scale(.85);transition:all .9s cubic-bezier(.4,0,.2,1)}
+.cl-logo.show{opacity:1;filter:blur(0);transform:translateX(-50%) scale(1)}
+.cl-logo img{width:100%;filter:drop-shadow(0 .5vh 4vh rgba(0,61,165,.5))}
+
+.cl-text{position:absolute;bottom:3vh;left:0;right:0;text-align:center;z-index:20;padding:0 2vh}
+.cl-msg{color:#fff;font-size:1.7vh;font-weight:600;line-height:1.5;opacity:0;transform:translateY(1vh);transition:all .6s}
+.cl-msg.show{opacity:1;transform:translateY(0)}
+.cl-url{color:#fff;font-size:3vh;font-weight:900;letter-spacing:-.02em;margin-top:1.5vh;opacity:0;transition:opacity .6s .2s}
+.cl-url.show{opacity:1}
+.cl-badges{color:rgba(255,255,255,.45);font-size:1.2vh;font-weight:500;margin-top:.8vh;opacity:0;transition:opacity .6s .4s}
+.cl-badges.show{opacity:1}
+.cl-wa{color:#16a34a;font-size:1.5vh;font-weight:700;margin-top:1vh;opacity:0;transition:opacity .6s .6s}
+.cl-wa.show{opacity:1}
+
+/* === PROGRESS BAR === */
+.pbar{position:absolute;bottom:0;left:0;height:.35vh;background:linear-gradient(90deg,#003DA5 0%,#E31837 100%);z-index:80;border-radius:0 .2vh .2vh 0;transition:width .15s linear}
+
+/* === INNOVATION BADGE (overlay on phone during demo) === */
+.badge-overlay{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:14;pointer-events:none;opacity:0;transition:opacity .6s}
+.badge-overlay.show{opacity:1}
+.badge-card{background:rgba(10,24,69,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:.12vh solid rgba(255,255,255,.12);border-radius:2vh;padding:2.5vh 3vh;text-align:center;box-shadow:0 1vh 5vh rgba(0,0,0,.5)}
+.badge-card .bc-line{color:#fff;font-size:2vh;font-weight:800;line-height:1.4}
+.badge-card .bc-sub{color:rgba(255,255,255,.5);font-size:1.2vh;font-weight:500;margin-top:.8vh}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="sweep"></div>
+
+  <!-- Controls -->
+  <div class="controls" id="ctrls">
+    <button class="ctrl-btn" id="btn-play">Reproducir</button>
+    <button class="ctrl-btn" id="btn-voice">Voz: ON</button>
+    <button class="ctrl-btn ctrl-rec" id="btn-rec">Descargar Video</button>
+  </div>
+
+  <!-- INTRO -->
+  <div class="intro" id="intro">
+    <div class="intro-logo" id="i-logo"><img src="assets/img/logo.png" alt="Trasteos Ya"></div>
+    <div class="intro-title" id="i-title">La nueva forma de contratar<br>tu mudanza ya esta aqui</div>
+    <div class="intro-pills" id="i-pills">
+      <span class="intro-pill">Innovacion</span>
+      <span class="intro-pill">Confianza</span>
+      <span class="intro-pill">Experiencia</span>
+    </div>
+  </div>
+
+  <!-- PHONE -->
+  <div class="phone-wrap" id="phone">
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="ph-status"><span>9:41</span><span>5G</span></div>
+        <div class="ph-hdr"><img src="assets/img/logo.png" alt="Trasteos Ya"></div>
+        <div class="ph-body">
+
+          <div class="slide active" id="sl-datos">
+            <div class="sl-step">Paso 1</div>
+            <div class="sl-title">Tus datos</div>
+            <div class="sl-label">Tu nombre</div>
+            <div class="sl-input" id="inp-n"><span id="t-n"></span><span class="cursor" id="c-n"></span></div>
+            <div class="sl-label">Tu WhatsApp</div>
+            <div class="sl-input" id="inp-w"><span id="t-w"></span><span class="cursor" id="c-w" style="display:none"></span></div>
+          </div>
+
+          <div class="slide" id="sl-viv">
+            <div class="sl-step">Paso 2</div>
+            <div class="sl-title">Tu vivienda</div>
+            <div class="sl-opts">
+              <div class="sl-opt" id="o-apt"><span class="ico">Apt</span><span class="lbl">Apartamento</span></div>
+              <div class="sl-opt" id="o-cas"><span class="ico">Cas</span><span class="lbl">Casa</span></div>
+              <div class="sl-opt" id="o-ofi"><span class="ico">Ofi</span><span class="lbl">Oficina</span></div>
+            </div>
+            <div class="sl-m2">60 - 80 m&sup2;</div>
+            <div class="sl-btn">Continuar &rarr;</div>
+          </div>
+
+          <div class="slide" id="sl-ruta">
+            <div class="sl-step">Paso 3</div>
+            <div class="sl-title">Tu ruta</div>
+            <div class="sl-route">
+              <div class="sl-rcity"><div class="city">Bogota</div><div class="dept">Cundinamarca</div></div>
+              <div class="sl-arrow">&rarr;</div>
+              <div class="sl-rcity"><div class="city">Bogota</div><div class="dept">Cundinamarca</div></div>
+            </div>
+            <div class="sl-btn">Confirmar ruta &rarr;</div>
+          </div>
+
+          <div class="slide" id="sl-emp">
+            <div class="sl-step">Paso 4</div>
+            <div class="sl-title">Empaque</div>
+            <div class="sl-tabs">
+              <div class="sl-tab">Express</div>
+              <div class="sl-tab on">Full</div>
+            </div>
+            <div class="sl-emp"><span class="n">Vinipel industrial</span><span class="q">3 rollos</span></div>
+            <div class="sl-emp"><span class="n">Papel burbuja</span><span class="q">2 rollos</span></div>
+            <div class="sl-emp"><span class="n">Cajas de carton</span><span class="q">8 und</span></div>
+            <div class="sl-emp"><span class="n">Papel craft</span><span class="q">2 rollos</span></div>
+            <div class="sl-btn">Continuar &rarr;</div>
+          </div>
+
+          <div class="slide" id="sl-res">
+            <div class="sl-step" style="color:#16a34a">Listo</div>
+            <div class="sl-title">Tu cotizacion</div>
+            <div class="sl-rcat">Trasteo</div>
+            <div class="sl-rline"><span class="n">Camion + 2 operarios</span><span class="v" id="v-tr">$0</span></div>
+            <div class="sl-rcat">Empaque</div>
+            <div class="sl-rline"><span class="n">Material completo</span><span class="v" id="v-em">$0</span></div>
+            <div class="sl-rcat">Instalaciones</div>
+            <div class="sl-rline"><span class="n">TV + cortinas + lampara</span><span class="v" id="v-in">$0</span></div>
+            <div class="sl-rtotal"><span>Total estimado</span><span id="v-tot">$0</span></div>
+            <button class="sl-wa" id="wa-btn">Enviar por WhatsApp</button>
+          </div>
+
+        </div>
+        <div class="phone-home"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Badge overlay (trust messages on top of phone) -->
+  <div class="badge-overlay" id="badge">
+    <div class="badge-card">
+      <div class="bc-line" id="bc-line"></div>
+      <div class="bc-sub" id="bc-sub"></div>
+    </div>
+  </div>
+
+  <!-- Caption -->
+  <div class="caption"><div class="cap-text" id="cap"></div></div>
+
+  <!-- Closing elements -->
+  <div class="cl-logo" id="cl-logo"><img src="assets/img/logo.png" alt="Trasteos Ya"></div>
+  <div class="cl-text" id="cl-text">
+    <div class="cl-msg" id="cl-msg">Enviatelo a tu WhatsApp en tiempo real<br>o contacta a un asesor con toda tu informacion</div>
+    <div class="cl-url" id="cl-url">trasteosya.online</div>
+    <div class="cl-badges" id="cl-bad">15+ anos de experiencia &middot; 5.000+ mudanzas</div>
+    <div class="cl-wa" id="cl-wa">WhatsApp: +57 314 309 5194</div>
+  </div>
+
+  <!-- Progress -->
+  <div class="pbar" id="pbar" style="width:0"></div>
+  <div class="hint" id="hint">Espacio = reproducir &middot; V = voz on/off</div>
+</div>
+
+<script>
+'use strict';
+var voiceOn=true,esVoice=null,T=[],DURATION=30000;
+
+/* --- Voice --- */
+function loadV(){var v=speechSynthesis.getVoices();esVoice=v.find(function(x){return x.lang==='es-CO'})||v.find(function(x){return x.lang==='es-MX'})||v.find(function(x){return x.lang==='es-ES'})||v.find(function(x){return x.lang.startsWith('es')});}
+if(window.speechSynthesis){speechSynthesis.onvoiceschanged=loadV;loadV();}
+function speak(t){if(!voiceOn||!window.speechSynthesis)return;speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='es-CO';u.rate=.88;u.pitch=1.02;if(esVoice)u.voice=esVoice;speechSynthesis.speak(u);}
+
+/* --- Utils --- */
+function q(id){return document.getElementById(id)}
+function d(ms,fn){T.push(setTimeout(fn,ms))}
+function clearAll(){T.forEach(function(t){clearTimeout(t);clearInterval(t)});T=[];if(window.speechSynthesis)speechSynthesis.cancel();}
+
+function typeText(id,text,spd,cb){
+  var s=q(id),i=0;s.textContent='';
+  var iv=setInterval(function(){s.textContent+=text[i];i++;if(i>=text.length){clearInterval(iv);if(cb)cb();}},spd||65);T.push(iv);
+}
+function slide(id){document.querySelectorAll('.slide').forEach(function(s){s.classList.remove('active')});q(id).classList.add('active');}
+function cap(t){var e=q('cap');e.classList.remove('show');e.textContent=t;setTimeout(function(){e.classList.add('show')},60);}
+function capHide(){q('cap').classList.remove('show');}
+function countUp(id,val,dur){
+  var el=q(id),st=20,inc=val/st,iv=dur/st,c=0;
+  var t=setInterval(function(){c+=inc;if(c>=val){c=val;clearInterval(t);}el.textContent='$'+Math.round(c).toLocaleString('es-CO');},iv);T.push(t);
+}
+function showBadge(line,sub){q('bc-line').textContent=line;q('bc-sub').textContent=sub||'';q('badge').classList.add('show');}
+function hideBadge(){q('badge').classList.remove('show');}
+
+/* --- Progress --- */
+function startProg(){
+  var s=Date.now(),bar=q('pbar');
+  var iv=setInterval(function(){var p=Math.min(100,((Date.now()-s)/DURATION)*100);bar.style.width=p+'%';if(p>=100)clearInterval(iv);},100);T.push(iv);
+}
+
+/* --- Reset --- */
+function reset(){
+  clearAll();
+  q('pbar').style.width='0';
+  /* Intro */
+  q('intro').classList.remove('hidden');
+  q('i-logo').classList.remove('show');q('i-title').classList.remove('show');q('i-pills').classList.remove('show');
+  /* Phone */
+  q('phone').classList.remove('show');q('phone').classList.remove('closing');
+  /* Slides */
+  document.querySelectorAll('.slide').forEach(function(s){s.classList.remove('active')});
+  q('sl-datos').classList.add('active');
+  q('t-n').textContent='';q('t-w').textContent='';
+  q('c-n').style.display='';q('c-w').style.display='none';
+  q('inp-n').classList.remove('typing');q('inp-w').classList.remove('typing');
+  q('o-apt').classList.remove('sel');
+  q('v-tr').textContent='$0';q('v-em').textContent='$0';q('v-in').textContent='$0';q('v-tot').textContent='$0';
+  q('wa-btn').classList.remove('pulse');
+  /* Badge */
+  hideBadge();
+  /* Caption */
+  capHide();
+  /* Closing */
+  q('cl-logo').classList.remove('show');
+  q('cl-msg').classList.remove('show');q('cl-url').classList.remove('show');
+  q('cl-bad').classList.remove('show');q('cl-wa').classList.remove('show');
+  /* Controls */
+  q('ctrls').classList.remove('hidden');q('hint').classList.remove('hidden');
+  q('btn-play').textContent='Reproducir';
+}
+
+/* ============= PLAY ============= */
+function play(){
+  reset();
+  q('ctrls').classList.add('hidden');q('hint').classList.add('hidden');
+  startProg();
+
+  /* ---- INTRO (0-3.8s) ---- */
+  d(200,function(){q('i-logo').classList.add('show');});
+  d(900,function(){q('i-title').classList.add('show');speak('La nueva forma de contratar tu mudanza ya esta aqui');});
+  d(1800,function(){q('i-pills').classList.add('show');});
+
+  /* ---- PHONE ENTRANCE (3.8s) ---- */
+  d(3800,function(){
+    q('intro').classList.add('hidden');
+    q('phone').classList.add('show');
+    cap('Cotiza tu trasteo en minutos!');
+    speak('Cotiza tu trasteo en minutos');
+  });
+
+  /* ---- DATOS (5-8s) ---- */
+  d(5200,function(){
+    cap('Rapido, facil y seguro');
+    q('inp-n').classList.add('typing');
+    typeText('t-n','Maria Lopez',75,function(){q('inp-n').classList.remove('typing');q('c-n').style.display='none';});
+    speak('Rapido, facil y seguro');
+  });
+  d(6800,function(){
+    q('c-w').style.display='';q('inp-w').classList.add('typing');
+    typeText('t-w','3124567890',55,function(){q('inp-w').classList.remove('typing');q('c-w').style.display='none';});
+  });
+
+  /* ---- VIVIENDA (8.5s) ---- */
+  d(8500,function(){slide('sl-viv');cap('Selecciona tu vivienda');});
+  d(9300,function(){q('o-apt').classList.add('sel');});
+
+  /* ---- RUTA (10.5s) ---- */
+  d(10500,function(){slide('sl-ruta');cap('Confirma tu ruta');});
+
+  /* ---- EMPAQUE (12.5s) ---- */
+  d(12500,function(){slide('sl-emp');cap('Elige tu empaque ideal');});
+
+  /* ---- RESULTADO (14.5s) ---- */
+  d(14500,function(){
+    slide('sl-res');cap('Precio estimado al instante');
+    speak('Recibe tu cotizacion de forma rapida, facil y segura');
+  });
+  d(15200,function(){countUp('v-tr',850000,700);countUp('v-em',420000,700);countUp('v-in',180000,700);});
+  d(16300,function(){countUp('v-tot',1450000,600);});
+  d(17200,function(){q('wa-btn').classList.add('pulse');});
+
+  /* ---- TRUST BADGE 1 (18s) ---- */
+  d(18000,function(){
+    capHide();
+    showBadge('Mas de 15 anos de experiencia nos respaldan','5.000+ mudanzas realizadas');
+    speak('Mas de quince anos de experiencia nos respaldan');
+  });
+
+  /* ---- TRUST BADGE 2 (20.5s) ---- */
+  d(20500,function(){
+    showBadge('Pioneros en innovacion y servicio','Trasteos Ya');
+    speak('Pioneros en innovacion y servicio');
+  });
+
+  /* ---- CLOSING (22.5s) ---- */
+  d(22500,function(){
+    hideBadge();capHide();
+    q('phone').classList.add('closing');
+  });
+  d(23200,function(){
+    q('cl-logo').classList.add('show');
+    speak('Enviatelo a tu whatsapp en tiempo real o contacta a un asesor con toda tu informacion. Trasteos Ya punto online');
+  });
+  d(24000,function(){q('cl-msg').classList.add('show');});
+  d(25200,function(){q('cl-url').classList.add('show');});
+  d(26000,function(){q('cl-bad').classList.add('show');});
+  d(26800,function(){q('cl-wa').classList.add('show');});
+
+  d(29500,function(){q('ctrls').classList.remove('hidden');q('btn-play').textContent='Reproducir de nuevo';});
+}
+
+/* --- Controls --- */
+q('btn-play').addEventListener('click',play);
+q('btn-voice').addEventListener('click',function(){
+  voiceOn=!voiceOn;this.textContent=voiceOn?'Voz: ON':'Voz: OFF';
+  this.classList.toggle('off',!voiceOn);
+  if(!voiceOn&&window.speechSynthesis)speechSynthesis.cancel();
+});
+document.addEventListener('keydown',function(e){
+  if(e.code==='Space'){e.preventDefault();play();}
+  if(e.code==='KeyV'){voiceOn=!voiceOn;var b=q('btn-voice');b.textContent=voiceOn?'Voz: ON':'Voz: OFF';b.classList.toggle('off',!voiceOn);if(!voiceOn&&window.speechSynthesis)speechSynthesis.cancel();}
+});
+
+/* ========= RECORDER ========= */
+q('btn-rec').addEventListener('click',async function(){
+  var btn=this;
+  try{
+    var stream=await navigator.mediaDevices.getDisplayMedia({
+      video:{frameRate:30},audio:true,preferCurrentTab:true,selfBrowserSurface:'include'
+    });
+    var mime=MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')?'video/mp4;codecs=avc1':
+             MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
+    var ext=mime.indexOf('mp4')!==-1?'mp4':'webm';
+    var rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:2000000});
+    var chunks=[];
+    rec.ondataavailable=function(e){if(e.data.size>0)chunks.push(e.data);};
+    rec.onstop=function(){
+      var blob=new Blob(chunks,{type:mime});
+      var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+      a.download='video-trasteos-ya.'+ext;document.body.appendChild(a);a.click();
+      document.body.removeChild(a);URL.revokeObjectURL(a.href);
+      stream.getTracks().forEach(function(t){t.stop();});
+      q('ctrls').classList.remove('hidden');btn.textContent='Descargar Video';btn.classList.remove('recording');
+    };
+    stream.getVideoTracks()[0].onended=function(){if(rec.state==='recording')rec.stop();};
+    q('ctrls').classList.add('hidden');q('hint').classList.add('hidden');
+    btn.classList.add('recording');
+    rec.start();
+    setTimeout(function(){play();},600);
+    setTimeout(function(){if(rec.state==='recording')rec.stop();},32000);
+  }catch(e){/* user cancelled */}
+});
+</script>
+</body>
+</html>
