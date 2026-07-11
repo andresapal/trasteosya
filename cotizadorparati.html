@@ -108,6 +108,11 @@ body{padding-top:68px;transition:padding-top .4s ease}
 .field input::placeholder{color:var(--muted)}
 .field-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:420px){.field-2{grid-template-columns:1fr}}
+.wa-input-wrap{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:var(--r-md);background:#fafafa;transition:.2s;overflow:hidden}
+.wa-input-wrap:focus-within{border-color:var(--blue);background:var(--card);box-shadow:0 0 0 4px rgba(0,61,165,.1)}
+.wa-prefix{padding:14px 0 14px 16px;font-size:16px;font-weight:700;color:var(--navy);white-space:nowrap;user-select:none}
+.wa-input-wrap input{border:none!important;background:transparent!important;box-shadow:none!important;padding-left:8px}
+.wa-input-wrap input:focus{outline:none;border:none!important;box-shadow:none!important}
 .field-error{font-size:12px;color:#dc2626;margin-top:6px;min-height:0;overflow:hidden;transition:min-height .3s,opacity .3s;opacity:0}
 .field-error.show{min-height:18px;opacity:1}
 .wa-confirm{margin-top:14px;padding:16px;background:linear-gradient(135deg,#f0f4ff,#e8edf8);border-radius:var(--r-md);border:1.5px solid rgba(0,61,165,.15)}
@@ -433,10 +438,12 @@ body.result-shown .tyc{display:block}
       <p class="card-desc">Para comenzar tu cotización</p>
     </div>
     <div class="field"><label for="ur-nombre">Tu nombre</label><input type="text" id="ur-nombre" placeholder="Ej: María López" autocomplete="name"></div>
-    <div class="field"><label for="ur-whatsapp">Tu WhatsApp</label><input type="tel" id="ur-whatsapp" placeholder="Ej: 3001234567" inputmode="numeric" autocomplete="tel"><div class="field-error" id="wa-error"></div></div>
+    <div class="field"><label for="ur-whatsapp">Tu WhatsApp</label>
+      <div class="wa-input-wrap"><span class="wa-prefix" id="wa-prefix">+57</span><input type="tel" id="ur-whatsapp" placeholder="300 123 4567" inputmode="numeric" autocomplete="tel"></div>
+      <div class="field-error" id="wa-error"></div>
+    </div>
     <div class="wa-confirm" id="wa-confirm" style="display:none">
-      <div class="wa-confirm__num" id="wa-confirm-num"></div>
-      <div class="wa-confirm__note">Al continuar, declaras que este es tu numero real de WhatsApp y aceptas el uso de tus datos conforme a nuestra politica de tratamiento de datos personales.</div>
+      <div class="wa-confirm__note">Al continuar declaras que este es tu numero real de WhatsApp y aceptas el tratamiento de tus datos personales conforme a la ley. Trasteos Ya usara este numero unicamente para contactarte sobre tu cotizacion.</div>
       <button type="button" class="wa-confirm__btn" id="wa-confirm-btn">Confirmar y continuar</button>
     </div>
   </div>
@@ -768,52 +775,47 @@ function timerNext(sectionId,revealId,stepName,msg,secs){
 }
 
 /* ========= STEP 1: DATOS → VIVIENDA ========= */
-var _waFails=0,_waBlocked=false,_waConfirmed=false;
+var _waFails=0,_waBlocked=false;
 function validarTel(raw){
   if(raw.length<10) return 'Ingresa tu numero completo (minimo 10 digitos)';
   if(/^(.)\1{7,}$/.test(raw)) return 'Este numero no parece valido';
   if(/^0?1234567890/.test(raw)||/^0?9876543210/.test(raw)) return 'Este numero no parece valido';
   var d=raw.split(''),asc=0,desc=0;
-  for(var i=1;i<d.length;i++){if(+d[i]===+d[i-1]+1)asc++;else asc=0;if(+d[i]===+d[i-1]-1)desc++;else desc=0;if(asc>=5||desc>=5)return 'Este numero no parece real. Ingresa tu WhatsApp verdadero';}
+  for(var i=1;i<d.length;i++){if(+d[i]===+d[i-1]+1)asc++;else asc=0;if(+d[i]===+d[i-1]-1)desc++;else desc=0;if(asc>=5||desc>=5)return 'Ingresa un numero de WhatsApp real donde podamos contactarte';}
   var uniq=new Set(d).size;if(uniq<=2&&raw.length>=10) return 'Este numero no parece valido';
   if(raw.length===10&&raw.startsWith('3')) return '';
   if(raw.length===12&&raw.startsWith('57')&&raw[2]==='3') return '';
   if(raw.length>=11&&raw.length<=15){
-    var cc=['1','7','20','27','30','31','32','33','34','36','39','40','41','43','44','45','46','47','48','49','51','52','53','54','55','56','58','60','61','62','63','64','65','66','81','82','84','86','90','91','92','93','94','95','98','212','213','216','220','234','249','254','255','256','263','351','352','353','354','355','356','358','370','371','372','380','381','385','386','420','421','502','503','504','505','506','507','509','591','592','593','595','596','598'];
-    var match=false;
-    for(var i=0;i<cc.length;i++){if(raw.startsWith(cc[i])){match=true;break;}}
-    if(match) return '';
+    var cc=['1','7','20','27','30','31','32','33','34','36','39','40','41','43','44','45','46','47','48','49','51','52','53','54','55','56','58','60','61','62','63','64','65','66','81','82','84','86','90','91','92','93','94','95','98'];
+    for(var i=0;i<cc.length;i++){if(raw.startsWith(cc[i])) return '';}
   }
-  if(raw.length===10) return 'Si es colombiano debe empezar con 3. Si es internacional agrega el codigo de pais';
-  return 'Verifica tu numero. Si es internacional incluye el codigo de pais (ej: 13051234567)';
-}
-function fmtTelVista(raw){
-  if(raw.length===10&&raw.startsWith('3')) return '+57 '+raw.slice(0,3)+' '+raw.slice(3,6)+' '+raw.slice(6);
-  if(raw.length===12&&raw.startsWith('57')) return '+'+raw.slice(0,2)+' '+raw.slice(2,5)+' '+raw.slice(5,8)+' '+raw.slice(8);
-  if(raw.startsWith('1')&&raw.length===11) return '+1 '+raw.slice(1,4)+' '+raw.slice(4,7)+' '+raw.slice(7);
-  return '+'+raw;
+  if(raw.length===10) return 'Colombiano debe empezar con 3. Internacional: quita el +57 y escribe tu codigo de pais + numero';
+  return 'Verifica tu numero. Internacional: quita el +57 y escribe codigo de pais + numero';
 }
 function showWaError(msg){var e=$('#wa-error');e.textContent=msg;e.classList.toggle('show',!!msg);}
 function checkDatos(){
   if(_waBlocked) return;
-  var conf=$('#wa-confirm');
   var n=$('#ur-nombre').value.trim(),raw=$('#ur-whatsapp').value.replace(/\D/g,'');
+  var conf=$('#wa-confirm'),pref=$('#wa-prefix');
   showWaError('');
-  conf.style.display='none';
-  _waConfirmed=false;
-  if(n.length<2||raw.length<7) return;
-  var err=validarTel(raw);
-  if(err){showWaError(err);_waFails++;
-    if(_waFails>=2){_waBlocked=true;showWaError('Has ingresado numeros invalidos varias veces. Para cotizar necesitamos un WhatsApp real donde contactarte. Recarga la pagina para intentar de nuevo.');$('#ur-whatsapp').disabled=true;}
-    return;}
-  S.nombre=n;S.whatsapp=raw;
-  conf.style.display='';
-  $('#wa-confirm-num').textContent=fmtTelVista(raw);
+  if(n.length>=2&&raw.length>=4){conf.style.display='';} else {conf.style.display='none';}
 }
 $('#ur-nombre').addEventListener('input',checkDatos);
 $('#ur-whatsapp').addEventListener('input',function(){this.value=this.value.replace(/\D/g,'').slice(0,15);checkDatos();});
 $('#wa-confirm-btn').addEventListener('click',function(){
-  _waConfirmed=true;$('#wa-confirm').style.display='none';showWaError('');
+  if(_waBlocked) return;
+  var n=$('#ur-nombre').value.trim(),raw=$('#ur-whatsapp').value.replace(/\D/g,'');
+  if(n.length<2){showWaError('Ingresa tu nombre');return;}
+  var err=validarTel(raw);
+  if(err){showWaError(err);_waFails++;
+    if(_waFails>=2){_waBlocked=true;showWaError('Has ingresado numeros invalidos. Para cotizar necesitamos un WhatsApp real donde contactarte. Recarga la pagina para intentar.');$('#ur-whatsapp').disabled=true;$('#wa-confirm-btn').disabled=true;}
+    return;}
+  showWaError('');
+  S.nombre=n;
+  if(raw.length===10&&raw.startsWith('3')){S.whatsapp=raw;}
+  else if(raw.startsWith('57')&&raw.length===12){S.whatsapp=raw.slice(2);}
+  else{S.whatsapp=raw;}
+  $('#wa-confirm').style.display='none';
   if(!S._ready){S._ready=true;$('#progress').classList.add('show');stepCurrent('vivienda');setTimeout(()=>reveal('c-vivienda'),400);}
 });
 
@@ -1183,11 +1185,20 @@ function saveBackend(lines,total){
     costo:lines.reduce((a,l)=>a+(l.c||0),0),
     items:lines.map(l=>({cat:l.cat,l:l.l,v:l.v,c:l.c||0,qty:l.qty}))};
   fetch(COT_SHEET_URL,{method:'POST',body:JSON.stringify({type:'cotizacion',apikey:BACKUP_APIKEY,meta:meta}),redirect:'follow'}).catch(()=>{});
-  const tg='💰 *Nueva cotización WEB*\n👤 '+S.nombre+'\n📱 '+S.whatsapp+'\n🏠 '+VIV_LABEL[S.vivienda]+'\n📍 '+S.origen+' → '+S.destino+'\n📦 Empaque '+S.empaque.tipo+'\n💵 Total: '+COP(total);
+  var cats={trasteo:{l:'Trasteo',items:[],t:0},empaque:{l:'Empaque',items:[],t:0},inst:{l:'Instalaciones',items:[],t:0},adicionales:{l:'Otros',items:[],t:0},bodegaje:{l:'Bodegaje',items:[],t:0}};
+  lines.forEach(function(l){var c=cats[l.cat]||cats.adicionales;c.items.push(l);c.t+=l.v;});
+  var detalle='';
+  Object.keys(cats).forEach(function(k){var c=cats[k];if(!c.items.length)return;detalle+='\n*'+c.l+': '+COP(c.t)+'*\n';c.items.forEach(function(l){detalle+='  - '+l.l+': '+COP(l.v)+(l.est?' (est)':'')+'\n';});});
+  const tg='💰 *Nueva cotización WEB*\n👤 '+S.nombre+'\n📱 '+S.whatsapp+'\n🏠 '+VIV_LABEL[S.vivienda]+'\n📍 '+S.origen+' → '+S.destino+'\n📦 Empaque '+S.empaque.tipo+'\n'+detalle+'\n💵 *Total: '+COP(total)+'*';
   notifyOperador(tg);
+  notifyWhatsApp(tg);
 }
 function notifyOperador(text){
   fetch('https://api.telegram.org/bot'+NOTIFY.TG_TOKEN+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:NOTIFY.TG_CHAT,text:text,parse_mode:'Markdown'})}).catch(()=>{});
+}
+function notifyWhatsApp(text){
+  var clean=text.replace(/\*/g,'').replace(/💰|👤|📱|🏠|📍|📦|💵/g,'').trim();
+  fetch('https://api.callmebot.com/whatsapp.php?phone='+NOTIFY.CMB_PHONE+'&text='+encodeURIComponent(clean)+'&apikey='+NOTIFY.CMB_KEY).catch(()=>{});
 }
 
 /* ========= WHATSAPP (texto al cliente) ========= */
