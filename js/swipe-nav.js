@@ -34,7 +34,7 @@
     location.href=pages[idx].path;
   }
 
-  document.addEventListener('DOMContentLoaded',function(){
+  function initNav(){
     var nav=document.createElement('div');
     nav.className='swipe-nav-dots';
     nav.style.cssText='position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:196;display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:10px;background:rgba(0,0,0,.06)';
@@ -72,5 +72,6 @@
         });
       }catch(e){}
     }
-  });
+  }
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initNav);}else{initNav();}
 })();
