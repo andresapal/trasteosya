@@ -13,7 +13,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;background:#f0f2
 .main-header{background:#fff;border-bottom:3px solid #1B3E8C;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.08)}
 .main-header img{height:42px;width:auto}
 .header-actions{display:flex;gap:8px;flex-wrap:wrap}
-.tab-bar{background:#fff;border-bottom:1px solid #e2e5ea;padding:0 24px;display:flex}
+.tab-bar{background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid #e2e5ea;padding:0 24px;display:flex;position:sticky;top:65px;z-index:99}
 .tab{padding:12px 20px;border:none;background:none;font-size:13px;font-weight:500;color:#666;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;transition:all .2s}
 .tab:hover{color:#1B3E8C}
 .tab.active{color:#1B3E8C;border-bottom-color:#1B3E8C;font-weight:600}
@@ -65,11 +65,13 @@ input[readonly]{background:#f8f9fa;color:#6b7280;cursor:default;border-color:#e9
 .td-emp{background:#4b5563;color:#fff;font-weight:700}
 @media print{
   .main-header,.tab-bar,.preview-toolbar,.ty-lock-btn,.ty-op-toolbar,.ty-gate-modal,.os-route-map,.os-bottom-panel,.swipe-nav-dots,.ty-op-trigger{display:none!important}
+  #view-form{display:none!important}
   .preview-outer{padding:0;max-width:100%}
   .pv{border:none;border-radius:0;padding:0;background:transparent}
-  body{background:#fff;margin:0}
+  body{background:#fff;margin:0;overflow:visible}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   .pv-carta{width:100%;min-height:auto;padding:8mm 8mm 6mm 8mm}
+  @page{size:letter;margin:5mm}
 }
 /* OS Dropdown */
 .os-dropdown{position:relative}
@@ -1168,11 +1170,25 @@ async function enviarOSWhatsApp(){
   }
 }
 const printWithColors=()=>{
-  // Mostrar aviso antes de imprimir
+  setVista("preview");
+  renderPreview();
+  const pv=document.getElementById("pvContent");
+  const maxH=920;
+  const pvH=pv.scrollHeight;
+  let scaled=false;
+  if(pvH>maxH){
+    const sc=maxH/pvH;
+    pv.style.transform='scale('+sc+')';
+    pv.style.transformOrigin='top left';
+    pv.style.width=(100/sc)+'%';
+    scaled=true;
+  }
+  const restore=()=>{if(scaled){pv.style.transform='';pv.style.transformOrigin='';pv.style.width='';}};
+  window.addEventListener('afterprint',function h(){restore();window.removeEventListener('afterprint',h);});
   const aviso=document.createElement("div");
   aviso.style.cssText="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:2px solid #1B3E8C;border-radius:12px;padding:24px 28px;z-index:9999;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.2);font-family:inherit";
   aviso.innerHTML=`
-    <div style="font-weight:700;font-size:15px;color:#1B3E8C;margin-bottom:10px">⚠️ Antes de guardar el PDF</div>
+    <div style="font-weight:700;font-size:15px;color:#1B3E8C;margin-bottom:10px">Antes de guardar el PDF</div>
     <p style="font-size:13px;color:#374151;margin-bottom:8px">Para que aparezcan los colores azules en el PDF:</p>
     <ol style="font-size:12px;color:#374151;margin-left:16px;line-height:1.8">
       <li>En el diálogo de impresión haz clic en <b>Más opciones</b></li>
@@ -1180,8 +1196,8 @@ const printWithColors=()=>{
       <li>Luego guarda como PDF</li>
     </ol>
     <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
-      <button onclick="this.parentElement.parentElement.remove()" style="padding:7px 14px;border-radius:7px;border:1px solid #e2e5ea;background:#fff;cursor:pointer;font-size:13px">Cancelar</button>
-      <button onclick="this.parentElement.parentElement.remove();window.print()" style="padding:7px 14px;border-radius:7px;border:none;background:#1B3E8C;color:#fff;cursor:pointer;font-size:13px;font-weight:600">Entendido → Imprimir</button>
+      <button onclick="this.parentElement.parentElement.remove();var p=document.getElementById('pvContent');p.style.transform='';p.style.transformOrigin='';p.style.width='';" style="padding:7px 14px;border-radius:7px;border:1px solid #e2e5ea;background:#fff;cursor:pointer;font-size:13px">Cancelar</button>
+      <button onclick="this.parentElement.parentElement.remove();window.print()" style="padding:7px 14px;border-radius:7px;border:none;background:#1B3E8C;color:#fff;cursor:pointer;font-size:13px;font-weight:600">Entendido, Imprimir</button>
     </div>`;
   document.body.appendChild(aviso);
 };
