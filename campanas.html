@@ -22,25 +22,27 @@ body{font-family:'Source Sans 3',sans-serif;background:#f4f5f9;color:#111827;fon
 .header-left h1{font-size:15px;font-weight:700;color:var(--brand)}
 
 /* LAYOUT */
-.layout{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 400px;gap:16px;padding:16px 20px 100px}
+.layout{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 400px;gap:16px;padding:16px 20px 100px;width:100%}
 @media(max-width:900px){
-  .layout{grid-template-columns:1fr;padding:12px 8px 120px;overflow-x:hidden}
+  .layout{grid-template-columns:1fr;padding:12px 8px 120px;max-width:100vw}
+  .layout>*{max-width:100%;overflow-x:hidden;box-sizing:border-box}
   input,select,textarea{font-size:16px!important}
   .stats{gap:8px}
   .stat{min-width:0;flex:1 1 30%;padding:8px 10px}
   .stat .num{font-size:18px}
   .cl-phone{font-size:11px}
   .cl-city{display:none}
-  .campaign{overflow:visible;max-width:100%;box-sizing:border-box}
+  .campaign{max-width:100%;box-sizing:border-box}
   .camp-head{padding:12px 10px}
-  .camp-body{padding:12px 10px;max-height:none;overflow:visible}
+  .camp-body{padding:12px 10px;max-height:none;overflow-x:hidden}
   .camp-actions{padding:10px}
-  .tpl-grid{gap:6px}
-  .tpl-card{padding:8px 6px}
-  .tpl-name{font-size:11px}
-  .tpl-desc{font-size:9px;overflow-wrap:break-word}
-  .field input,.field textarea{width:100%;max-width:100%}
+  .tpl-grid{gap:6px;max-width:100%;box-sizing:border-box}
+  .tpl-card{padding:8px 4px;min-width:0}
+  .tpl-name{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tpl-desc{font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .field input,.field textarea{max-width:100%}
   .btn-wa{font-size:13px;padding:10px 12px}
+  .hist-card{max-width:100%;overflow:hidden}
 }
 
 /* STATS BAR */
