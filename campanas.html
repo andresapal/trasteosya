@@ -23,8 +23,18 @@ body{font-family:'Source Sans 3',sans-serif;background:#f4f5f9;color:#111827;fon
 
 /* LAYOUT */
 .layout{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 400px;gap:16px;padding:16px 20px 100px}
-@media(max-width:900px){.layout{grid-template-columns:1fr;padding:12px 12px 120px}
+@media(max-width:900px){.layout{grid-template-columns:1fr;padding:12px 10px 120px}
   input,select,textarea{font-size:16px!important}
+  .stats{gap:8px}
+  .stat{min-width:90px;padding:8px 10px}
+  .stat .num{font-size:18px}
+  .cl-phone{font-size:11px}
+  .cl-city{display:none}
+  .tpl-name{font-size:11px}
+  .tpl-desc{font-size:9px}
+  .camp-body{padding:12px 10px}
+  .camp-actions{padding:10px}
+  .camp-head{padding:12px 10px}
 }
 
 /* STATS BAR */
@@ -239,7 +249,7 @@ var TEMPLATES={
     name:'Resenas',
     desc:'Solicitar resenas en Google',
     model:'Social proof (review request)',
-    msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nGracias por haber confiado en nosotros para tu mudanza. Tu opinion es muy importante para seguir mejorando.\n\nTe agradeceria mucho si pudieras dejarnos una resena en Google, solo toma un minuto:\n\nhttps://g.page/r/trasteosya/review\n\nTu experiencia ayuda a otras personas a tomar la decision con confianza.\n\ntrasteosya.online\n\nMuchas gracias.'
+    msg:'¡Hola! 👋 {nombre}\n\nGracias por confiar en Trasteos Ya. Esperamos que hayas quedado satisfecho/a con nuestro servicio.\n\n¿Nos regalarías un minuto para compartir tu experiencia? Tu opinión nos ayuda a seguir mejorando y permite que más personas conozcan nuestro trabajo.\n\n⭐ Déjanos tu reseña aquí:\nhttps://g.page/r/CY8SnfZIjp_VEAE/review\n\n¡Muchas gracias por tu apoyo y por elegir a Trasteos Ya! 🚚💙❤️\n\nTrasteosya.online'
   },
   corporativo:{
     icon:'C',
