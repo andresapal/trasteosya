@@ -61,6 +61,13 @@
       nav.appendChild(next);
     }
 
+    nav.addEventListener('click',function(e){
+      if(e.target===nav){
+        var tb=document.querySelector('.ty-op-toolbar');
+        if(tb)tb.classList.toggle('ty-op-toolbar--hidden');
+      }
+    });
+
     document.body.appendChild(nav);
 
     if(loc.indexOf('cotizador.html')!==-1){
