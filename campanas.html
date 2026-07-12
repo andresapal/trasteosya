@@ -23,18 +23,24 @@ body{font-family:'Source Sans 3',sans-serif;background:#f4f5f9;color:#111827;fon
 
 /* LAYOUT */
 .layout{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 400px;gap:16px;padding:16px 20px 100px}
-@media(max-width:900px){.layout{grid-template-columns:1fr;padding:12px 10px 120px}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;padding:12px 8px 120px;overflow-x:hidden}
   input,select,textarea{font-size:16px!important}
   .stats{gap:8px}
-  .stat{min-width:90px;padding:8px 10px}
+  .stat{min-width:0;flex:1 1 30%;padding:8px 10px}
   .stat .num{font-size:18px}
   .cl-phone{font-size:11px}
   .cl-city{display:none}
-  .tpl-name{font-size:11px}
-  .tpl-desc{font-size:9px}
-  .camp-body{padding:12px 10px}
-  .camp-actions{padding:10px}
+  .campaign{overflow:visible;max-width:100%;box-sizing:border-box}
   .camp-head{padding:12px 10px}
+  .camp-body{padding:12px 10px;max-height:none;overflow:visible}
+  .camp-actions{padding:10px}
+  .tpl-grid{gap:6px}
+  .tpl-card{padding:8px 6px}
+  .tpl-name{font-size:11px}
+  .tpl-desc{font-size:9px;overflow-wrap:break-word}
+  .field input,.field textarea{width:100%;max-width:100%}
+  .btn-wa{font-size:13px;padding:10px 12px}
 }
 
 /* STATS BAR */
@@ -86,11 +92,6 @@ body{font-family:'Source Sans 3',sans-serif;background:#f4f5f9;color:#111827;fon
 /* TEMPLATE CARDS */
 .tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin:0 auto;box-sizing:border-box}
 .tpl-card{border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;transition:.15s;text-align:center;min-width:0;overflow:hidden;word-wrap:break-word;overflow-wrap:break-word;box-sizing:border-box}
-@media(max-width:600px){
-  .camp-body{padding:14px 20px}
-  .stats{justify-content:center}
-  .controls{justify-content:center}
-}
 .tpl-card:hover{border-color:var(--brand);background:#fafbfc}
 .tpl-card.active{border-color:var(--brand);background:var(--brand-light)}
 .tpl-icon{font-size:20px;margin-bottom:4px}
