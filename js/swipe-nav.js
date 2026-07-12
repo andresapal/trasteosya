@@ -5,8 +5,7 @@
     {path:'/orden-servicio.html',label:'Orden de Servicio'},
     {path:'/kpis.html',label:'KPI General'},
     {path:'/kpi-empresa.html',label:'KPI Empresa'},
-    {path:'/campanas.html',label:'Campañas'},
-    {path:'/servicios.html',label:'Servicios'}
+    {path:'/campanas.html',label:'Campañas'}
   ];
 
   var currentIdx=-1;
@@ -38,7 +37,7 @@
   document.addEventListener('DOMContentLoaded',function(){
     var nav=document.createElement('div');
     nav.className='swipe-nav-dots';
-    nav.style.cssText='position:fixed;bottom:4px;left:50%;transform:translateX(-50%);z-index:196;display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:10px;background:rgba(0,0,0,.06)';
+    nav.style.cssText='position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:196;display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:10px;background:rgba(0,0,0,.06)';
 
     if(currentIdx>0){
       var prev=document.createElement('div');

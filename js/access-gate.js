@@ -120,44 +120,6 @@
     document.body.appendChild(btn);
   }
 
-  // ============ RESEÑA STANDALONE ============
-  window.resenaStandalone = function() {
-    if (typeof pedirResena === 'function') { pedirResena(); return; }
-    // Build standalone modal
-    if (document.querySelector('.ty-resena-modal')) return;
-    const wrap = document.createElement('div');
-    wrap.className = 'ty-resena-modal';
-    wrap.style.cssText = 'position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px';
-    wrap.innerHTML =
-      '<div style="position:absolute;inset:0;background:rgba(5,14,45,.6);backdrop-filter:blur(6px)" onclick="this.parentElement.remove()"></div>' +
-      '<div style="position:relative;background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.25);font-family:system-ui,sans-serif">' +
-        '<h3 style="font-size:16px;margin:0 0 4px;color:#1a1a2e">Enviar pedido de reseña</h3>' +
-        '<p style="font-size:12px;color:#6b7280;margin:0 0 16px">Se abrirá WhatsApp con el mensaje listo.</p>' +
-        '<label style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase">Nombre del cliente</label>' +
-        '<input id="ty-res-nombre" type="text" placeholder="Nombre" style="width:100%;padding:10px 12px;border:1px solid #e2e5ea;border-radius:8px;font-size:14px;margin:4px 0 12px;font-family:inherit">' +
-        '<label style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase">Teléfono (WhatsApp)</label>' +
-        '<input id="ty-res-tel" type="tel" placeholder="3XX XXX XXXX" style="width:100%;padding:10px 12px;border:1px solid #e2e5ea;border-radius:8px;font-size:14px;margin:4px 0 16px;font-family:inherit">' +
-        '<div style="display:flex;gap:8px">' +
-          '<button type="button" onclick="this.closest(\'.ty-resena-modal\').remove()" style="flex:1;padding:10px;border:1px solid #e2e5ea;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;font-family:inherit">Cancelar</button>' +
-          '<button type="button" id="ty-res-enviar" style="flex:1;padding:10px;border:none;border-radius:8px;background:#16A34A;color:#fff;font-weight:600;cursor:pointer;font-size:13px;font-family:inherit">Enviar</button>' +
-        '</div>' +
-      '</div>';
-    document.body.appendChild(wrap);
-    setTimeout(function(){ wrap.querySelector('#ty-res-nombre').focus(); }, 50);
-    wrap.querySelector('#ty-res-enviar').onclick = function() {
-      var nombre = wrap.querySelector('#ty-res-nombre').value.trim();
-      var tel = wrap.querySelector('#ty-res-tel').value.replace(/\D/g, '');
-      if (tel && tel.indexOf('57') !== 0) tel = '57' + tel;
-      var primer = nombre ? nombre.split(/\s+/)[0] : '';
-      var saludo = primer ? ('¡Hola ' + primer + '!') : '¡Hola!';
-      var link = localStorage.getItem('ty_resena_link') || 'https://g.page/r/CY8SnfZIjp_VEAE/review';
-      var msg = saludo + ' 👋\n\nGracias por confiar en Trasteos Ya. Esperamos que hayas quedado satisfecho con nuestro servicio.\n\n¿Nos regalarías un minuto para compartir tu experiencia? Tu opinión nos ayuda a seguir mejorando y permite que más personas conozcan nuestro trabajo.\n\n⭐ Déjanos tu reseña aquí:\n' + link + '\n\n¡Muchas gracias por tu apoyo y por elegir a Trasteos Ya! 🚚💙❤️\n\nTrasteosya.online';
-      var base = tel ? ('https://wa.me/' + tel) : 'https://wa.me/';
-      window.open(base + '?text=' + encodeURIComponent(msg), '_blank');
-      wrap.remove();
-    };
-  }
-
   // ============ TOOLBAR OPERADOR ============
   function injectOpToolbar() {
     if (!isOperator()) return;
@@ -172,7 +134,6 @@
       '<a href="kpi-empresa.html" class="ty-op-toolbar__link">KPI\'s</a>' +
       '<a href="campanas.html" class="ty-op-toolbar__link">Campañas</a>' +
       '<a href="servicios.html" class="ty-op-toolbar__link">Servicios</a>' +
-      '<button type="button" class="ty-op-toolbar__link ty-op-toolbar__resena" onclick="resenaStandalone()">Resena</button>' +
       '<button type="button" class="ty-op-toolbar__dark" title="Modo oscuro">' + (localStorage.getItem('ty_dark_mode')==='1' ? lightIcon : darkIcon) + '</button>' +
       '<button type="button" class="ty-op-toolbar__logout">Salir</button>';
     document.body.appendChild(bar);
