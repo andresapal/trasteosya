@@ -56,6 +56,13 @@ body{font-family:'Source Sans 3',sans-serif;background:#f4f5f9;color:#111827;fon
   .funnel-wrap{overflow-x:auto}
   .main-tabs{padding:0 8px}
   .main-tabs button{font-size:12px;padding:10px 8px}
+  .cal-grid{grid-template-columns:repeat(7,1fr)!important;gap:2px!important}
+  .cal-cell{min-height:36px!important;font-size:10px!important;padding:2px!important}
+  .cal-cell__label{font-size:9px!important}
+  .cal-nav{flex-wrap:wrap;gap:6px}
+  .cal-nav h3{font-size:13px!important}
+  .alert-banner{flex-direction:column;gap:6px}
+  .alert-banner .btn{width:100%}
 }
 
 .stats{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
@@ -187,6 +194,54 @@ body{font-family:'Source Sans 3',sans-serif;background:#f4f5f9;color:#111827;fon
 .piece-modal__actions{display:flex;gap:8px;margin-top:12px}
 .piece-modal__actions .btn{flex:1;text-align:center}
 
+/* CALENDARIO */
+.cal-container{max-width:1200px;margin:0 auto;padding:16px 20px 100px}
+.alert-banner{display:flex;align-items:center;gap:12px;background:#fef3c7;border:1px solid #fbbf24;border-radius:var(--radius);padding:12px 16px;margin-bottom:16px}
+.alert-banner--urgent{background:#fee2e2;border-color:#f87171}
+.alert-banner__icon{flex-shrink:0;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px}
+.alert-banner__icon--warn{background:#fbbf24;color:#78350f}
+.alert-banner__icon--urgent{background:#f87171;color:#7f1d1d}
+.alert-banner__text{flex:1;font-size:13px;line-height:1.4}
+.alert-banner__text strong{display:block;font-size:14px}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cal-nav h3{font-size:16px;font-weight:700}
+.cal-nav .btn{min-width:36px}
+.cal-head{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+.cal-head span{text-align:center;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;padding:6px 0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-cell{min-height:56px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-size:12px;position:relative;cursor:default;transition:.15s}
+.cal-cell--empty{background:transparent;border-color:transparent}
+.cal-cell--today{border-color:var(--brand);box-shadow:0 0 0 2px rgba(0,61,165,.15)}
+.cal-cell--event{background:var(--brand-light);border-color:rgba(0,61,165,.3);cursor:pointer}
+.cal-cell--event:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,61,165,.15)}
+.cal-cell--alert{background:#fef3c7;border-color:#fbbf24}
+.cal-cell--urgent{background:#fee2e2;border-color:#f87171}
+.cal-cell__day{font-weight:700;font-size:11px;color:var(--muted)}
+.cal-cell--today .cal-cell__day{color:var(--brand)}
+.cal-cell__label{font-size:10px;font-weight:600;color:var(--brand);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;line-height:1.3}
+.cal-cell--alert .cal-cell__label{color:#92400e}
+.cal-cell--urgent .cal-cell__label{color:#991b1b}
+.cal-legend{display:flex;gap:16px;margin-top:16px;flex-wrap:wrap}
+.cal-legend span{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.cal-legend span::before{content:'';width:12px;height:12px;border-radius:3px;display:inline-block}
+.cal-legend .leg-event::before{background:var(--brand-light);border:1px solid rgba(0,61,165,.3)}
+.cal-legend .leg-alert::before{background:#fef3c7;border:1px solid #fbbf24}
+.cal-legend .leg-urgent::before{background:#fee2e2;border:1px solid #f87171}
+.cal-legend .leg-today::before{background:var(--surface);border:2px solid var(--brand)}
+.cal-upcoming{margin-top:24px}
+.cal-upcoming h3{font-size:14px;font-weight:700;margin-bottom:12px}
+.cal-upcoming__list{display:flex;flex-direction:column;gap:8px}
+.cal-upcoming__item{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;box-shadow:var(--shadow)}
+.cal-upcoming__item--alert{border-left:4px solid #fbbf24}
+.cal-upcoming__item--urgent{border-left:4px solid #f87171}
+.cal-upcoming__item--past{opacity:.5}
+.cal-upcoming__icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cal-upcoming__icon svg{width:20px;height:20px}
+.cal-upcoming__info{flex:1;min-width:0}
+.cal-upcoming__info strong{display:block;font-size:13px}
+.cal-upcoming__info span{font-size:11px;color:var(--muted)}
+.cal-upcoming__actions{display:flex;gap:6px;flex-shrink:0}
+
 /* DARK MODE */
 body.ty-dark{color:#e8eaed}
 body.ty-dark .header{background:rgba(22,24,34,.92);border-bottom-color:rgba(255,255,255,.06)}
@@ -206,6 +261,13 @@ body.ty-dark .bib-section__title{color:#93b4f5;border-bottom-color:rgba(147,180,
 body.ty-dark .res-hist-table th{background:rgba(20,22,32,.9)}
 body.ty-dark .res-hist-table td{border-bottom-color:rgba(255,255,255,.04)}
 body.ty-dark .piece-modal__box{background:rgba(30,32,44,.98)}
+body.ty-dark .cal-cell{background:rgba(30,32,44,.95);border-color:rgba(255,255,255,.08)}
+body.ty-dark .cal-cell--event{background:rgba(0,61,165,.15);border-color:rgba(0,61,165,.3)}
+body.ty-dark .cal-cell--alert{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.3)}
+body.ty-dark .cal-cell--urgent{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.3)}
+body.ty-dark .alert-banner{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.3);color:#e8eaed}
+body.ty-dark .alert-banner--urgent{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.3)}
+body.ty-dark .cal-upcoming__item{background:rgba(30,32,44,.95);border-color:rgba(255,255,255,.08)}
 
 @media print{.header,.controls,.camp-actions,.main-tabs,.swipe-nav-dots,.ty-op-toolbar,.ty-op-trigger,.ty-gate-modal,.ty-lock-btn{display:none!important}}
 </style>
@@ -225,6 +287,7 @@ body.ty-dark .piece-modal__box{background:rgba(30,32,44,.98)}
   <button class="active" onclick="switchTab('enviar')">Enviar</button>
   <button onclick="switchTab('biblioteca')">Biblioteca</button>
   <button onclick="switchTab('resultados')">Resultados</button>
+  <button onclick="switchTab('calendario')">Calendario</button>
 </div>
 
 <!-- ============ TAB 1: ENVIAR ============ -->
@@ -327,6 +390,11 @@ body.ty-dark .piece-modal__box{background:rgba(30,32,44,.98)}
 <!-- ============ TAB 3: RESULTADOS ============ -->
 <div id="view-resultados" style="display:none">
   <div class="res-container" id="res-content"></div>
+</div>
+
+<!-- ============ TAB 4: CALENDARIO ============ -->
+<div id="view-calendario" style="display:none">
+  <div class="cal-container" id="cal-content"></div>
 </div>
 
 <!-- MODAL PIEZA -->
@@ -462,15 +530,36 @@ var TEMPLATES={
     msg:'Hola {nombre}, soy Andres.\n\nOfrecemos *servicios logisticos integrales*: transporte, bodegaje, distribucion y entregas en todo Colombia.\n\nSi tu empresa necesita un aliado logistico confiable, cotiza sin compromiso.\n\nQuedo atento.'}
 };
 
+// ============ CALENDARIO: fechas fijas por año ============
+var CAMP_DATES={
+  regreso_clases:{m:0,d:15,label:'Regreso a clases'},
+  dia_mujer:{m:2,d:8,label:'Dia de la Mujer'},
+  semana_santa:{m:2,d:28,label:'Semana Santa'},
+  dia_madre:{m:4,d:11,label:'Dia de la Madre'},
+  dia_padre:{m:5,d:15,label:'Dia del Padre'},
+  vacaciones:{m:5,d:20,label:'Vacaciones mitad ano'},
+  prima_junio:{m:5,d:1,label:'Prima de junio'},
+  amor_amistad:{m:8,d:20,label:'Amor y Amistad'},
+  halloween:{m:9,d:31,label:'Halloween'},
+  black_friday:{m:10,d:28,label:'Black Friday'},
+  prima_diciembre:{m:11,d:1,label:'Prima de diciembre'},
+  navidad:{m:11,d:25,label:'Navidad'},
+  ano_nuevo:{m:11,d:31,label:'Ano Nuevo'}
+};
+var calMonth=new Date().getMonth();
+var calYear=new Date().getFullYear();
+
 // ============ TABS ============
 function switchTab(tab){
   document.getElementById('view-enviar').style.display=tab==='enviar'?'':'none';
   document.getElementById('view-biblioteca').style.display=tab==='biblioteca'?'':'none';
   document.getElementById('view-resultados').style.display=tab==='resultados'?'':'none';
+  document.getElementById('view-calendario').style.display=tab==='calendario'?'':'none';
   var btns=document.querySelectorAll('.main-tabs button');
-  btns.forEach(function(b,i){b.className=(['enviar','biblioteca','resultados'][i]===tab)?'active':'';});
+  btns.forEach(function(b,i){b.className=(['enviar','biblioteca','resultados','calendario'][i]===tab)?'active':'';});
   if(tab==='biblioteca')renderBiblioteca();
   if(tab==='resultados')renderResultados();
+  if(tab==='calendario')renderCalendario();
 }
 
 // ============ CATEGORY & ESTADO PILLS ============
@@ -838,6 +927,224 @@ var FUNNEL_KEY='ty_camp_funnels';
 function getFunnelData(){try{return JSON.parse(localStorage.getItem(FUNNEL_KEY)||'{}');}catch(_){return {};}}
 function updateFunnel(key,val){var f=getFunnelData();f[key]=parseInt(val)||0;localStorage.setItem(FUNNEL_KEY,JSON.stringify(f));}
 
+// ============ CALENDARIO ============
+function getEventsForMonth(y,m){
+  var events=[];
+  Object.keys(CAMP_DATES).forEach(function(k){
+    var cd=CAMP_DATES[k];
+    if(cd.m===m){events.push({key:k,day:cd.d,label:cd.label,tpl:TEMPLATES[k]});}
+  });
+  var custom=getCustomEvents();
+  custom.forEach(function(ev){
+    var d=new Date(ev.date);
+    if(d.getMonth()===m&&d.getFullYear()===y){events.push({key:'custom_'+ev.id,day:d.getDate(),label:ev.label,custom:true,customData:ev});}
+  });
+  return events;
+}
+function getAlertClass(eventDay,eventMonth,eventYear){
+  var today=new Date();today.setHours(0,0,0,0);
+  var evDate=new Date(eventYear,eventMonth,eventDay);evDate.setHours(0,0,0,0);
+  var diff=(evDate-today)/(1000*60*60*24);
+  if(diff<0)return '';
+  if(diff<=2)return 'cal-cell--urgent';
+  if(diff<=5)return 'cal-cell--alert';
+  return 'cal-cell--event';
+}
+function renderCalendario(){
+  var y=calYear,m=calMonth;
+  var months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var days=['Lun','Mar','Mie','Jue','Vie','Sab','Dom'];
+  var firstDay=new Date(y,m,1).getDay();
+  var offset=(firstDay===0)?6:firstDay-1;
+  var daysInMonth=new Date(y,m+1,0).getDate();
+  var today=new Date();
+  var todayD=(today.getFullYear()===y&&today.getMonth()===m)?today.getDate():-1;
+  var events=getEventsForMonth(y,m);
+  var eventMap={};
+  events.forEach(function(ev){if(!eventMap[ev.day])eventMap[ev.day]=[];eventMap[ev.day].push(ev);});
+
+  var alerts=getUpcomingAlerts();
+  var html='';
+  if(alerts.length){
+    alerts.forEach(function(a){
+      var cls=a.daysUntil<=2?'alert-banner--urgent':'';
+      var iconCls=a.daysUntil<=2?'alert-banner__icon--urgent':'alert-banner__icon--warn';
+      var iconChar=a.daysUntil<=2?'!!':'!';
+      var timeText=a.daysUntil===0?'HOY':a.daysUntil===1?'MANANA':'En '+a.daysUntil+' dias';
+      html+='<div class="alert-banner '+cls+'">'+
+        '<div class="alert-banner__icon '+iconCls+'">'+iconChar+'</div>'+
+        '<div class="alert-banner__text"><strong>'+timeText+': '+a.label+'</strong>Prepara la campana "'+a.label+'" para enviar a tus contactos.</div>'+
+        '<button class="btn btn-sm btn-primary" onclick="prepararCampana(\''+a.key+'\')">Preparar</button>'+
+        '</div>';
+    });
+  }
+
+  html+='<div class="cal-nav">'+
+    '<button class="btn btn-sm" onclick="calPrev()">&lt;</button>'+
+    '<h3>'+months[m]+' '+y+'</h3>'+
+    '<button class="btn btn-sm" onclick="calNext()">&gt;</button>'+
+    '<button class="btn btn-sm" onclick="calToday()">Hoy</button>'+
+    '<button class="btn btn-sm" onclick="addCustomEvent()">+ Evento</button>'+
+    '</div>';
+
+  html+='<div class="cal-head">';
+  days.forEach(function(d){html+='<span>'+d+'</span>';});
+  html+='</div>';
+
+  html+='<div class="cal-grid">';
+  for(var i=0;i<offset;i++)html+='<div class="cal-cell cal-cell--empty"></div>';
+  for(var d=1;d<=daysInMonth;d++){
+    var evs=eventMap[d];
+    var isToday=d===todayD;
+    var cellClass='cal-cell';
+    if(isToday)cellClass+=' cal-cell--today';
+    if(evs&&evs.length){
+      var alertCls=getAlertClass(d,m,y);
+      if(alertCls)cellClass+=' '+alertCls;
+      else cellClass+=' cal-cell--event';
+    }
+    var onclick=evs?'onclick="calCellClick('+d+','+m+','+y+')"':'';
+    html+='<div class="'+cellClass+'" '+onclick+'>'+
+      '<div class="cal-cell__day">'+d+'</div>';
+    if(evs){evs.forEach(function(ev){html+='<div class="cal-cell__label" title="'+ev.label+'">'+ev.label+'</div>';});}
+    html+='</div>';
+  }
+  html+='</div>';
+
+  html+='<div class="cal-legend">'+
+    '<span class="leg-today">Hoy</span>'+
+    '<span class="leg-event">Campana programada</span>'+
+    '<span class="leg-alert">Faltan 3-5 dias</span>'+
+    '<span class="leg-urgent">Faltan 0-2 dias</span>'+
+    '</div>';
+
+  html+=renderUpcoming(y);
+
+  document.getElementById('cal-content').innerHTML=html;
+}
+function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendario();}
+function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendario();}
+function calToday(){var n=new Date();calMonth=n.getMonth();calYear=n.getFullYear();renderCalendario();}
+
+function calCellClick(d,m,y){
+  var events=getEventsForMonth(y,m).filter(function(ev){return ev.day===d;});
+  if(!events.length)return;
+  var ev=events[0];
+  if(ev.custom){
+    if(confirm('Evento: '+ev.label+'\n\nEliminar este evento?')){
+      removeCustomEvent(ev.customData.id);
+      renderCalendario();
+    }
+    return;
+  }
+  if(confirm(ev.label+'\n\nPreparar esta campana para enviar?'))prepararCampana(ev.key);
+}
+
+function prepararCampana(key){
+  if(TEMPLATES[key]){selectTemplate(key);switchTab('enviar');}
+}
+
+function getUpcomingAlerts(){
+  var today=new Date();today.setHours(0,0,0,0);
+  var y=today.getFullYear();
+  var alerts=[];
+  Object.keys(CAMP_DATES).forEach(function(k){
+    var cd=CAMP_DATES[k];
+    var evDate=new Date(y,cd.m,cd.d);evDate.setHours(0,0,0,0);
+    if(evDate<today){evDate=new Date(y+1,cd.m,cd.d);evDate.setHours(0,0,0,0);}
+    var diff=Math.round((evDate-today)/(1000*60*60*24));
+    if(diff<=5)alerts.push({key:k,label:cd.label,daysUntil:diff,date:evDate});
+  });
+  var custom=getCustomEvents();
+  custom.forEach(function(ev){
+    var evDate=new Date(ev.date);evDate.setHours(0,0,0,0);
+    var diff=Math.round((evDate-today)/(1000*60*60*24));
+    if(diff>=0&&diff<=5)alerts.push({key:'custom',label:ev.label,daysUntil:diff,date:evDate,custom:true});
+  });
+  alerts.sort(function(a,b){return a.daysUntil-b.daysUntil;});
+  return alerts;
+}
+
+function renderUpcoming(year){
+  var today=new Date();today.setHours(0,0,0,0);
+  var y=year||today.getFullYear();
+  var list=[];
+  Object.keys(CAMP_DATES).forEach(function(k){
+    var cd=CAMP_DATES[k];
+    var evDate=new Date(y,cd.m,cd.d);
+    var diff=Math.round((evDate-today)/(1000*60*60*24));
+    list.push({key:k,label:cd.label,date:evDate,diff:diff,icon:TEMPLATES[k]?TEMPLATES[k].icon:'',bg1:TEMPLATES[k]?TEMPLATES[k].bg1:'#1B3E8C'});
+  });
+  var custom=getCustomEvents();
+  custom.forEach(function(ev){
+    var evDate=new Date(ev.date);
+    var diff=Math.round((evDate-today)/(1000*60*60*24));
+    if(evDate.getFullYear()===y)list.push({key:'custom',label:ev.label,date:evDate,diff:diff,icon:'',bg1:'#6b7280',custom:true});
+  });
+  list.sort(function(a,b){return a.date-b.date;});
+
+  var html='<div class="cal-upcoming"><h3>Todas las campanas del '+y+'</h3><div class="cal-upcoming__list">';
+  list.forEach(function(item){
+    var fecha=item.date.toLocaleDateString('es-CO',{day:'numeric',month:'long'});
+    var cls='cal-upcoming__item';
+    if(item.diff<0)cls+=' cal-upcoming__item--past';
+    else if(item.diff<=2)cls+=' cal-upcoming__item--urgent';
+    else if(item.diff<=5)cls+=' cal-upcoming__item--alert';
+    var statusText=item.diff<0?'Pasada':item.diff===0?'HOY':item.diff===1?'Manana':'En '+item.diff+' dias';
+    html+='<div class="'+cls+'">'+
+      '<div class="cal-upcoming__icon" style="background:'+(item.bg1||'#6b7280')+'">'+
+      (item.icon?item.icon.replace(/currentColor/g,'#fff'):'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>')+
+      '</div>'+
+      '<div class="cal-upcoming__info"><strong>'+item.label+'</strong><span>'+fecha+' · '+statusText+'</span></div>'+
+      '<div class="cal-upcoming__actions">'+
+      (item.diff>=0&&!item.custom?'<button class="btn btn-sm btn-primary" onclick="prepararCampana(\''+item.key+'\')">Preparar</button>':'')+
+      '</div></div>';
+  });
+  html+='</div></div>';
+  return html;
+}
+
+// ============ CUSTOM EVENTS ============
+var CUSTOM_EVENTS_KEY='ty_camp_custom_events';
+function getCustomEvents(){try{return JSON.parse(localStorage.getItem(CUSTOM_EVENTS_KEY)||'[]');}catch(_){return [];}}
+function saveCustomEvents(evts){localStorage.setItem(CUSTOM_EVENTS_KEY,JSON.stringify(evts));}
+function addCustomEvent(){
+  var label=prompt('Nombre del evento:');
+  if(!label)return;
+  var dateStr=prompt('Fecha (AAAA-MM-DD):',new Date().toISOString().slice(0,10));
+  if(!dateStr||!/^\d{4}-\d{2}-\d{2}$/.test(dateStr))return;
+  var evts=getCustomEvents();
+  evts.push({id:Date.now(),label:label,date:dateStr});
+  saveCustomEvents(evts);
+  var d=new Date(dateStr);calMonth=d.getMonth();calYear=d.getFullYear();
+  renderCalendario();
+}
+function removeCustomEvent(id){
+  var evts=getCustomEvents().filter(function(e){return e.id!==id;});
+  saveCustomEvents(evts);
+}
+
+// ============ ALERTAS AL CARGAR ============
+function checkAlertsOnLoad(){
+  var alerts=getUpcomingAlerts();
+  var dismissed=getDismissedAlerts();
+  var today=new Date().toISOString().slice(0,10);
+  alerts.forEach(function(a){
+    var key=a.key+'_'+a.date.toISOString().slice(0,10);
+    if(dismissed[key]===today)return;
+    if(a.daysUntil<=2){
+      var timeText=a.daysUntil===0?'HOY':a.daysUntil===1?'MANANA':'En '+a.daysUntil+' dias';
+      if(confirm('ALERTA: '+timeText+' es "'+a.label+'".\n\nPreparar la campana ahora?')){
+        prepararCampana(a.key);
+      }
+      dismissAlert(key);
+    }
+  });
+}
+var DISMISSED_KEY='ty_camp_alerts_dismissed';
+function getDismissedAlerts(){try{return JSON.parse(localStorage.getItem(DISMISSED_KEY)||'{}');}catch(_){return {};}}
+function dismissAlert(key){var d=getDismissedAlerts();d[key]=new Date().toISOString().slice(0,10);localStorage.setItem(DISMISSED_KEY,JSON.stringify(d));}
+
 // ============ UTILS ============
 function escH(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 function formatPhone(p){if(p.length===12&&p.startsWith('57'))return'+57 '+p.substring(2,5)+' '+p.substring(5,8)+' '+p.substring(8);return p;}
@@ -845,6 +1152,7 @@ function formatPhone(p){if(p.length===12&&p.startsWith('57'))return'+57 '+p.subs
 // ============ INIT ============
 selectTemplate('referidos');
 loadClients();
+setTimeout(checkAlertsOnLoad,1500);
 </script>
 <script src="js/swipe-nav.js"></script>
 <link rel="stylesheet" href="css/access-gate.css?v=18"/>
