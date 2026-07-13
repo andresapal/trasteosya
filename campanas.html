@@ -313,6 +313,28 @@ body.ty-dark .cal-upcoming__item{background:rgba(30,32,44,.95);border-color:rgba
       <h3>Historial de campanas</h3>
       <div id="hist-list"></div>
     </div>
+    <div id="wa-status-panel" style="display:none">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center">
+        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">WhatsApp Status</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Publica esta pieza como Estado para que todos tus contactos la vean</div>
+        <div id="wa-status-piece" style="max-width:280px;margin:0 auto 16px;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12)"></div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px">
+          <button class="btn btn-primary" onclick="downloadStatusPiece()">Descargar imagen</button>
+          <label class="btn" style="cursor:pointer;text-align:center">Subir tu pieza<input type="file" accept="image/*" style="display:none" onchange="uploadStatusPiece(event)"></label>
+        </div>
+        <div style="text-align:left;background:rgba(37,211,102,.06);border:1px solid rgba(37,211,102,.2);border-radius:12px;padding:14px;font-size:12px;color:var(--text);line-height:1.6">
+          <div style="font-weight:700;margin-bottom:6px;color:#128C7E">Como publicar:</div>
+          <div>1. Descarga la imagen o sube tu pieza personalizada</div>
+          <div>2. Abre WhatsApp y ve a la seccion Estado</div>
+          <div>3. Selecciona la imagen desde tu galeria</div>
+          <div>4. Agrega texto corto: trasteosya.online</div>
+          <div style="margin-top:8px;font-weight:600;color:#128C7E">Tips de publicacion:</div>
+          <div>- Publica entre 8am-10am o 6pm-8pm</div>
+          <div>- Repite 2-3 veces por semana</div>
+          <div>- Cambia la pieza cada semana</div>
+        </div>
+      </div>
+    </div>
   </div>
   <div>
     <div class="campaign">
@@ -691,7 +713,66 @@ function selectTemplate(k){
   document.getElementById('camp-msg').value=t.msg;
   if(!document.getElementById('camp-name').value.trim())document.getElementById('camp-name').value=t.name+' '+new Date().toLocaleDateString('es-CO',{month:'long',year:'numeric'});
   if(t.category){var cat=t.category;activeCategory=cat==='estacional'||cat==='permanente'||cat==='negocio'?cat:'todas';renderCatPills();}
-  renderTemplates();updatePreview();
+  renderTemplates();updatePreview();toggleStatusPanel();
+}
+function toggleStatusPanel(){
+  var isStatus=activeTpl==='wa_status';
+  var sp=document.getElementById('wa-status-panel');
+  var contacts=document.querySelector('.controls');
+  var clientList=document.querySelector('.client-list');
+  var hist=document.getElementById('hist-section');
+  var campActions=document.querySelector('.camp-actions');
+  var campBody=document.querySelector('.camp-body');
+  if(sp)sp.style.display=isStatus?'':'none';
+  if(contacts)contacts.style.display=isStatus?'none':'';
+  if(clientList)clientList.style.display=isStatus?'none':'';
+  if(hist)hist.style.display=isStatus?'none':'';
+  if(campActions)campActions.style.display=isStatus?'none':'';
+  if(campBody)campBody.style.display=isStatus?'none':'';
+  if(isStatus)renderStatusPiece();
+}
+function renderStatusPiece(){
+  var el=document.getElementById('wa-status-piece');if(!el)return;
+  var customImg=getCustomPiece('wa_status');
+  if(customImg){
+    el.innerHTML='<img src="'+customImg+'" style="width:100%;display:block;border-radius:12px" alt="Status">';
+  } else {
+    var t=TEMPLATES.wa_status;var iconPaths='';
+    var m=t.icon.match(/<svg[^>]*>([\s\S]*)<\/svg>/);if(m)iconPaths=m[1];
+    el.innerHTML=makePieceSVG({id:'wast',bg1:t.bg1,bg2:t.bg2,title:t.pieceTitle||t.name,sub:t.pieceSub||'',iconPaths:iconPaths});
+  }
+}
+function downloadStatusPiece(){
+  var el=document.querySelector('#wa-status-piece svg')||document.querySelector('#wa-status-piece img');
+  if(!el)return;
+  if(el.tagName==='svg'){
+    var blob=new Blob([el.outerHTML],{type:'image/svg+xml'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='wa-status-trasteosya.svg';a.click();URL.revokeObjectURL(a.href);
+  } else {
+    var a=document.createElement('a');a.href=el.src;a.download='wa-status-trasteosya.png';a.click();
+  }
+}
+function uploadStatusPiece(e){
+  var file=e.target.files[0];if(!file)return;
+  if(file.size>2*1024*1024){alert('Imagen muy grande (max 2MB)');return;}
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var img=new Image();
+    img.onload=function(){
+      var canvas=document.createElement('canvas');
+      var maxW=1080;var w=img.width,h=img.height;
+      if(w>maxW){h=h*(maxW/w);w=maxW;}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      var dataUrl=canvas.toDataURL('image/jpeg',0.85);
+      saveCustomPiece('wa_status',dataUrl);
+      renderStatusPiece();
+      renderBiblioteca();
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value='';
 }
 
 // ============ CAMPAIGN ACTIONS ============
