@@ -76,6 +76,10 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 .kpi-card.c-red::before{background:linear-gradient(180deg,#E30613,#f87171)}
 .kpi-card.c-teal::before{background:linear-gradient(180deg,#0d9488,#5eead4)}
 .kpi-card.c-purple::before{background:linear-gradient(180deg,#7c3aed,#a78bfa)}
+.kpi-card.c-sky::before{background:linear-gradient(180deg,#0284c7,#38bdf8)}
+.kpi-card.c-lime::before{background:linear-gradient(180deg,#65a30d,#a3e635)}
+.kpi-card.c-amber::before{background:linear-gradient(180deg,#d97706,#fde68a)}
+.kpi-card.c-pink::before{background:linear-gradient(180deg,#db2777,#f9a8d4)}
 .kpi-label{font-size:10px;font-weight:700;color:var(--ty-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
 .kpi-value{font-size:26px;font-weight:800;color:var(--ty-dark);line-height:1.1}
 .kpi-sub{font-size:11px;color:var(--ty-muted);margin-top:6px}
@@ -563,47 +567,42 @@ function drawGauge(canvasId,value,color){
   var r=Math.min(w/2-15,h-25);
   var pct=Math.max(0,Math.min(100,value))/100;
   ctx.clearRect(0,0,w,h);
-  // Background arc (3 color zones)
+  ctx.lineCap='butt';
   ctx.lineWidth=16;
   ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,Math.PI+Math.PI*0.33);ctx.strokeStyle='#fee2e2';ctx.stroke();
   ctx.beginPath();ctx.arc(cx,cy,r,Math.PI+Math.PI*0.33,Math.PI+Math.PI*0.66);ctx.strokeStyle='#fef3c7';ctx.stroke();
   ctx.beginPath();ctx.arc(cx,cy,r,Math.PI+Math.PI*0.66,2*Math.PI);ctx.strokeStyle='#d1fae5';ctx.stroke();
-  // Value arc
-  ctx.beginPath();
-  ctx.arc(cx,cy,r,Math.PI,Math.PI+pct*Math.PI);
-  ctx.lineWidth=16;
-  ctx.strokeStyle=color;
-  ctx.lineCap='round';
-  ctx.stroke();
-  // Ticks 0/50/100
+  if(pct>0){
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,Math.PI,Math.PI+pct*Math.PI);
+    ctx.lineWidth=16;ctx.strokeStyle=color;ctx.lineCap='round';ctx.stroke();
+  }
   ctx.fillStyle='#64748b';
   ctx.font='bold 10px Source Sans 3, sans-serif';
   ctx.textAlign='center';
   ctx.fillText('0',cx-r,cy+18);
   ctx.fillText('50',cx,cy-r-6);
   ctx.fillText('100',cx+r,cy+18);
-  // Needle (interactive pointer)
-  var needleLen=r-4;
   var angle=Math.PI+pct*Math.PI;
+  var needleLen=r-4;
   var nx=cx+Math.cos(angle)*needleLen;
   var ny=cy+Math.sin(angle)*needleLen;
-  // Needle line
+  var perp=angle+Math.PI/2;
+  ctx.save();
+  ctx.shadowColor='rgba(27,62,140,.25)';ctx.shadowBlur=10;
   ctx.beginPath();
-  ctx.moveTo(cx,cy);
-  ctx.lineTo(nx,ny);
-  ctx.strokeStyle='#1a1a2e';
-  ctx.lineWidth=3;
-  ctx.lineCap='round';
-  ctx.stroke();
-  // Needle center pin
-  ctx.beginPath();
-  ctx.arc(cx,cy,7,0,2*Math.PI);
-  ctx.fillStyle='#1a1a2e';
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(cx,cy,3,0,2*Math.PI);
-  ctx.fillStyle='#fff';
-  ctx.fill();
+  ctx.moveTo(nx,ny);
+  ctx.lineTo(cx+Math.cos(perp)*4.5,cy+Math.sin(perp)*4.5);
+  ctx.lineTo(cx-Math.cos(perp)*4.5,cy-Math.sin(perp)*4.5);
+  ctx.closePath();
+  ctx.fillStyle='rgba(27,62,140,.35)';ctx.fill();
+  ctx.restore();
+  ctx.beginPath();ctx.arc(nx,ny,4.5,0,2*Math.PI);
+  ctx.fillStyle='rgba(27,62,140,.55)';ctx.fill();
+  ctx.beginPath();ctx.arc(cx,cy,6,0,2*Math.PI);
+  ctx.fillStyle='rgba(27,62,140,.45)';ctx.fill();
+  ctx.beginPath();ctx.arc(cx,cy,2.5,0,2*Math.PI);
+  ctx.fillStyle='#fff';ctx.fill();
 }
 
 /* ============================================
@@ -619,7 +618,7 @@ function renderIngresos(orders,allOrders,prevOrders){
   var cotCache=getAllCots();
   function _isVendido(c){
     var e=String(c.estado||'').toUpperCase().trim();
-    return e.indexOf('VEND')>=0||e==='V'||e==='SOLD'||e==='OK';
+    return e.indexOf('VEND')>=0||e==='V'||e==='SOLD'||e==='OK'||e.indexOf('CERR')>=0||e.indexOf('GANADO')>=0||e.indexOf('GANADA')>=0||e.indexOf('FACTUR')>=0||e.indexOf('EJECUT')>=0||e.indexOf('CONFIRM')>=0;
   }
   function _isCotizado(c){
     var e=String(c.estado||'').toUpperCase().trim();
@@ -680,18 +679,14 @@ function renderIngresos(orders,allOrders,prevOrders){
       +'</div><div class="kpi-sub">'+(sub||'')+'</div></div>';
   }
 
-  var html='<div class="kpi-grid kpi-6col">'
+  var html='<div class="kpi-grid">'
     +cardK('Ingresos total',displayValor,'c-green','Suma cotizaciones')
-    +cardK('Ingreso empaque',ingEmp,'c-teal','Vinipel, burbuja, cajas, craft')
-    +cardK('Ingresos instalaciones',ingInst,'c-sky','Nevecon, TV, muebles, otros')
     +cardK('Otros ingresos',ingOtros,'c-purple','Trasteo, bodegaje, escaleras, etc.')
-    +cardK('Utilidad',utilidad,'c-lime','Ingresos − Costos')
+    +cardK('Utilidad',utilidad,'c-lime','Ingresos - Costos')
     +cardPct('Margen',margen,'c-amber','Utilidad / Ingresos')
     +'</div>'
-    +'<div class="kpi-grid kpi-6col">'
+    +'<div class="kpi-grid">'
     +cardK('Costo total',displayCosto,'c-red','Suma cotizaciones')
-    +cardK('Costo empaque',costoEmp,'c-orange','Materiales + operarios empaque')
-    +cardK('Costo instalaciones',costoInst,'c-pink','Nevecon, TV, muebles, otros')
     +cardK('Otros costos',costoOtros,'c-red','Trasteo, bodegaje, escaleras, etc.')
     +cardK('Pipeline',pipeValor,'c-orange',cotsPipeline.length+' cotizaciones sin cerrar')
     +cardK('Vendido',vendValor,'c-green',cotsVendidas.length+' cotizaciones vendidas')
@@ -701,11 +696,20 @@ function renderIngresos(orders,allOrders,prevOrders){
     +'</div>';
 
   // Gauges (efectividad y salud financiera)
-  var efectividad=cotCache.length?Math.round(cotsVendidas.length/cotCache.length*100):0;
+  var ejecutadosG=allOrders.filter(function(o){return o.fecha&&!isPending(o.fecha);}).length;
+  var totalBase=cotCache.length+allOrders.length;
+  var efectividad,efecSub;
+  if(cotsVendidas.length>0){
+    efectividad=cotCache.length?Math.round(cotsVendidas.length/cotCache.length*100):0;
+    efecSub=cotsVendidas.length+' vendidas de '+cotCache.length+' cotizadas';
+  }else{
+    efectividad=totalBase?Math.round(ejecutadosG/totalBase*100):0;
+    efecSub=ejecutadosG+' ejecutados de '+totalBase+' (cots+ordenes). Actualizar ESTADO en Sheet a VENDIDO';
+  }
   var margenGauge=margen||0;
   html+='<div class="gauge-row">'
-    +'<div class="gauge-box"><div class="gauge-title">Efectividad de cierre</div><div class="gauge-canvas"><canvas id="gauge-efec" width="220" height="130"></canvas><div class="gauge-value">'+efectividad+'%</div></div><div class="gauge-sub">'+cotsVendidas.length+' vendidas de '+cotCache.length+' cotizadas</div></div>'
-    +'<div class="gauge-box"><div class="gauge-title">Margen bruto</div><div class="gauge-canvas"><canvas id="gauge-mgn" width="220" height="130"></canvas><div class="gauge-value">'+margenGauge+'%</div></div><div class="gauge-sub">'+(margenGauge>=40?'Saludable':margenGauge>=25?'Aceptable':'Bajo — revisar precios')+'</div></div>'
+    +'<div class="gauge-box"><div class="gauge-title">Efectividad de cierre</div><div class="gauge-canvas"><canvas id="gauge-efec" width="220" height="130"></canvas><div class="gauge-value">'+efectividad+'%</div></div><div class="gauge-sub">'+efecSub+'</div></div>'
+    +'<div class="gauge-box"><div class="gauge-title">Margen bruto</div><div class="gauge-canvas"><canvas id="gauge-mgn" width="220" height="130"></canvas><div class="gauge-value">'+margenGauge+'%</div></div><div class="gauge-sub">'+(margenGauge>=40?'Saludable':margenGauge>=25?'Aceptable':'Bajo - revisar precios')+'</div></div>'
     +'</div>';
 
   // Conversion funnel
@@ -874,6 +878,12 @@ function renderEmpaque(orders,allOrders){
   var total=orders.length;
   var conEmpaque=orders.filter(function(o){return o.tieneEmpaque;}).length;
 
+  var cotCache=getAllCots();
+  var ingEmpCot=sumBy(cotCache,function(c){return c.ingEmp||0;});
+  var costoEmpCot=sumBy(cotCache,function(c){return c.costoEmp||0;});
+  var utilEmpCot=ingEmpCot-costoEmpCot;
+  var margenEmpCot=ingEmpCot?Math.round(utilEmpCot/ingEmpCot*100):null;
+
   var totVinipel=0,totBurbuja=0,totCraft=0,totCajas=0;
   orders.forEach(function(o){
     var e=o.empaque||{};
@@ -888,9 +898,28 @@ function renderEmpaque(orders,allOrders){
   var utilEst=ventaEst-costoEst;
   var margenEst=ventaEst?Math.round(utilEst/ventaEst*100):0;
 
+  function cardK(label,val,color,sub,prefix){
+    prefix=prefix||'$ ';
+    var has=val>0;
+    return '<div class="kpi-card '+color+'"><div class="kpi-label">'+label+'</div><div class="kpi-value">'
+      +(has?'<span class="kpi-counter" data-target="'+Math.round(val)+'" data-prefix="'+prefix+'" data-format="money">0</span>':'<span class="kpi-skeleton">'+prefix+'---</span>')
+      +'</div><div class="kpi-sub">'+(sub||'')+'</div></div>';
+  }
+  function cardPct(label,val,color,sub){
+    var has=val!==null&&val!==undefined;
+    return '<div class="kpi-card '+color+'"><div class="kpi-label">'+label+'</div><div class="kpi-value">'
+      +(has?'<span class="kpi-counter" data-target="'+val+'" data-suffix="%">0</span>':'<span class="kpi-skeleton">--%</span>')
+      +'</div><div class="kpi-sub">'+(sub||'')+'</div></div>';
+  }
+
   var html='<div class="kpi-grid">'
-    +'<div class="kpi-card c-teal"><div class="kpi-label">Servicios con empaque</div><div class="kpi-value"><span class="kpi-counter" data-target="'+conEmpaque+'">0</span></div><div class="kpi-sub">'+(total?Math.round(conEmpaque/total*100):0)+'% del total</div></div>'
-    +'<div class="kpi-card c-green"><div class="kpi-label">Venta estimada empaque</div><div class="kpi-value"><span class="kpi-counter" data-target="'+Math.round(ventaEst)+'" data-prefix="$ " data-format="money">0</span></div><div class="kpi-sub"><span class="skeleton-msg">Estimado con precios del cotizador</span></div></div>'
+    +cardK('Ingreso empaque',ingEmpCot,'c-teal','Vinipel, burbuja, cajas, craft')
+    +cardK('Costo empaque',costoEmpCot,'c-orange','Materiales + operarios empaque')
+    +cardPct('Margen empaque',margenEmpCot,'c-blue','Utilidad: '+fmtM(utilEmpCot))
+    +'<div class="kpi-card c-green"><div class="kpi-label">Servicios con empaque</div><div class="kpi-value"><span class="kpi-counter" data-target="'+conEmpaque+'">0</span></div><div class="kpi-sub">'+(total?Math.round(conEmpaque/total*100):0)+'% del total</div></div>'
+    +'</div>'
+    +'<div class="kpi-grid">'
+    +'<div class="kpi-card c-green"><div class="kpi-label">Venta estimada empaque</div><div class="kpi-value"><span class="kpi-counter" data-target="'+Math.round(ventaEst)+'" data-prefix="$ " data-format="money">0</span></div><div class="kpi-sub">Estimado con precios del cotizador</div></div>'
     +'<div class="kpi-card c-orange"><div class="kpi-label">Costo estimado</div><div class="kpi-value"><span class="kpi-counter" data-target="'+Math.round(costoEst)+'" data-prefix="$ " data-format="money">0</span></div><div class="kpi-sub">Materiales</div></div>'
     +'<div class="kpi-card c-blue"><div class="kpi-label">Margen estimado</div><div class="kpi-value"><span class="kpi-counter" data-target="'+margenEst+'" data-suffix="%">0</span></div><div class="kpi-sub">Utilidad: '+fmtM(utilEst)+'</div></div>'
     +'</div>';
@@ -975,7 +1004,6 @@ function renderEmpaque(orders,allOrders){
   });
 
   // Cotizaciones con empaque detail
-  var cotCache=getAllCots();
   var cotEmpItems={};
   cotCache.forEach(function(cot){
     if(!cot.items)return;
@@ -1024,11 +1052,30 @@ function renderOperacion(orders,allOrders){
   orders.forEach(function(o){if(o.conductor)conductores[o.conductor.toUpperCase()]=(conductores[o.conductor.toUpperCase()]||0)+1;});
   var numConductores=Object.keys(conductores).length;
 
+  var cotCache=getAllCots();
+  var ingInstCot=sumBy(cotCache,function(c){return c.ingInst||0;});
+  var costoInstCot=sumBy(cotCache,function(c){return c.costoInst||0;});
+  var utilInstCot=ingInstCot-costoInstCot;
+  var margenInstCot=ingInstCot?Math.round(utilInstCot/ingInstCot*100):null;
+
+  function cardK(label,val,color,sub,prefix){
+    prefix=prefix||'$ ';
+    var has=val>0;
+    return '<div class="kpi-card '+color+'"><div class="kpi-label">'+label+'</div><div class="kpi-value">'
+      +(has?'<span class="kpi-counter" data-target="'+Math.round(val)+'" data-prefix="'+prefix+'" data-format="money">0</span>':'<span class="kpi-skeleton">'+prefix+'---</span>')
+      +'</div><div class="kpi-sub">'+(sub||'')+'</div></div>';
+  }
+
   var html='<div class="kpi-grid">'
+    +cardK('Ingreso instalaciones',ingInstCot,'c-sky','Nevecon, TV, muebles, otros')
+    +cardK('Costo instalaciones',costoInstCot,'c-pink','Nevecon, TV, muebles, otros')
+    +'<div class="kpi-card c-blue"><div class="kpi-label">Margen instalaciones</div><div class="kpi-value">'+(margenInstCot!==null?'<span class="kpi-counter" data-target="'+margenInstCot+'" data-suffix="%">0</span>':'<span class="kpi-skeleton">--%</span>')+'</div><div class="kpi-sub">Utilidad: '+fmtM(utilInstCot)+'</div></div>'
     +'<div class="kpi-card c-blue"><div class="kpi-label">Total servicios</div><div class="kpi-value"><span class="kpi-counter" data-target="'+total+'">0</span></div><div class="kpi-sub">Periodo seleccionado</div></div>'
+    +'</div>'
+    +'<div class="kpi-grid">'
     +'<div class="kpi-card c-teal"><div class="kpi-label">Urbano / Nacional</div><div class="kpi-value"><span class="kpi-counter" data-target="'+urbano+'">0</span> / <span class="kpi-counter" data-target="'+(total-urbano)+'">0</span></div><div class="kpi-sub">'+(total?Math.round(urbano/total*100):0)+'% urbano</div></div>'
     +'<div class="kpi-card c-orange"><div class="kpi-label">Promedio operarios</div><div class="kpi-value"><span class="kpi-counter" data-target="'+avgOps+'" data-decimal="1">0</span></div><div class="kpi-sub">por servicio</div></div>'
-    +'<div class="kpi-card c-green"><div class="kpi-label">Conductores únicos</div><div class="kpi-value"><span class="kpi-counter" data-target="'+numConductores+'">0</span></div><div class="kpi-sub">identificados en el periodo</div></div>'
+    +'<div class="kpi-card c-green"><div class="kpi-label">Conductores unicos</div><div class="kpi-value"><span class="kpi-counter" data-target="'+numConductores+'">0</span></div><div class="kpi-sub">identificados en el periodo</div></div>'
     +'</div>';
 
   // Charts: vehicles + operators + drivers
