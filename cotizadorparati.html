@@ -1180,7 +1180,9 @@ function showSentConfirm(){
 /* ========= BACKEND (sheet + telegram, mismo flujo admin) ========= */
 function saveBackend(lines,total){
   const fecha=new Date().toISOString().substring(0,10);
-  const meta={cliente:S.nombre,telefono:S.whatsapp,fecha:fecha,tipo:'Web cliente',estado:'COTIZADO',
+  const hora=new Date().toTimeString().substring(0,5);
+  const meta={cliente:S.nombre,telefono:S.whatsapp,fecha:fecha,hora:hora,tipo:'Web cliente',estado:'COTIZADO',
+    fuente:'Cotizador Web',origen:S.origen||'',destino:S.destino||'',
     total:total,subtotal:total,descuento:0,
     costo:lines.reduce((a,l)=>a+(l.c||0),0),
     items:lines.map(l=>({cat:l.cat,l:l.l,v:l.v,c:l.c||0,qty:l.qty}))};

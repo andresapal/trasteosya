@@ -154,6 +154,25 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 .map-legend span{display:flex;align-items:center;gap:4px}
 .map-legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
 
+/* Cotizaciones management */
+.cot-mgmt{margin-top:16px}
+.cot-mgmt-title{font-size:14px;font-weight:700;color:var(--ty-dark);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.cot-mgmt-title .cot-count{font-size:11px;font-weight:500;color:var(--ty-muted)}
+.cot-list{display:flex;flex-direction:column;gap:6px}
+.cot-row{display:flex;align-items:center;gap:10px;background:var(--ty-card);border:1px solid var(--ty-border);border-radius:12px;padding:10px 14px;transition:box-shadow .2s}
+.cot-row:hover{box-shadow:0 2px 12px rgba(27,62,140,.1)}
+.cot-info{flex:1;min-width:0}
+.cot-name{font-size:13px;font-weight:700;color:var(--ty-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cot-meta{font-size:11px;color:var(--ty-muted);margin-top:2px}
+.cot-total{font-size:14px;font-weight:800;color:var(--ty-dark);text-align:right;min-width:90px}
+.cot-badge{font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;border:none;cursor:pointer;min-width:80px;text-align:center;transition:all .2s}
+.cot-badge.cotizado{background:rgba(217,119,6,.12);color:#d97706}
+.cot-badge.cotizado:hover{background:rgba(217,119,6,.25)}
+.cot-badge.vendido{background:rgba(21,128,61,.12);color:#15803d}
+.cot-badge.vendido:hover{background:rgba(21,128,61,.25)}
+.cot-badge:disabled{opacity:.5;cursor:wait}
+@media(max-width:600px){.cot-row{flex-wrap:wrap;gap:6px}.cot-total{min-width:auto}}
+
 /* Print */
 @media print{
   .header,.period-bar,.mod-tabs,.swipe-nav-dots,.ty-lock-btn,.ty-op-toolbar,.ty-gate-modal,.ty-op-trigger{display:none!important}
@@ -366,23 +385,24 @@ function getCotCache(){
 async function fetchDriveCots(){
   try{var url=COT_SHEET_URL+'?action=cotizaciones&apikey='+BACKUP_APIKEY;
     var r=await fetch(url,{redirect:'follow'});var data=await r.json();
-    if(data.ok&&data.cotizaciones){
+    if((data.success||data.ok)&&data.cotizaciones){
       driveCots=data.cotizaciones.map(function(c){
         var total=+c['INGRESO TOTAL']||+c['INGRESO']||0;
-        var ingEmp=+c['ING EMPAQUE']||((+c['ING VINIPEL']||0)+(+c['ING BURBUJA']||0)+(+c['ING CAJAS']||0)+(+c['ING CRAFT']||0)+(+c['ING CARTON CORRUGADO']||0));
-        var ingInst=+c['ING INSTALACIONES TOTAL']||0;
-        var ingTrans=+c['ING TRANSPORTE']||0;
+        var ingEmp=+c['ING EMPAQUE']||+c['ING EMP']||((+c['ING VINIPEL']||0)+(+c['ING BURBUJA']||0)+(+c['ING CAJAS']||0)+(+c['ING CRAFT']||0)+(+c['ING CARTON CORRUGADO']||0));
+        var ingInst=+c['ING INSTALACIONES TOTAL']||+c['ING INST']||+c['ING INSTALACIONES']||0;
+        var ingTrans=+c['ING TRANSPORTE']||+c['ING TRANS']||0;
         var ingOtros=(+c['ING BODEGAJE']||0)+(+c['ING CAMINADOS']||0)+(+c['ING ESCALERAS']||0)+(+c['ING PARADAS ADICIONAL']||0)+(+c['INGRESO FACHADA']||0)+ingTrans;
         var costoTot=+c['COSTO TOTAL']||0;
-        var costoEmp=+c['COSTO TOTAL EMPAQUE-']||+c['COSTO TOTAL EMPAQUE']||((+c['COSTO VINIPEL']||0)+(+c['COSTO BURBUJA']||0)+(+c['COSTO CAJAS']||0)+(+c['COSTO CRAFT']||0)+(+c['COSTO CARTON CORRUGADO']||0)+(+c['COSTO CINTAS']||0)+(+c['COSTO TRANSPORTE ENVIO EMPAQUE']||0)+(+c['COSTO OPERARIOS EMPAQUE']||0));
-        var costoInst=+c['COSTO TOTAL INSTALACIONES']||((+c['COSTO INST NEVECON']||0)+(+c['COSTO INST SECADORA']||0)+(+c['COSTO INST TV']||0)+(+c['COSTO INSTALACION REPISAS']||0)+(+c['COSTO INSTALACION CUADROS']||0)+(+c['COSTO INSTALACION MUEBLES/OTROS']||0));
-        var costoTras=+c['COSTO TRASTEO']||0;
+        var costoEmp=+c['COSTO TOTAL EMPAQUE-']||+c['COSTO TOTAL EMPAQUE']||+c['COSTO EMP']||((+c['COSTO VINIPEL']||0)+(+c['COSTO BURBUJA']||0)+(+c['COSTO CAJAS']||0)+(+c['COSTO CRAFT']||0)+(+c['COSTO CARTON CORRUGADO']||0)+(+c['COSTO CINTAS']||0)+(+c['COSTO TRANSPORTE ENVIO EMPAQUE']||0)+(+c['COSTO OPERARIOS EMPAQUE']||0));
+        var costoInst=+c['COSTO TOTAL INSTALACIONES']||+c['COSTO INST']||+c['COSTO INSTALACIONES']||((+c['COSTO INST NEVECON']||0)+(+c['COSTO INST SECADORA']||0)+(+c['COSTO INST TV']||0)+(+c['COSTO INSTALACION REPISAS']||0)+(+c['COSTO INSTALACION CUADROS']||0)+(+c['COSTO INSTALACION MUEBLES/OTROS']||0));
+        var costoTras=+c['COSTO TRASTEO']||+c['COSTO TRANS']||0;
         var costoOtros=costoTras+(+c['COSTO BODEGAJE']||0)+(+c['COSTO CAMINADO']||0)+(+c['COSTO ESCALERAS']||0)+(+c['COSTO PARADA ADICIONAL']||0)+(+c['COSTO FACHADA O VACIO']||0)+(+c['COSTO DESEMPAQUE']||0);
         if(!costoTot)costoTot=costoEmp+costoInst+costoOtros;
-        var fechaRaw=c['FECHA']||'';
+        var fechaRaw=c['FECHA']||c['TIMESTAMP']||'';
         var fecha=(typeof fechaRaw==='string'&&fechaRaw.length>=10)?fechaRaw.substring(0,10):
           (fechaRaw&&fechaRaw.toISOString?fechaRaw.toISOString().substring(0,10):'');
         return{cliente:c['CLIENTE']||'',telefono:String(c['TELEFONO']||''),fecha:fecha,
+          timestamp:c['TIMESTAMP']||'',hora:c['HORA']||'',fuente:c['FUENTE']||'',
           total:total,costo:costoTot,estado:String(c['ESTADO']||'').toUpperCase(),
           ingEmp:ingEmp,ingInst:ingInst,ingOtros:ingOtros,
           ingTrans:ingTrans,
@@ -558,6 +578,21 @@ function animateRankBars(){
   });
 }
 
+async function toggleEstado(btn,timestamp,nuevoEstado){
+  btn.disabled=true;btn.textContent='...';
+  try{
+    var r=await fetch(COT_SHEET_URL,{method:'POST',body:JSON.stringify({
+      type:'update_estado',apikey:BACKUP_APIKEY,
+      meta:{timestamp:timestamp,estado:nuevoEstado,year:new Date().getFullYear().toString()}
+    }),redirect:'follow'});
+    var t=await r.text();
+    try{var j=JSON.parse(t);if(!j.success)console.warn('toggleEstado:',j.error);}catch(_){}
+  }catch(e){console.warn('toggleEstado error:',e);}
+  await fetchDriveCots();
+  renderIngresos();
+  initAnimations();
+}
+
 function drawGauge(canvasId,value,color){
   var canvas=document.getElementById(canvasId);
   if(!canvas)return;
@@ -711,6 +746,30 @@ function renderIngresos(orders,allOrders,prevOrders){
     +'<div class="gauge-box"><div class="gauge-title">Efectividad de cierre</div><div class="gauge-canvas"><canvas id="gauge-efec" width="220" height="130"></canvas><div class="gauge-value">'+efectividad+'%</div></div><div class="gauge-sub">'+efecSub+'</div></div>'
     +'<div class="gauge-box"><div class="gauge-title">Margen bruto</div><div class="gauge-canvas"><canvas id="gauge-mgn" width="220" height="130"></canvas><div class="gauge-value">'+margenGauge+'%</div></div><div class="gauge-sub">'+(margenGauge>=40?'Saludable':margenGauge>=25?'Aceptable':'Bajo - revisar precios')+'</div></div>'
     +'</div>';
+
+  // Cotizaciones management (last 3 weeks)
+  var threeWeeksAgo=new Date();threeWeeksAgo.setDate(threeWeeksAgo.getDate()-21);
+  var threeWeeksStr=threeWeeksAgo.toISOString().substring(0,10);
+  var recentCots=cotCache.filter(function(c){return(c.fecha||'')>=threeWeeksStr;});
+  recentCots.sort(function(a,b){return(b.fecha||'').localeCompare(a.fecha||'');});
+  if(recentCots.length>0){
+    html+='<div class="cot-mgmt"><div class="cot-mgmt-title">Gestión de cotizaciones <span class="cot-count">Últimas 3 semanas · '+recentCots.length+' cotizaciones</span></div><div class="cot-list">';
+    for(var ci=0;ci<recentCots.length;ci++){
+      var cc=recentCots[ci];
+      var isV=_isVendido(cc);
+      var badgeCls=isV?'vendido':'cotizado';
+      var badgeTxt=isV?'VENDIDO':'COTIZADO';
+      var nextEstado=isV?'COTIZADO':'VENDIDO';
+      var ts=cc.timestamp||'';
+      html+='<div class="cot-row">'
+        +'<div class="cot-info"><div class="cot-name">'+(cc.cliente||'Sin nombre')+'</div>'
+        +'<div class="cot-meta">'+(cc.telefono||'')+(cc.fecha?' · '+cc.fecha:'')+(cc.hora?' '+cc.hora:'')+(cc.fuente?' · '+cc.fuente:'')+'</div></div>'
+        +'<div class="cot-total">'+fmtM(cc.total)+'</div>'
+        +'<button class="cot-badge '+badgeCls+'" onclick="toggleEstado(this,\''+ts.replace(/'/g,"\\'")+'\',\''+nextEstado+'\')">'+badgeTxt+'</button>'
+        +'</div>';
+    }
+    html+='</div></div>';
+  }
 
   // Conversion funnel
   var totalCot=cotCache.length+allOrders.length;

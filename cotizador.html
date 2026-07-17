@@ -1169,7 +1169,9 @@ async function _saveCotSheet(financials){
     const cliente=document.getElementById("cliente").value.trim();
     const telefono=document.getElementById("telefono")?document.getElementById("telefono").value.trim():'';
     const fecha=document.getElementById("fecha").value;
-    var meta={cliente:cliente,telefono:telefono,fecha:fecha,tipo:financials.tipo||'',estado:'COTIZADO',
+    const hora=new Date().toTimeString().substring(0,5);
+    var meta={cliente:cliente,telefono:telefono,fecha:fecha,hora:hora,tipo:financials.tipo||'',estado:'COTIZADO',
+      fuente:'Cotizador Admin',
       total:financials.total||0,subtotal:financials.subtotal||0,descuento:financials.descuento||0,
       costo:financials.costo||0,utilidad:financials.utilidad||0,items:financials.items||[]};
     await fetch(COT_SHEET_URL,{method:'POST',body:JSON.stringify({

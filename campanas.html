@@ -316,22 +316,21 @@ body.ty-dark .cal-upcoming__item{background:rgba(30,32,44,.95);border-color:rgba
     <div id="wa-status-panel" style="display:none">
       <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center">
         <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">WhatsApp Status</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Publica esta pieza como Estado para que todos tus contactos la vean</div>
-        <div id="wa-status-piece" style="max-width:280px;margin:0 auto 16px;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12)"></div>
-        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px">
-          <button class="btn btn-primary" onclick="downloadStatusPiece()">Descargar imagen</button>
-          <label class="btn" style="cursor:pointer;text-align:center">Subir tu pieza<input type="file" accept="image/*" style="display:none" onchange="uploadStatusPiece(event)"></label>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Sube tu imagen y comparte directo a WhatsApp</div>
+        <div id="wa-status-piece" style="max-width:300px;margin:0 auto 16px;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);min-height:120px;display:flex;align-items:center;justify-content:center;background:rgba(37,211,102,.04);border:2px dashed rgba(37,211,102,.25);cursor:pointer" onclick="document.getElementById('status-file-input').click()">
+          <div id="wa-status-placeholder" style="padding:30px;color:var(--muted);font-size:13px">Toca para subir tu imagen</div>
         </div>
-        <div style="text-align:left;background:rgba(37,211,102,.06);border:1px solid rgba(37,211,102,.2);border-radius:12px;padding:14px;font-size:12px;color:var(--text);line-height:1.6">
-          <div style="font-weight:700;margin-bottom:6px;color:#128C7E">Como publicar:</div>
-          <div>1. Descarga la imagen o sube tu pieza personalizada</div>
-          <div>2. Abre WhatsApp y ve a la seccion Estado</div>
-          <div>3. Selecciona la imagen desde tu galeria</div>
-          <div>4. Agrega texto corto: trasteosya.online</div>
-          <div style="margin-top:8px;font-weight:600;color:#128C7E">Tips de publicacion:</div>
-          <div>- Publica entre 8am-10am o 6pm-8pm</div>
-          <div>- Repite 2-3 veces por semana</div>
-          <div>- Cambia la pieza cada semana</div>
+        <input type="file" id="status-file-input" accept="image/*" style="display:none" onchange="uploadStatusPiece(event)">
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px">
+          <button class="btn btn-wa" id="btn-share-status" onclick="shareStatus()" disabled style="flex:1;max-width:260px">Compartir en WhatsApp</button>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px">
+          <label class="btn btn-sm" style="cursor:pointer;text-align:center">Cambiar imagen<input type="file" accept="image/*" style="display:none" onchange="uploadStatusPiece(event)"></label>
+          <button class="btn btn-sm" id="btn-download-status" onclick="downloadStatusPiece()" disabled>Descargar</button>
+        </div>
+        <div style="text-align:left;background:rgba(37,211,102,.06);border:1px solid rgba(37,211,102,.2);border-radius:12px;padding:12px;font-size:11px;color:var(--muted);line-height:1.5">
+          <div style="font-weight:600;color:#128C7E;margin-bottom:4px">Tips:</div>
+          <div>Publica entre 8am-10am o 6pm-8pm - Repite 2-3 veces/semana</div>
         </div>
       </div>
     </div>
@@ -715,6 +714,7 @@ function selectTemplate(k){
   if(t.category){var cat=t.category;activeCategory=cat==='estacional'||cat==='permanente'||cat==='negocio'?cat:'todas';renderCatPills();}
   renderTemplates();updatePreview();toggleStatusPanel();
 }
+var _statusFile=null;
 function toggleStatusPanel(){
   var isStatus=activeTpl==='wa_status';
   var sp=document.getElementById('wa-status-panel');
@@ -733,28 +733,33 @@ function toggleStatusPanel(){
 }
 function renderStatusPiece(){
   var el=document.getElementById('wa-status-piece');if(!el)return;
+  var ph=document.getElementById('wa-status-placeholder');
   var customImg=getCustomPiece('wa_status');
   if(customImg){
+    if(ph)ph.style.display='none';
+    el.style.border='none';el.style.background='none';el.style.minHeight='0';
     el.innerHTML='<img src="'+customImg+'" style="width:100%;display:block;border-radius:12px" alt="Status">';
+    document.getElementById('btn-share-status').disabled=false;
+    document.getElementById('btn-download-status').disabled=false;
+    if(!_statusFile)dataUrlToFile(customImg);
   } else {
-    var t=TEMPLATES.wa_status;var iconPaths='';
-    var m=t.icon.match(/<svg[^>]*>([\s\S]*)<\/svg>/);if(m)iconPaths=m[1];
-    el.innerHTML=makePieceSVG({id:'wast',bg1:t.bg1,bg2:t.bg2,title:t.pieceTitle||t.name,sub:t.pieceSub||'',iconPaths:iconPaths});
+    el.innerHTML='<div id="wa-status-placeholder" style="padding:30px;color:var(--muted);font-size:13px">Toca para subir tu imagen</div>';
+    el.style.border='2px dashed rgba(37,211,102,.25)';el.style.background='rgba(37,211,102,.04)';el.style.minHeight='120px';
+    document.getElementById('btn-share-status').disabled=true;
+    document.getElementById('btn-download-status').disabled=true;
   }
 }
-function downloadStatusPiece(){
-  var el=document.querySelector('#wa-status-piece svg')||document.querySelector('#wa-status-piece img');
-  if(!el)return;
-  if(el.tagName==='svg'){
-    var blob=new Blob([el.outerHTML],{type:'image/svg+xml'});
-    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='wa-status-trasteosya.svg';a.click();URL.revokeObjectURL(a.href);
-  } else {
-    var a=document.createElement('a');a.href=el.src;a.download='wa-status-trasteosya.png';a.click();
-  }
+function dataUrlToFile(dataUrl){
+  try{
+    var arr=dataUrl.split(','),mime=arr[0].match(/:(.*?);/)[1];
+    var bstr=atob(arr[1]),n=bstr.length,u8=new Uint8Array(n);
+    while(n--)u8[n]=bstr.charCodeAt(n);
+    _statusFile=new File([u8],'status-trasteosya.jpg',{type:mime});
+  }catch(_){_statusFile=null;}
 }
 function uploadStatusPiece(e){
   var file=e.target.files[0];if(!file)return;
-  if(file.size>2*1024*1024){alert('Imagen muy grande (max 2MB)');return;}
+  if(file.size>5*1024*1024){alert('Imagen muy grande (max 5MB)');return;}
   var reader=new FileReader();
   reader.onload=function(ev){
     var img=new Image();
@@ -764,15 +769,29 @@ function uploadStatusPiece(e){
       if(w>maxW){h=h*(maxW/w);w=maxW;}
       canvas.width=w;canvas.height=h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
-      var dataUrl=canvas.toDataURL('image/jpeg',0.85);
+      var dataUrl=canvas.toDataURL('image/jpeg',0.9);
       saveCustomPiece('wa_status',dataUrl);
+      dataUrlToFile(dataUrl);
       renderStatusPiece();
-      renderBiblioteca();
     };
     img.src=ev.target.result;
   };
   reader.readAsDataURL(file);
   e.target.value='';
+}
+function shareStatus(){
+  if(!_statusFile){alert('Sube una imagen primero');return;}
+  if(navigator.canShare&&navigator.canShare({files:[_statusFile]})){
+    navigator.share({files:[_statusFile],title:'Trasteos Ya',text:'trasteosya.online'}).catch(function(){});
+  } else {
+    downloadStatusPiece();
+    alert('Tu navegador no soporta compartir directo. La imagen se descargo, publicala manualmente como Estado en WhatsApp.');
+  }
+}
+function downloadStatusPiece(){
+  var customImg=getCustomPiece('wa_status');
+  if(!customImg)return;
+  var a=document.createElement('a');a.href=customImg;a.download='status-trasteosya.jpg';a.click();
 }
 
 // ============ CAMPAIGN ACTIONS ============
