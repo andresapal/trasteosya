@@ -585,18 +585,22 @@ function animateRankBars(){
 }
 
 async function toggleEstado(btn,cliente,fecha,nuevoEstado){
-  btn.disabled=true;btn.textContent='...';
+  btn.disabled=true;
+  var oldEstado=btn.textContent;
+  btn.textContent=nuevoEstado;
+  btn.className='cot-badge '+(nuevoEstado==='VENDIDO'?'vendido':'cotizado');
   try{
     var r=await fetch(COT_SHEET_URL,{method:'POST',body:JSON.stringify({
       type:'update_estado',apikey:BACKUP_APIKEY,
       meta:{cliente:cliente,fecha:fecha,estado:nuevoEstado,year:new Date().getFullYear().toString()}
     }),redirect:'follow'});
     var t=await r.text();
-    try{var j=JSON.parse(t);if(!j.ok)console.warn('toggleEstado:',j.error);}catch(_){}
-  }catch(e){console.warn('toggleEstado error:',e);}
-  await fetchDriveCots();
-  renderModule();
-  initAnimations();
+    try{var j=JSON.parse(t);if(!j.ok){btn.textContent=oldEstado;btn.className='cot-badge '+(oldEstado==='VENDIDO'?'vendido':'cotizado');}}catch(_){}
+  }catch(e){btn.textContent=oldEstado;btn.className='cot-badge '+(oldEstado==='VENDIDO'?'vendido':'cotizado');}
+  btn.disabled=false;
+  var nextE=nuevoEstado==='VENDIDO'?'COTIZADO':'VENDIDO';
+  btn.setAttribute('onclick',"toggleEstado(this,'"+cliente.replace(/'/g,"\\'")+"','"+fecha.replace(/'/g,"\\'")+"','"+nextE+"')");
+  fetchDriveCots().catch(function(){});
 }
 
 function drawGauge(canvasId,value,color){
