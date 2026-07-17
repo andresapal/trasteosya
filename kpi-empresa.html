@@ -578,15 +578,15 @@ function animateRankBars(){
   });
 }
 
-async function toggleEstado(btn,timestamp,nuevoEstado){
+async function toggleEstado(btn,cliente,fecha,nuevoEstado){
   btn.disabled=true;btn.textContent='...';
   try{
     var r=await fetch(COT_SHEET_URL,{method:'POST',body:JSON.stringify({
       type:'update_estado',apikey:BACKUP_APIKEY,
-      meta:{timestamp:timestamp,estado:nuevoEstado,year:new Date().getFullYear().toString()}
+      meta:{cliente:cliente,fecha:fecha,estado:nuevoEstado,year:new Date().getFullYear().toString()}
     }),redirect:'follow'});
     var t=await r.text();
-    try{var j=JSON.parse(t);if(!j.success)console.warn('toggleEstado:',j.error);}catch(_){}
+    try{var j=JSON.parse(t);if(!j.ok)console.warn('toggleEstado:',j.error);}catch(_){}
   }catch(e){console.warn('toggleEstado error:',e);}
   await fetchDriveCots();
   renderIngresos();
@@ -760,12 +760,13 @@ function renderIngresos(orders,allOrders,prevOrders){
       var badgeCls=isV?'vendido':'cotizado';
       var badgeTxt=isV?'VENDIDO':'COTIZADO';
       var nextEstado=isV?'COTIZADO':'VENDIDO';
-      var ts=cc.timestamp||'';
+      var cli=(cc.cliente||'').replace(/'/g,"\\'");
+      var fch=(cc.fecha||'').replace(/'/g,"\\'");
       html+='<div class="cot-row">'
         +'<div class="cot-info"><div class="cot-name">'+(cc.cliente||'Sin nombre')+'</div>'
         +'<div class="cot-meta">'+(cc.telefono||'')+(cc.fecha?' · '+cc.fecha:'')+(cc.hora?' '+cc.hora:'')+(cc.fuente?' · '+cc.fuente:'')+'</div></div>'
         +'<div class="cot-total">'+fmtM(cc.total)+'</div>'
-        +'<button class="cot-badge '+badgeCls+'" onclick="toggleEstado(this,\''+ts.replace(/'/g,"\\'")+'\',\''+nextEstado+'\')">'+badgeTxt+'</button>'
+        +'<button class="cot-badge '+badgeCls+'" onclick="toggleEstado(this,\''+cli+'\',\''+fch+'\',\''+nextEstado+'\')">'+badgeTxt+'</button>'
         +'</div>';
     }
     html+='</div></div>';
