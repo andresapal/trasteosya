@@ -434,6 +434,7 @@ body.ty-dark .cal-upcoming__item{background:rgba(30,32,44,.95);border-color:rgba
 
 <script>
 // ============ DATA ============
+var CONTACTS_URL='https://script.google.com/macros/s/AKfycbz4gG8fs_mAq9z9dcIhhqB9GUOFehc4_jW0Wd77RxPMIEmmshcXHlAVb39cML6hdGKM/exec';
 var CLIENTS=[];
 var selected=new Set();
 var filtered=[];
@@ -636,16 +637,21 @@ function mergeAllContacts(sources){
   merged.sort(function(a,b){return a.n.localeCompare(b.n);});
   return merged;
 }
-function initClients(fileClients,allContacts){
-  CLIENTS=mergeAllContacts([allContacts||[],fileClients||[],getLocalContacts()]);
+function initClients(fileClients,allContacts,googleContacts){
+  CLIENTS=mergeAllContacts([googleContacts||[],allContacts||[],fileClients||[],getLocalContacts()]);
   filtered=CLIENTS.slice();
   renderStats();renderClients();renderTemplates();updatePreview();renderHistory();renderCatPills();renderEstadoPills();
 }
 function loadClients(){
-  var fileClients=null,allContacts=null,done=0;
-  function check(){done++;if(done>=2)initClients(fileClients,allContacts);}
+  var fileClients=null,allContacts=null,googleContacts=null,done=0,need=CONTACTS_URL?3:2;
+  function check(){done++;if(done>=need)initClients(fileClients,allContacts,googleContacts);}
   try{var xhr=new XMLHttpRequest();xhr.open('GET','/output/clientes.json',true);xhr.onload=function(){if(xhr.status===200)try{fileClients=JSON.parse(xhr.responseText);}catch(_){}check();};xhr.onerror=function(){check();};xhr.send();}catch(e){check();}
   try{var xhr2=new XMLHttpRequest();xhr2.open('GET','/output/contactos.json',true);xhr2.onload=function(){if(xhr2.status===200)try{allContacts=JSON.parse(xhr2.responseText);}catch(_){}check();};xhr2.onerror=function(){check();};xhr2.send();}catch(e){check();}
+  if(CONTACTS_URL){
+    fetch(CONTACTS_URL,{redirect:'follow'}).then(function(r){return r.json();}).then(function(d){
+      if(d.ok&&d.contacts)googleContacts=d.contacts.map(function(c){return{n:c.n,p:c.p.replace(/[^\d]/g,''),c:'',src:'google'};});
+    }).catch(function(){}).finally(function(){check();});
+  }
 }
 
 // ============ RENDER ============
