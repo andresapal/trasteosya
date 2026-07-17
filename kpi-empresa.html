@@ -156,8 +156,14 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 
 /* Cotizaciones management */
 .cot-mgmt{margin-top:16px}
-.cot-mgmt-title{font-size:14px;font-weight:700;color:var(--ty-dark);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.cot-mgmt-title{font-size:14px;font-weight:700;color:var(--ty-dark);margin-bottom:0;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;background:var(--ty-card);border:1px solid var(--ty-border);border-radius:12px;user-select:none;transition:border-radius .2s}
+.cot-mgmt-title:hover{background:var(--ty-hover,rgba(27,62,140,.04))}
+.cot-mgmt-title .cot-arrow{display:inline-block;transition:transform .25s;margin-right:8px;font-size:12px;color:var(--ty-muted)}
+.cot-mgmt-title.open .cot-arrow{transform:rotate(90deg)}
+.cot-mgmt-title.open{border-radius:12px 12px 0 0;margin-bottom:0;border-bottom:none}
 .cot-mgmt-title .cot-count{font-size:11px;font-weight:500;color:var(--ty-muted)}
+.cot-list-wrap{max-height:0;overflow:hidden;transition:max-height .3s ease;border:1px solid var(--ty-border);border-top:none;border-radius:0 0 12px 12px;padding:0 10px}
+.cot-list-wrap.open{max-height:2000px;padding:10px}
 .cot-list{display:flex;flex-direction:column;gap:6px}
 .cot-row{display:flex;align-items:center;gap:10px;background:var(--ty-card);border:1px solid var(--ty-border);border-radius:12px;padding:10px 14px;transition:box-shadow .2s}
 .cot-row:hover{box-shadow:0 2px 12px rgba(27,62,140,.1)}
@@ -650,7 +656,9 @@ function renderIngresos(orders,allOrders,prevOrders){
   var totalCosto=sumBy(orders,function(o){return o.costo;});
 
   // Cotizaciones: separar VENDIDO (ingreso real) vs COTIZADO (pipeline)
-  var cotCache=getAllCots();
+  var cotCacheAll=getAllCots();
+  var pRange=getPeriodRange(currentPeriod);
+  var cotCache=cotCacheAll.filter(function(c){return(c.fecha||'')>=pRange.from&&(c.fecha||'')<=pRange.to;});
   function _isVendido(c){
     var e=String(c.estado||'').toUpperCase().trim();
     return e.indexOf('VEND')>=0||e==='V'||e==='SOLD'||e==='OK'||e.indexOf('CERR')>=0||e.indexOf('GANADO')>=0||e.indexOf('GANADA')>=0||e.indexOf('FACTUR')>=0||e.indexOf('EJECUT')>=0||e.indexOf('CONFIRM')>=0;
@@ -750,10 +758,10 @@ function renderIngresos(orders,allOrders,prevOrders){
   // Cotizaciones management (last 3 weeks)
   var threeWeeksAgo=new Date();threeWeeksAgo.setDate(threeWeeksAgo.getDate()-21);
   var threeWeeksStr=threeWeeksAgo.toISOString().substring(0,10);
-  var recentCots=cotCache.filter(function(c){return(c.fecha||'')>=threeWeeksStr;});
+  var recentCots=cotCacheAll.filter(function(c){return(c.fecha||'')>=threeWeeksStr;});
   recentCots.sort(function(a,b){return(b.fecha||'').localeCompare(a.fecha||'');});
   if(recentCots.length>0){
-    html+='<div class="cot-mgmt"><div class="cot-mgmt-title">Gestión de cotizaciones <span class="cot-count">Últimas 3 semanas · '+recentCots.length+' cotizaciones</span></div><div class="cot-list">';
+    html+='<div class="cot-mgmt"><div class="cot-mgmt-title" onclick="this.classList.toggle(\'open\');this.nextElementSibling.classList.toggle(\'open\')"><span class="cot-arrow">&#9654;</span>Gestión de cotizaciones <span class="cot-count">Últimas 3 semanas · '+recentCots.length+' cotizaciones</span></div><div class="cot-list-wrap"><div class="cot-list">';
     for(var ci=0;ci<recentCots.length;ci++){
       var cc=recentCots[ci];
       var isV=_isVendido(cc);
@@ -769,7 +777,7 @@ function renderIngresos(orders,allOrders,prevOrders){
         +'<button class="cot-badge '+badgeCls+'" onclick="toggleEstado(this,\''+cli+'\',\''+fch+'\',\''+nextEstado+'\')">'+badgeTxt+'</button>'
         +'</div>';
     }
-    html+='</div></div>';
+    html+='</div></div></div>';
   }
 
   // Conversion funnel
@@ -938,7 +946,8 @@ function renderEmpaque(orders,allOrders){
   var total=orders.length;
   var conEmpaque=orders.filter(function(o){return o.tieneEmpaque;}).length;
 
-  var cotCache=getAllCots();
+  var cotCacheAll=getAllCots();var pRange=getPeriodRange(currentPeriod);
+  var cotCache=cotCacheAll.filter(function(c){return(c.fecha||'')>=pRange.from&&(c.fecha||'')<=pRange.to;});
   var ingEmpCot=sumBy(cotCache,function(c){return c.ingEmp||0;});
   var costoEmpCot=sumBy(cotCache,function(c){return c.costoEmp||0;});
   var utilEmpCot=ingEmpCot-costoEmpCot;
@@ -1112,7 +1121,8 @@ function renderOperacion(orders,allOrders){
   orders.forEach(function(o){if(o.conductor)conductores[o.conductor.toUpperCase()]=(conductores[o.conductor.toUpperCase()]||0)+1;});
   var numConductores=Object.keys(conductores).length;
 
-  var cotCache=getAllCots();
+  var cotCacheAll=getAllCots();var pRange=getPeriodRange(currentPeriod);
+  var cotCache=cotCacheAll.filter(function(c){return(c.fecha||'')>=pRange.from&&(c.fecha||'')<=pRange.to;});
   var ingInstCot=sumBy(cotCache,function(c){return c.ingInst||0;});
   var costoInstCot=sumBy(cotCache,function(c){return c.costoInst||0;});
   var utilInstCot=ingInstCot-costoInstCot;
@@ -1252,7 +1262,8 @@ function renderOperacion(orders,allOrders){
   });
 
   // Cotizador cache: instalaciones, adicionales, bodegaje, desempaque
-  var cotCache=getAllCots();
+  var cotCacheAll=getAllCots();var pRange=getPeriodRange(currentPeriod);
+  var cotCache=cotCacheAll.filter(function(c){return(c.fecha||'')>=pRange.from&&(c.fecha||'')<=pRange.to;});
   var catSections=[
     {cat:'instalaciones',elId:'rank-instalaciones'},
     {cat:'adicionales',elId:'rank-adicionales'},
