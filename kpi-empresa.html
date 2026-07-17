@@ -1367,9 +1367,37 @@ function loadLeaflet(cb){
 
 function extractLocalidad(addr){
   if(!addr)return null;
-  var up=addr.toUpperCase();
+  var up=addr.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
   for(var i=0;i<LOCALIDADES_BOG.length;i++){
-    if(up.indexOf(LOCALIDADES_BOG[i])>=0)return LOCALIDADES_BOG[i];
+    var loc=LOCALIDADES_BOG[i].normalize('NFD').replace(/[̀-ͯ]/g,'');
+    if(up.indexOf(loc)>=0)return LOCALIDADES_BOG[i];
+  }
+  var cm=up.match(/(?:CALLE|CLL|CL)\s*(\d+)/i);
+  var crm=up.match(/(?:CARRERA|CRA|CR|KRA|KR)\s*(\d+)/i);
+  var calle=cm?parseInt(cm[1],10):null;
+  var carrera=crm?parseInt(crm[1],10):null;
+  if(up.match(/SUR/)){if(calle)calle=-calle;}
+  if(calle!==null){
+    if(calle>=170)return carrera&&carrera>=50?'SUBA':'USAQUEN';
+    if(calle>=127)return carrera&&carrera>=50?'SUBA':'USAQUEN';
+    if(calle>=100)return carrera&&carrera>=50?'SUBA':(carrera&&carrera<15?'USAQUEN':'CHAPINERO');
+    if(calle>=72)return carrera&&carrera>=70?'ENGATIVA':(carrera&&carrera>=30?'BARRIOS UNIDOS':'CHAPINERO');
+    if(calle>=53)return carrera&&carrera>=60?'ENGATIVA':(carrera&&carrera>=30?'BARRIOS UNIDOS':'TEUSAQUILLO');
+    if(calle>=26)return carrera&&carrera>=60?'FONTIBON':(carrera&&carrera>=35?'PUENTE ARANDA':(carrera&&carrera>=15?'TEUSAQUILLO':'SANTA FE'));
+    if(calle>=1)return carrera&&carrera>=30?'PUENTE ARANDA':(carrera&&carrera>=15?'LOS MARTIRES':'CANDELARIA');
+    if(calle<0)return carrera&&carrera>=60?'BOSA':(carrera&&carrera>=30?'TUNJUELITO':'SAN CRISTOBAL');
+  }
+  if(carrera!==null&&!calle){
+    if(carrera>=100)return 'ENGATIVA';
+    if(carrera>=70)return 'ENGATIVA';
+    if(carrera>=50)return 'SUBA';
+  }
+  var dm=up.match(/(?:DIAGONAL|DG|DIAG)\s*(\d+)/i)||up.match(/(?:TRANSVERSAL|TV|TR)\s*(\d+)/i);
+  if(dm){
+    var dn=parseInt(dm[1],10);
+    if(dn>=100)return 'SUBA';
+    if(dn>=50)return 'CHAPINERO';
+    if(dn>=20)return 'SANTA FE';
   }
   return null;
 }
@@ -1432,11 +1460,11 @@ function renderGeo(orders){
   var locOrig={},locDest={};
   orders.forEach(function(o){
     if(o.ciudadOrigen&&o.ciudadOrigen.toUpperCase().indexOf('BOGOT')>=0){
-      var loc=extractLocalidad(o.direccionOrigen);
+      var loc=extractLocalidad(o.dirOrigen);
       if(loc)locOrig[loc]=(locOrig[loc]||0)+1;
     }
     if(o.ciudadDestino&&o.ciudadDestino.toUpperCase().indexOf('BOGOT')>=0){
-      var loc2=extractLocalidad(o.direccionDestino);
+      var loc2=extractLocalidad(o.dirDestino);
       if(loc2)locDest[loc2]=(locDest[loc2]||0)+1;
     }
   });
@@ -1566,6 +1594,8 @@ function renderMapBogota(orders,locOrig,locDest){
     'CENTRO':[4.6017,-74.0758],'PALERMO':[4.6450,-74.0647],
     'ZONA G':[4.6611,-74.0550],'ZONA T':[4.6664,-74.0531],'ZONA ROSA':[4.6678,-74.0528],
     'CALLE 100':[4.6856,-74.0444],'CALLE 80':[4.6722,-74.0714],'CALLE 72':[4.6611,-74.0653],
+    'CALLE 53':[4.6339,-74.0697],'CALLE 26':[4.6150,-74.0733],
+    'SANTA ANA':[4.6950,-74.0390],'BATÁN':[4.6692,-74.0558],'BATAN':[4.6692,-74.0558],
     'AMÉRICAS':[4.6267,-74.1433],'AMERICAS':[4.6267,-74.1433],'TINTAL':[4.6322,-74.1728],
     'HAYUELOS':[4.6656,-74.1361],'SPRING':[4.7008,-74.0533],'PONTEVEDRA':[4.6781,-74.0611],
     'EL REFUGIO':[4.6800,-74.0414],'LA CABRERA':[4.6636,-74.0481],

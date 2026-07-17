@@ -17,6 +17,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;background:#f0f2
 .tab{padding:12px 20px;border:none;background:none;font-size:13px;font-weight:500;color:#666;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;transition:all .2s}
 .tab:hover{color:#1B3E8C}
 .tab.active{color:#1B3E8C;border-bottom-color:#1B3E8C;font-weight:600}
+.tab-bar-bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid #e2e5ea;padding:0 24px;display:flex;justify-content:center;z-index:199;box-shadow:0 -2px 12px rgba(0,0,0,.06)}
 .form-layout{max-width:960px;margin:0 auto;padding:20px 16px 60px;display:flex;flex-direction:column;gap:12px}
 .card{background:#fff;border-radius:12px;border:1px solid #e2e5ea;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
 .card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;cursor:pointer;user-select:none;border-bottom:1px solid #f0f0f0;transition:background .15s}
@@ -64,7 +65,7 @@ input[readonly]{background:#f8f9fa;color:#6b7280;cursor:default;border-color:#e9
 .td-sub{background:#f0f2f7;font-weight:700;white-space:nowrap}
 .td-emp{background:#4b5563;color:#fff;font-weight:700}
 @media print{
-  .main-header,.tab-bar,.preview-toolbar,.ty-lock-btn,.ty-op-toolbar,.ty-gate-modal,.os-route-map,.os-bottom-panel,.swipe-nav-dots,.ty-op-trigger{display:none!important}
+  .main-header,.tab-bar,.tab-bar-bottom,.preview-toolbar,.ty-lock-btn,.ty-op-toolbar,.ty-gate-modal,.os-route-map,.os-bottom-panel,.swipe-nav-dots,.ty-op-trigger{display:none!important}
   #view-form{display:none!important}
   .preview-outer{padding:0;max-width:100%}
   .pv{border:none;border-radius:0;padding:0;background:transparent}
@@ -343,6 +344,11 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
 
 </div>
 
+<div class="tab-bar-bottom" id="tab-bar-bottom">
+  <button class="tab active" id="tab-form-b" onclick="setVista('form')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Formulario</button>
+  <button class="tab" id="tab-prev-b" onclick="setVista('preview')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Vista previa / PDF</button>
+</div>
+
 <div id="view-preview" style="display:none">
   <div class="preview-outer">
     <div class="preview-toolbar">
@@ -576,6 +582,9 @@ const setVista=v=>{
   document.getElementById("view-preview").style.display=v==="preview"?"block":"none";
   document.getElementById("tab-form").className="tab"+(v==="form"?" active":"");
   document.getElementById("tab-prev").className="tab"+(v==="preview"?" active":"");
+  document.getElementById("tab-form-b").className="tab"+(v==="form"?" active":"");
+  document.getElementById("tab-prev-b").className="tab"+(v==="preview"?" active":"");
+  document.getElementById("tab-bar-bottom").style.display=v==="form"?"flex":"none";
   if(v==="preview"){renderPreview();window.scrollTo(0,0);}
 };
 
