@@ -595,7 +595,7 @@ async function toggleEstado(btn,cliente,fecha,nuevoEstado){
     try{var j=JSON.parse(t);if(!j.ok)console.warn('toggleEstado:',j.error);}catch(_){}
   }catch(e){console.warn('toggleEstado error:',e);}
   await fetchDriveCots();
-  renderIngresos();
+  renderModule();
   initAnimations();
 }
 
