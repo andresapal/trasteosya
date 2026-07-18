@@ -52,6 +52,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 .kpi-card.c-orange::before{background:linear-gradient(180deg,#d97706,#fbbf24)}
 .kpi-card.c-red::before{background:linear-gradient(180deg,#E30613,#f87171)}
 .kpi-card.c-teal::before{background:linear-gradient(180deg,#0d9488,#5eead4)}
+.kpi-card.c-purple::before{background:linear-gradient(180deg,#7c3aed,#a78bfa)}
 .kpi-card .kpi-label{font-size:10px;font-weight:700;color:var(--ty-muted);text-transform:uppercase;letter-spacing:.5px}
 .kpi-card .kpi-value{font-size:30px;font-weight:800;margin-top:6px;line-height:1.1;background:linear-gradient(135deg,var(--ty-dark),#374151);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .kpi-card .kpi-sub{font-size:11px;color:var(--ty-muted);margin-top:6px}
@@ -580,7 +581,8 @@ function renderDashboard(orders,allOrders){
   var cardsHTML=''
     +'<div class="kpi-card c-blue"><div class="kpi-label">Total servicios</div><div class="kpi-value"><span class="kpi-counter" data-target="'+total+'">0</span></div><div class="kpi-sub">'+pending.length+' pendientes · '+done.length+' ejecutados</div></div>'
     +'<div class="kpi-card c-green"><div class="kpi-label">Promedio mensual</div><div class="kpi-value"><span class="kpi-counter" data-target="'+avgPerMonth+'" data-decimal="1">0</span></div><div class="kpi-sub">en '+monthKeys.length+' meses con actividad</div></div>'
-    +'<div class="kpi-card c-orange"><div class="kpi-label">Valor total</div><div class="kpi-value"><span class="kpi-counter" data-target="'+Math.round(totalValor)+'" data-prefix="$ " data-format="money">0</span></div><div class="kpi-sub">Utilidad: '+fmtM(totalUtil)+(totalValor?' ('+Math.round(totalUtil/totalValor*100)+'%)':'')+'</div></div>'
+    +'<div class="kpi-card c-orange"><div class="kpi-label">Valor total</div><div class="kpi-value"><span class="kpi-counter" data-target="'+Math.round(totalValor)+'" data-prefix="$ " data-format="money">0</span></div><div class="kpi-sub">Costo: '+fmtM(totalCosto)+'</div></div>'
+    +'<div class="kpi-card c-purple"><div class="kpi-label">Utilidad</div><div class="kpi-value"><span class="kpi-counter" data-target="'+Math.round(totalUtil)+'" data-prefix="$ " data-format="money">0</span></div><div class="kpi-sub">Margen: '+(totalValor?Math.round(totalUtil/totalValor*100):0)+'%</div></div>'
     +'<div class="kpi-card c-teal"><div class="kpi-label">Con empaque</div><div class="kpi-value"><span class="kpi-counter" data-target="'+conEmpaque+'">0</span></div><div class="kpi-sub">'+(total?Math.round(conEmpaque/total*100):0)+'% de los servicios</div></div>'
     +'<div class="kpi-card c-red"><div class="kpi-label">Promedio operarios</div><div class="kpi-value"><span class="kpi-counter" data-target="'+avgOps+'" data-decimal="1">0</span></div><div class="kpi-sub">por servicio</div></div>';
   document.getElementById('kpi-cards').innerHTML=cardsHTML;
