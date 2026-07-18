@@ -447,7 +447,8 @@ var CATEGORIES=[
   {key:'todas',label:'Todas'},
   {key:'estacional',label:'Estacionales'},
   {key:'permanente',label:'Permanentes'},
-  {key:'negocio',label:'Linea de negocio'}
+  {key:'negocio',label:'Linea de negocio'},
+  {key:'redes',label:'Redes Sociales'}
 ];
 var ESTADOS=['planeacion','activa','pausada','finalizada'];
 
@@ -495,9 +496,9 @@ var TEMPLATES={
   dia_padre:{icon:ICONS.gift,name:'Dia del Padre',desc:'Homenaje junio',category:'estacional',season:'Junio',
     msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nFeliz Dia del Padre. A todos los papas que han confiado en nosotros, gracias por su preferencia.\n\nEste mes tienen *10% de descuento* en cualquier servicio. Solo menciona esta promocion al cotizar.\n\ntrasteosya.online',
     bg1:'#1B3E8C',bg2:'#3b82f6',pieceTitle:'Feliz Dia del Padre',pieceSub:'10% de descuento este mes'},
-  vacaciones:{icon:ICONS.sun,name:'Vacaciones mitad de ano',desc:'Temporada alta de mudanzas',category:'estacional',season:'Jun - Jul',
+  vacaciones:{icon:ICONS.sun,name:'Vacaciones mitad de año',desc:'Temporada alta de mudanzas',category:'estacional',season:'Jun - Jul',
     msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nLlego la temporada de vacaciones, el mejor momento para mudarse con tranquilidad.\n\nReserva tu fecha con anticipacion y obtén *tarifa preferencial*. Agenda llena = precios mas altos.\n\nCotiza ahora: trasteosya.online',
-    bg1:'#0891b2',bg2:'#06b6d4',pieceTitle:'Vacaciones de Mitad de Ano',pieceSub:'Reserva ahora, mejor precio'},
+    bg1:'#0891b2',bg2:'#06b6d4',pieceTitle:'Vacaciones de Mitad de Año',pieceSub:'Reserva ahora, mejor precio'},
   prima_junio:{icon:ICONS.dollar,name:'Prima de junio',desc:'Aprovecha la prima para mudarte',category:'estacional',season:'Junio',
     msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nYa llego la prima. Si estas pensando en mudarte, este es el mejor momento para invertir en tu nuevo hogar.\n\nTenemos *planes de pago* y opciones para que tu prima rinda mas.\n\nCotiza gratis: trasteosya.online',
     bg1:'#15803d',bg2:'#22c55e',pieceTitle:'Aprovecha tu Prima',pieceSub:'Planes de pago disponibles'},
@@ -514,11 +515,11 @@ var TEMPLATES={
     msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nLlego la prima de diciembre. Si has estado pensando en mudarte, *este es tu momento*.\n\nReserva en diciembre y te congelamos el precio hasta enero.\n\nCotiza: trasteosya.online',
     bg1:'#15803d',bg2:'#059669',pieceTitle:'Prima de Diciembre',pieceSub:'Congela tu precio hasta enero'},
   navidad:{icon:ICONS.tree,name:'Navidad',desc:'Felicitacion y recordacion de marca',category:'estacional',season:'Diciembre',
-    msg:'Hola {nombre}, de parte de todo el equipo de *Trasteos Ya* te deseamos una *Feliz Navidad*.\n\nGracias por confiar en nosotros este ano. Que esta epoca traiga alegria y nuevos comienzos para ti y tu familia.\n\nSi necesitas mudarte para empezar el ano nuevo en tu nuevo hogar, estamos listos.\n\ntrasteosya.online',
+    msg:'Hola {nombre}, de parte de todo el equipo de *Trasteos Ya* te deseamos una *Feliz Navidad*.\n\nGracias por confiar en nosotros este año. Que esta epoca traiga alegria y nuevos comienzos para ti y tu familia.\n\nSi necesitas mudarte para empezar el año nuevo en tu nuevo hogar, estamos listos.\n\ntrasteosya.online',
     bg1:'#E30613',bg2:'#15803d',pieceTitle:'Feliz Navidad',pieceSub:'De parte de Trasteos Ya'},
-  ano_nuevo:{icon:ICONS.sparkle,name:'Ano Nuevo',desc:'Bienvenida al nuevo ano',category:'estacional',season:'Dic - Ene',
-    msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\n*Feliz Ano Nuevo*. Que este sea un ano lleno de exitos y nuevos comienzos.\n\nSi entre tus planes esta mudarte, empezar un negocio o reorganizar tu espacio, cuenta con nosotros.\n\n*Promocion enero*: 10% OFF en todos los servicios.\n\ntrasteosya.online',
-    bg1:'#1B3E8C',bg2:'#7c3aed',pieceTitle:'Feliz Ano Nuevo',pieceSub:'10% OFF en enero'},
+  ano_nuevo:{icon:ICONS.sparkle,name:'Año Nuevo',desc:'Bienvenida al nuevo año',category:'estacional',season:'Dic - Ene',
+    msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\n*Feliz Año Nuevo*. Que este sea un año lleno de exitos y nuevos comienzos.\n\nSi entre tus planes esta mudarte, empezar un negocio o reorganizar tu espacio, cuenta con nosotros.\n\n*Promocion enero*: 10% OFF en todos los servicios.\n\ntrasteosya.online',
+    bg1:'#1B3E8C',bg2:'#7c3aed',pieceTitle:'Feliz Año Nuevo',pieceSub:'10% OFF en enero'},
   referidos:{icon:ICONS.share,name:'Referidos',desc:'Programa de referidos con incentivo',category:'permanente',
     msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nGracias por haber confiado en nosotros para tu mudanza. Esperamos que todo haya quedado perfecto.\n\nQueremos invitarte a nuestro *programa de referidos*:\n\nPor cada persona que nos recomiendes y contrate con nosotros, recibes una *comision de $20.000* a partir de servicio cerrado y/o vendido.\n\nSolo dile que te mencione al cotizar.\n\ntrasteosya.online\n\nGracias por ser parte de la familia Trasteos Ya.'},
   reactivacion:{icon:ICONS.users,name:'Reactivacion',desc:'Recuperar clientes inactivos',category:'permanente',
@@ -553,7 +554,61 @@ var TEMPLATES={
   consultoria:{icon:ICONS.briefcase,name:'Consultoria',desc:'Consultoria y educacion',category:'negocio',
     msg:'Hola {nombre}, soy Andres.\n\nOfrezco *consultoria empresarial* y capacitacion en logistica, emprendimiento y transformacion digital.\n\nSi tu empresa necesita optimizar procesos o capacitar a su equipo, con gusto agendamos una reunion.\n\nQuedo atento.'},
   logistica:{icon:ICONS.truck,name:'Servicios logisticos',desc:'Logistica y transporte',category:'negocio',
-    msg:'Hola {nombre}, soy Andres.\n\nOfrecemos *servicios logisticos integrales*: transporte, bodegaje, distribucion y entregas en todo Colombia.\n\nSi tu empresa necesita un aliado logistico confiable, cotiza sin compromiso.\n\nQuedo atento.'}
+    msg:'Hola {nombre}, soy Andres.\n\nOfrecemos *servicios logisticos integrales*: transporte, bodegaje, distribucion y entregas en todo Colombia.\n\nSi tu empresa necesita un aliado logistico confiable, cotiza sin compromiso.\n\nQuedo atento.'},
+
+  // ======= REDES SOCIALES — Posts listos para publicar =======
+
+  // --- TIPS DE MUDANZA ---
+  rs_checklist:{icon:ICONS.star,name:'Checklist de mudanza',desc:'Lista de verificacion para el dia D',category:'redes',
+    msg:'CHECKLIST PARA EL DIA DE TU MUDANZA\n\nAntes:\n- Confirma hora y direccion con la empresa\n- Empaca una maleta con lo esencial del primer dia\n- Desconecta electrodomesticos desde la noche anterior\n- Marca cada caja con la habitacion de destino\n\nDurante:\n- Revisa que nada quede en closets y cajones\n- Supervisa la carga del camion\n- Toma fotos del estado de muebles grandes\n\nDespues:\n- Verifica que todo llego completo\n- Conecta nevera y lavadora primero\n- Desarma cajas por habitacion\n\nGuarda este post para cuando lo necesites.\n\nCotiza gratis: trasteosya.online\n\n#Mudanza #Tips #TrasteosYa #Bogota #Colombia'},
+  rs_fragiles:{icon:ICONS.gift,name:'Embalar fragiles',desc:'Como proteger objetos delicados',category:'redes',
+    msg:'COMO EMBALAR OBJETOS FRAGILES SIN QUE SE ROMPAN\n\n1. Usa papel craft o periodico para envolver cada pieza por separado\n2. Coloca una capa de burbuja en el fondo de la caja\n3. Rellena los espacios vacios con papel arrugado\n4. Marca la caja como FRAGIL en todos los lados\n5. No apiles mas de 3 cajas de fragiles\n\nConsejo pro: los platos van de pie (vertical), nunca acostados.\n\nEn Trasteos Ya empacamos tus cosas con materiales profesionales. Cotiza gratis en trasteosya.online\n\n#EmpaqueSeguro #Mudanza #Tips #TrasteosYa'},
+  rs_errores:{icon:ICONS.cross,name:'5 errores al mudarse',desc:'Lo que NO debes hacer',category:'redes',
+    msg:'5 ERRORES QUE COMETES AL MUDARTE\n(y como evitarlos)\n\n1. No empacar con tiempo: empieza minimo 1 semana antes\n2. No marcar las cajas: despues no encuentras nada\n3. Cargar todo tu solo: contrata profesionales y evita lesiones\n4. No medir muebles grandes: asegurate de que pasan por puertas y escaleras\n5. No contratar seguro: un accidente puede salir muy caro\n\nMudarse no tiene que ser estresante. Con planificacion y el equipo correcto, es facil.\n\nCotiza tu mudanza profesional: trasteosya.online\n\n#Mudanza #Errores #Consejos #TrasteosYa #Bogota'},
+  rs_organizar:{icon:ICONS.search,name:'Organizar cajas',desc:'Sistema por colores y habitacion',category:'redes',
+    msg:'SISTEMA PARA ORGANIZAR TUS CAJAS COMO UN PROFESIONAL\n\nAsigna un color por habitacion:\n- Rojo: Cocina\n- Azul: Habitacion principal\n- Verde: Habitacion hijos\n- Amarillo: Bano\n- Naranja: Sala/Comedor\n\nEn cada caja escribe:\n- Habitacion\n- Contenido general\n- Si es fragil\n- Numero de caja (1 de 5, 2 de 5...)\n\nCuando llegues al nuevo hogar, cada caja va directo a su lugar. Cero confusion.\n\nNosotros te ayudamos con todo el proceso. Cotiza gratis: trasteosya.online\n\n#Organizacion #Mudanza #Tips #TrasteosYa'},
+  rs_primer_dia:{icon:ICONS.sun,name:'Primer dia en casa nueva',desc:'Que hacer al llegar',category:'redes',
+    msg:'LLEGASTE A TU NUEVO HOGAR. Y AHORA QUE?\n\nPrimer dia:\n- Revisa que agua, luz y gas funcionan\n- Limpia antes de desempacar\n- Arma las camas primero (vas a necesitar dormir)\n- Conecta nevera y lavadora\n\nPrimera semana:\n- Desempaca por habitacion, no todo al tiempo\n- Conoce a tus vecinos\n- Ubica la drogueria, supermercado y hospital mas cercanos\n- Cambia tu direccion en bancos y servicios\n\nMudarse es un nuevo comienzo. Disfruta el proceso.\n\ntrasteosya.online\n\n#CasaNueva #Mudanza #NuevoComienzo #TrasteosYa'},
+
+  // --- DETRAS DE CAMARAS ---
+  rs_equipo:{icon:ICONS.users,name:'Nuestro equipo',desc:'Conoce al equipo Trasteos Ya',category:'redes',
+    msg:'DETRAS DE CADA MUDANZA HAY UN EQUIPO QUE DA TODO\n\nNuestros operarios cargan, protegen y transportan tus cosas como si fueran propias.\n\nCapacitados en:\n- Empaque profesional\n- Manejo de muebles pesados\n- Desarme y armado de closets, camas y escritorios\n- Proteccion de electrodomesticos\n\nNo es solo cargar cajas. Es experiencia, cuidado y compromiso.\n\nGracias a nuestro equipo por hacer posible cada mudanza.\n\ntrasteosya.online\n\n#Equipo #TrasteosYa #Mudanzas #Bogota #Colombia'},
+  rs_preparacion:{icon:ICONS.truck,name:'Asi preparamos tu mudanza',desc:'El proceso profesional paso a paso',category:'redes',
+    msg:'ASI PREPARAMOS TU MUDANZA PASO A PASO\n\n1. Cotizas gratis en trasteosya.online\n2. Confirmamos fecha, vehiculo y operarios\n3. Llegamos puntual con materiales de empaque\n4. Protegemos muebles, electrodomesticos y fragiles\n5. Cargamos con tecnica profesional\n6. Transportamos por la ruta mas segura\n7. Descargamos y ubicamos todo en tu nuevo hogar\n8. Recoges los materiales sobrantes\n\nAsí de simple. Sin estres.\n\ntrasteosya.online\n\n#Mudanza #Proceso #Profesional #TrasteosYa'},
+  rs_dia_trabajo:{icon:ICONS.coffee,name:'Un dia en Trasteos Ya',desc:'Contenido behind the scenes',category:'redes',
+    msg:'UN DIA EN TRASTEOS YA\n\n6:00 AM — El equipo se alista y revisa la ruta del dia\n7:00 AM — Cargamos materiales de empaque al camion\n8:00 AM — Llegamos al punto de recogida\n9:00 AM — Empaque y proteccion de todo\n11:00 AM — Camion cargado, en ruta\n12:30 PM — Llegamos al destino\n1:00 PM — Descargamos y ubicamos\n2:30 PM — Cliente satisfecho. Mision cumplida.\n\nCada dia es diferente, pero el compromiso siempre es el mismo: cuidar tus cosas como propias.\n\ntrasteosya.online\n\n#BehindTheScenes #Mudanza #TrasteosYa #Bogota'},
+
+  // --- TESTIMONIOS Y NUMEROS ---
+  rs_numeros:{icon:ICONS.target,name:'Nuestros numeros',desc:'Estadisticas de la empresa',category:'redes',
+    msg:'TRASTEOS YA EN NUMEROS\n\n+3,400 clientes satisfechos\n+5 años de experiencia\nPresencia en toda Colombia\nFlota propia de vehiculos\nEmpaque profesional incluido\nCotizacion inmediata en linea\n\nDetras de cada numero hay una familia que confio en nosotros para uno de los momentos mas importantes: cambiar de hogar.\n\nGracias por elegirnos.\n\nCotiza gratis: trasteosya.online\n\n#TrasteosYa #Mudanzas #Colombia #Confianza'},
+  rs_testimonio:{icon:ICONS.heart,name:'Lo que dicen los clientes',desc:'Post de testimonio / resena',category:'redes',
+    msg:'LO QUE DICEN NUESTROS CLIENTES\n\n"Excelente servicio, llegaron puntual, cuidaron cada mueble y fueron muy amables. 100% recomendados."\n\nHistorias como esta nos motivan a mejorar cada dia.\n\nSi ya usaste nuestro servicio, dejanos tu resena en Google. Tu opinion nos ayuda a crecer.\n\nY si aun no nos conoces, cotiza gratis: trasteosya.online\n\n#Resenas #ClientesFelices #TrasteosYa #Mudanza #Bogota'},
+  rs_dato_mes:{icon:ICONS.sparkle,name:'Dato del mes',desc:'Estadistica mensual destacada',category:'redes',
+    msg:'DATO DEL MES\n\nEste mes completamos [XX] mudanzas exitosas en Bogota y otras ciudades de Colombia.\n\nCada mudanza es unica y la tratamos con el mismo profesionalismo, sea un apartaestudio o una casa de 4 pisos.\n\nGracias a todos los que confiaron en Trasteos Ya este mes.\n\nEl proximo podrias ser tu. Cotiza gratis: trasteosya.online\n\n#DatoDelMes #Mudanzas #TrasteosYa #Bogota'},
+
+  // --- DATO CURIOSO / BARRIOS ---
+  rs_zonas:{icon:ICONS.globe,name:'Zonas top en Bogota',desc:'Donde mas se mudan los bogotanos',category:'redes',
+    msg:'LAS ZONAS CON MAS MUDANZAS EN BOGOTA\n\nSegun nuestra data:\n\n1. Suba\n2. Usaquen\n3. Chapinero\n4. Kennedy\n5. Engativa\n\nLas familias buscan mejor ubicacion, mas espacio o estar mas cerca del trabajo.\n\nSin importar tu zona, Trasteos Ya llega a toda Bogota y todo Colombia.\n\nCotiza gratis: trasteosya.online\n\n#Bogota #Mudanza #Zonas #TrasteosYa #Colombia'},
+  rs_sabias_que:{icon:ICONS.search,name:'Sabias que...',desc:'Dato curioso sobre mudanzas',category:'redes',
+    msg:'SABIAS QUE...\n\n- Una persona promedio se muda entre 5 y 11 veces en su vida\n- El 60% de las mudanzas en Bogota son dentro de la misma ciudad\n- Enero, junio y diciembre son los meses con mas mudanzas\n- El objeto que mas se dana en mudanzas son las pantallas de TV\n- Empacar una casa de 3 habitaciones toma en promedio 4 horas con equipo profesional\n\nPor eso es mejor dejar tu mudanza en manos de expertos.\n\ntrasteosya.online\n\n#SabiasQue #Mudanza #Datos #TrasteosYa #Colombia'},
+  rs_ruta:{icon:ICONS.truck,name:'Rutas mas solicitadas',desc:'Corredores de mudanza populares',category:'redes',
+    msg:'RUTAS DE MUDANZA MAS SOLICITADAS\n\nUrbano Bogota:\n- Suba a Usaquen\n- Chapinero a Suba\n- Kennedy a Soacha\n\nNacional:\n- Bogota a Medellin\n- Bogota a Cali\n- Bogota a Bucaramanga\n- Bogota a Costa Atlantica\n\nCubrimos toda Colombia con flota propia y equipo profesional.\n\nSin importar tu ruta, cotiza gratis: trasteosya.online\n\n#Mudanza #Colombia #Rutas #TrasteosYa #MudanzaNacional'},
+
+  // --- VENTAS / LLAMADO A ACCION ---
+  rs_cotiza:{icon:ICONS.dollar,name:'Cotiza gratis hoy',desc:'Post de venta directa',category:'redes',
+    msg:'TU MUDANZA COTIZADA EN 2 MINUTOS\n\nEntra a trasteosya.online y recibe tu cotizacion inmediata:\n\n- Gratis y sin compromiso\n- Desde tu celular, 24/7\n- Precio justo y transparente\n- Incluye empaque, transporte y operarios\n\nDeja de buscar. Ya encontraste tu empresa de mudanzas.\n\ntrasteosya.online\n\n#CotizaGratis #Mudanza #TrasteosYa #Bogota #Colombia'},
+  rs_promo:{icon:ICONS.tag,name:'Promocion del mes',desc:'Oferta mensual con urgencia',category:'redes',
+    msg:'PROMOCION DEL MES\n\nEste mes en Trasteos Ya:\n\n- Empaque basico GRATIS en mudanzas urbanas\n- 10% OFF en mudanzas nacionales\n- Bodegaje: primera semana sin costo\n\nCondiciones:\n- Valido para servicios agendados este mes\n- Sujeto a disponibilidad\n- No acumulable con otras promociones\n\nNo dejes pasar esta oportunidad. Cotiza ahora: trasteosya.online\n\n#Promocion #Descuento #Mudanza #TrasteosYa #Oferta'},
+  rs_referido:{icon:ICONS.share,name:'Gana por referir',desc:'Programa de referidos para redes',category:'redes',
+    msg:'GANA DINERO POR RECOMENDAR A TRASTEOS YA\n\nAsi funciona:\n\n1. Recomiendanos a alguien que necesite mudarse\n2. Esa persona cotiza y contrata con nosotros\n3. Tu recibes $20,000 por cada referido exitoso\n\nSin limite de referidos. Entre mas recomiendes, mas ganas.\n\nSolo dile que te mencione al cotizar.\n\ntrasteosya.online\n\n#Referidos #GanaDinero #TrasteosYa #Mudanza #Bogota'},
+  rs_completo:{icon:ICONS.gift,name:'Servicio completo',desc:'Todo incluido: empaque + mudanza',category:'redes',
+    msg:'MUDANZA COMPLETA. TU NO MUEVES UN DEDO.\n\nNuestro servicio Full incluye:\n\n- Empaque profesional de todo (cocina, ropa, fragiles)\n- Materiales: cajas, burbuja, vinipel, craft\n- Desarme de muebles\n- Carga y transporte en camion cerrado\n- Descarga en destino\n- Armado de muebles\n- Instalacion de TV, cortinas y accesorios\n\nDe puerta a puerta. Sin estres.\n\nCotiza gratis: trasteosya.online\n\n#MudanzaCompleta #ServicioFull #TrasteosYa #Bogota #Colombia'},
+  rs_urgente:{icon:ICONS.zap,name:'Mudanza express',desc:'Servicio rapido mismo dia',category:'redes',
+    msg:'NECESITAS MUDARTE HOY?\n\nEn Trasteos Ya tenemos servicio EXPRESS:\n\n- Disponibilidad inmediata\n- Mismo dia o dia siguiente\n- Camion + operarios en menos de 2 horas\n- Empaque rapido incluido\n\nPorque sabemos que a veces los planes cambian y necesitas moverte ya.\n\nEscribenos o cotiza en: trasteosya.online\n\n#MudanzaExpress #SameDayMoving #TrasteosYa #Bogota #Urgente'},
+  rs_nacional:{icon:ICONS.globe,name:'Mudanza nacional',desc:'Servicio a todo Colombia',category:'redes',
+    msg:'MUDANZAS A TODO COLOMBIA\n\nBogota - Medellin\nBogota - Cali\nBogota - Barranquilla\nBogota - Cartagena\nBogota - Bucaramanga\nBogota - Santa Marta\nBogota - Pereira\n...y cualquier ciudad del pais.\n\nFlota propia\nSeguro de carga\nEmpaque profesional\nEntrega puerta a puerta\nSeguimiento en tiempo real\n\nCotiza tu mudanza nacional: trasteosya.online\n\n#MudanzaNacional #Colombia #TrasteosYa #Transporte #Logistica'},
+  rs_empresas:{icon:ICONS.briefcase,name:'Mudanza empresarial',desc:'Servicio corporativo para redes',category:'redes',
+    msg:'MUDANZAS CORPORATIVAS Y DE OFICINAS\n\nTu empresa necesita cambiar de sede?\n\nEn Trasteos Ya manejamos:\n\n- Traslado de oficinas completas\n- Empaque de equipos y documentos\n- Mudanza de bodegas e inventario\n- Servicio en horario nocturno o fines de semana\n- Minimo impacto en la operacion\n\nEmpresas de todos los tamanos confian en nosotros.\n\nSolicita cotizacion corporativa: trasteosya.online\n\n#MudanzaCorporativa #Oficinas #Empresas #TrasteosYa #Bogota'}
 };
 
 // ============ CALENDARIO: fechas fijas por año ============
@@ -563,14 +618,14 @@ var CAMP_DATES={
   semana_santa:{m:2,d:28,label:'Semana Santa'},
   dia_madre:{m:4,d:11,label:'Dia de la Madre'},
   dia_padre:{m:5,d:15,label:'Dia del Padre'},
-  vacaciones:{m:5,d:20,label:'Vacaciones mitad ano'},
+  vacaciones:{m:5,d:20,label:'Vacaciones mitad año'},
   prima_junio:{m:5,d:1,label:'Prima de junio'},
   amor_amistad:{m:8,d:20,label:'Amor y Amistad'},
   halloween:{m:9,d:31,label:'Halloween'},
   black_friday:{m:10,d:28,label:'Black Friday'},
   prima_diciembre:{m:11,d:1,label:'Prima de diciembre'},
   navidad:{m:11,d:25,label:'Navidad'},
-  ano_nuevo:{m:11,d:31,label:'Ano Nuevo'}
+  ano_nuevo:{m:11,d:31,label:'Año Nuevo'}
 };
 var calMonth=new Date().getMonth();
 var calYear=new Date().getFullYear();
@@ -910,7 +965,7 @@ function makePieceSVG(cfg){
 function renderBiblioteca(){
   var cats=[
     {key:'estacional',title:'Campanas Estacionales',desc:'Asociadas al calendario colombiano'},
-    {key:'permanente',title:'Campanas Permanentes',desc:'Se ejecutan durante todo el ano'},
+    {key:'permanente',title:'Campanas Permanentes',desc:'Se ejecutan durante todo el año'},
     {key:'negocio',title:'Lineas de Negocio',desc:'Por empresa o proyecto'}
   ];
   var html='';
