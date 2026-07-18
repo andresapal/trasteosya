@@ -34,6 +34,9 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 .btn-filter:hover{background:linear-gradient(135deg,#15306e,#1B3E8C)}
 .btn-clear{padding:6px 12px;background:transparent;color:var(--ty-muted);border:1px solid var(--ty-border);border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;height:32px}
 .btn-clear:hover{border-color:var(--ty-blue);color:var(--ty-blue)}
+.btn-period{padding:7px 16px;border:1px solid rgba(27,62,140,.15);background:rgba(27,62,140,.04);color:var(--ty-blue);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-period:hover{background:rgba(27,62,140,.1)}
+.btn-period.active{background:var(--ty-blue);color:#fff;border-color:var(--ty-blue);box-shadow:0 2px 8px rgba(27,62,140,.25)}
 
 /* KPI Cards — premium glass */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px}
@@ -132,31 +135,16 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 </div>
 
 <div class="container" id="main-container">
-  <!-- Filters -->
-  <div class="filters">
-    <div class="filter-group">
-      <label>Desde</label>
-      <input type="date" id="f-desde"/>
-    </div>
-    <div class="filter-group">
-      <label>Hasta</label>
-      <input type="date" id="f-hasta"/>
-    </div>
-    <div class="filter-group">
-      <label>Ciudad</label>
-      <select id="f-ciudad"><option value="">Todas</option></select>
-    </div>
-    <div class="filter-group">
-      <label>Tipo veh&iacute;culo</label>
-      <select id="f-vehiculo"><option value="">Todos</option></select>
-    </div>
-    <div class="filter-group">
-      <label>Estado</label>
-      <select id="f-estado"><option value="">Todos</option><option value="pendiente">Pendientes</option><option value="ejecutado">Ejecutados</option></select>
-    </div>
-    <button class="btn-filter" onclick="applyFilters()">Filtrar</button>
-    <button class="btn-clear" onclick="clearFilters()">Limpiar</button>
+  <!-- Period pills -->
+  <div class="filters" style="justify-content:center;gap:6px;padding:10px 14px">
+    <button class="btn-period" onclick="setPeriod('hoy')">Hoy</button>
+    <button class="btn-period" onclick="setPeriod('semana')">Semana</button>
+    <button class="btn-period" onclick="setPeriod('mes')">Mes</button>
+    <button class="btn-period" onclick="setPeriod('trimestre')">Trimestre</button>
+    <button class="btn-period" onclick="setPeriod('year')">Ano</button>
+    <button class="btn-period active" onclick="setPeriod('all')">Todos</button>
   </div>
+  <div style="text-align:center;font-size:12px;color:var(--ty-muted);margin-bottom:16px" id="period-label"></div>
 
   <!-- KPI Cards -->
   <div class="kpi-grid" id="kpi-cards"></div>
@@ -230,11 +218,35 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 var FIN_KEY='ty_os_financials';
 var BACKUP_URL='https://script.google.com/macros/s/AKfycbytFjQC4osp6QNdCyALI5DGLCMtomQ_DYGqa56MQkGJoykyZcJIPiA1JVyrJ2Smj3ST-w/exec';
 var BACKUP_APIKEY='TrasteosYa-2026-Backup';
+var COT_SHEET_URL='https://script.google.com/macros/s/AKfycbzk3szEtCvnMKaXqZw6gfAIMZFJEX-uI1Sm40OSV03xg47BvShY3ezttQIRmDuols_C/exec';
 var COLORS={blue:'#1B3E8C',red:'#E30613',green:'#15803d',orange:'#d97706',teal:'#0d9488',purple:'#7c3aed',pink:'#db2777',sky:'#0284c7',lime:'#65a30d',amber:'#b45309'};
 var PALETTE=['#1B3E8C','#E30613','#0d9488','#d97706','#7c3aed','#db2777','#0284c7','#65a30d','#b45309','#6366f1','#059669','#ea580c'];
 var charts={};
 var driveOrders=[];
 var fileOrders=[];
+var cotVendidas=[];
+
+async function fetchCotVendidas(){
+  try{
+    var url=COT_SHEET_URL+'?action=cotizaciones&apikey='+BACKUP_APIKEY;
+    var r=await fetch(url,{redirect:'follow'});var d=await r.json();
+    if(d.ok&&d.cotizaciones){
+      cotVendidas=d.cotizaciones.filter(function(c){
+        return String(c.ESTADO||'').toUpperCase().trim()==='VENDIDO';
+      }).map(function(c){
+        var fecha=c.FECHA||'';
+        if(fecha&&typeof fecha==='object'&&fecha.getTime)fecha='';
+        fecha=String(fecha).substring(0,10);
+        return{
+          cliente:String(c.CLIENTE||''),
+          fecha:fecha,
+          ingreso:parseFloat(c['INGRESO TOTAL']||c['INGRESO']||0)||0,
+          costo:parseFloat(c['COSTO TOTAL']||0)||0
+        };
+      });
+    }
+  }catch(e){console.warn('KPI: no cotizaciones',e);}
+}
 
 /* Chart.js enhancements */
 Chart.register(ChartDataLabels);
@@ -466,50 +478,40 @@ function isPending(fecha){
 
 function fmtM(n){return'$ '+String(Math.abs(Math.round(n||0))).replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
 
-// Filters
-var filteredOrders=[];
+var currentPeriod='all';
+var allMerged=[];
 
-function populateFilters(orders){
-  var ciudades={},vehiculos={};
-  for(var i=0;i<orders.length;i++){
-    if(orders[i].ciudadOrigen)ciudades[orders[i].ciudadOrigen.toUpperCase()]=1;
-    if(orders[i].ciudadDestino)ciudades[orders[i].ciudadDestino.toUpperCase()]=1;
-    if(orders[i].tipoVehiculo)vehiculos[orders[i].tipoVehiculo]=1;
-  }
-  var selC=document.getElementById('f-ciudad');
-  selC.innerHTML='<option value="">Todas</option>';
-  Object.keys(ciudades).sort().forEach(function(c){selC.innerHTML+='<option value="'+c+'">'+c+'</option>';});
-  var selV=document.getElementById('f-vehiculo');
-  selV.innerHTML='<option value="">Todos</option>';
-  Object.keys(vehiculos).sort().forEach(function(v){selV.innerHTML+='<option value="'+v+'">'+v+'</option>';});
+function getPeriodRange(period){
+  var now=new Date();
+  var y=now.getFullYear(),m=now.getMonth(),d=now.getDate();
+  var pad=function(n){return String(n).padStart(2,'0');};
+  var today=y+'-'+pad(m+1)+'-'+pad(d);
+  if(period==='hoy')return{from:today,to:today};
+  if(period==='semana'){var s=new Date(now);s.setDate(d-now.getDay());return{from:s.getFullYear()+'-'+pad(s.getMonth()+1)+'-'+pad(s.getDate()),to:today};}
+  if(period==='mes')return{from:y+'-'+pad(m+1)+'-01',to:today};
+  if(period==='trimestre'){var qm=m-m%3;return{from:y+'-'+pad(qm+1)+'-01',to:today};}
+  if(period==='year')return{from:y+'-01-01',to:today};
+  return{from:'2000-01-01',to:'2099-12-31'};
 }
 
-function applyFilters(){
-  var all=mergeOrders(getAllOrders(),driveOrders,fileOrders);
-  var desde=document.getElementById('f-desde').value;
-  var hasta=document.getElementById('f-hasta').value;
-  var ciudad=document.getElementById('f-ciudad').value;
-  var vehiculo=document.getElementById('f-vehiculo').value;
-  var estado=document.getElementById('f-estado').value;
-  filteredOrders=all.filter(function(o){
-    if(desde&&o.fecha<desde)return false;
-    if(hasta&&o.fecha>hasta)return false;
-    if(ciudad&&o.ciudadOrigen.toUpperCase()!==ciudad&&o.ciudadDestino.toUpperCase()!==ciudad)return false;
-    if(vehiculo&&o.tipoVehiculo!==vehiculo)return false;
-    if(estado==='pendiente'&&!isPending(o.fecha))return false;
-    if(estado==='ejecutado'&&isPending(o.fecha))return false;
-    return true;
-  });
-  renderDashboard(filteredOrders,all);
+function filterByPeriod(orders,range){
+  return orders.filter(function(o){return(o.fecha||'')>=range.from&&(o.fecha||'')<=range.to;});
 }
 
-function clearFilters(){
-  document.getElementById('f-desde').value='';
-  document.getElementById('f-hasta').value='';
-  document.getElementById('f-ciudad').value='';
-  document.getElementById('f-vehiculo').value='';
-  document.getElementById('f-estado').value='';
-  applyFilters();
+function setPeriod(p){
+  currentPeriod=p;
+  document.querySelectorAll('.btn-period').forEach(function(b){b.classList.remove('active');});
+  document.querySelector('.btn-period[onclick*="\''+p+'\'"]').classList.add('active');
+  renderModule();
+}
+
+function renderModule(){
+  var range=getPeriodRange(currentPeriod);
+  var orders=filterByPeriod(allMerged,range);
+  var label=document.getElementById('period-label');
+  if(currentPeriod==='all')label.textContent='Mostrando todos los datos ('+allMerged.length+' servicios)';
+  else label.textContent=range.from+' a '+range.to+' ('+orders.length+' servicios)';
+  renderDashboard(orders,allMerged);
 }
 
 // Count helpers
@@ -551,8 +553,10 @@ function renderDashboard(orders,allOrders){
   var total=orders.length;
   var pending=orders.filter(function(o){return isPending(o.fecha);});
   var done=orders.filter(function(o){return !isPending(o.fecha);});
+  var range=getPeriodRange(currentPeriod);
+  var cotFiltered=cotVendidas.filter(function(c){return(c.fecha||'')>=range.from&&(c.fecha||'')<=range.to;});
   var totalValor=0,totalCosto=0;
-  for(var i=0;i<orders.length;i++){totalValor+=orders[i].valor;totalCosto+=orders[i].costo;}
+  for(var ci=0;ci<cotFiltered.length;ci++){totalValor+=cotFiltered[ci].ingreso;totalCosto+=cotFiltered[ci].costo;}
   var totalUtil=totalValor-totalCosto;
 
   // Months
@@ -632,7 +636,8 @@ function renderDashboard(orders,allOrders){
   });
 
   // === Tipo de vehículo (doughnut) ===
-  var vehCount=countBy(orders,function(o){return o.tipoVehiculo||'Sin asignar';});
+  var vehCount=countBy(orders,function(o){return o.tipoVehiculo||'';});
+  delete vehCount[''];
   var vehTop=topN(vehCount,8);
   charts.vehiculo=new Chart(document.getElementById('ch-vehiculo'),{
     type:'doughnut',
@@ -837,24 +842,17 @@ function animateFunnelBars(){
   else setTimeout(window._kpiObserve,100);
 })();
 
-// Init: cargar servicios.json + localStorage + Drive
+// Init: cargar servicios.json + localStorage + Drive + cotizaciones
 (async function(){
   var localOrders=getAllOrders();
-  // Cargar datos de archivos (XLS/PDF importados)
-  try{await fetchFileOrders();}catch(e){}
-  // Render con datos locales + archivo
-  var combined=mergeOrders(localOrders,[],fileOrders);
-  populateFilters(combined);
-  filteredOrders=combined.slice();
-  renderDashboard(filteredOrders,combined);
-  // Cargar datos de Drive y combinar todo
+  try{await Promise.all([fetchFileOrders(),fetchCotVendidas()]);}catch(e){}
+  allMerged=mergeOrders(localOrders,[],fileOrders);
+  renderModule();
   try{
     var drive=await fetchDriveOrders();
     if(drive.length>0){
-      combined=mergeOrders(localOrders,drive,fileOrders);
-      populateFilters(combined);
-      filteredOrders=combined.slice();
-      renderDashboard(filteredOrders,combined);
+      allMerged=mergeOrders(localOrders,drive,fileOrders);
+      renderModule();
     }
   }catch(e){}
 })();
