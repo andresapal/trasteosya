@@ -145,7 +145,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
     <button class="btn-period" onclick="setPeriod('year')">A&#241;o</button>
     <button class="btn-period active" onclick="setPeriod('all')">Todos</button>
   </div>
-  <div style="text-align:center;font-size:12px;color:var(--ty-muted);margin-bottom:16px" id="period-label"></div>
+  <div style="text-align:center;font-size:12px;color:var(--ty-muted);margin-bottom:16px"><span id="period-label"></span> <button type="button" onclick="actualizarDatos()" id="btn-refresh" style="margin-left:6px;font-size:10px;font-weight:600;color:#1B3E8C;background:rgba(27,62,140,.08);border:1px solid rgba(27,62,140,.25);border-radius:6px;padding:3px 10px;cursor:pointer;transition:.15s;font-family:inherit">Actualizar</button></div>
 
   <!-- KPI Cards -->
   <div class="kpi-grid" id="kpi-cards"></div>
@@ -366,7 +366,7 @@ function parseDriveOrder(r){
   return{
     key:'drive_'+r.NumeroOS,
     os:r.NumeroOS||'',
-    cliente:(r.Cliente||'').trim(),
+    cliente:String(r.Cliente||'').trim(),
     fecha:fecha,
     tipoVehiculo:r.TipoVehiculo||'',
     numOperarios:parseInt(r.NumOperarios,10)||0,
@@ -460,7 +460,7 @@ async function fetchDriveOrders(){
     if(data.success&&data.ordenes){
       driveOrders=[];
       for(var i=0;i<data.ordenes.length;i++){
-        driveOrders.push(parseDriveOrder(data.ordenes[i]));
+        try{driveOrders.push(parseDriveOrder(data.ordenes[i]));}catch(_){}
       }
     }
   }catch(e){console.warn('KPI: no se pudieron cargar datos de Drive',e);}
@@ -844,19 +844,41 @@ function animateFunnelBars(){
   else setTimeout(window._kpiObserve,100);
 })();
 
+async function actualizarDatos(){
+  var btn=document.getElementById('btn-refresh');
+  btn.disabled=true;btn.textContent='Sincronizando...';btn.style.opacity='.5';
+  var label=document.getElementById('period-label');
+  try{
+    driveOrders=[];fileOrders=[];
+    var localOrders=getAllOrders();
+    await Promise.all([fetchFileOrders(),fetchDriveOrders(),fetchCotVendidas()]);
+    allMerged=mergeOrders(localOrders,driveOrders,fileOrders);
+    renderModule();
+    label.style.transition='background .4s';label.style.background='rgba(34,197,94,.15)';
+    setTimeout(function(){label.style.background='';},2000);
+  }catch(e){console.warn('Actualizar error',e);}
+  btn.disabled=false;btn.textContent='Actualizar';btn.style.opacity='1';
+}
+
 // Init: cargar servicios.json + localStorage + Drive + cotizaciones
 (async function(){
   var localOrders=getAllOrders();
   try{await Promise.all([fetchFileOrders(),fetchCotVendidas()]);}catch(e){}
   allMerged=mergeOrders(localOrders,[],fileOrders);
   renderModule();
+  var label=document.getElementById('period-label');
+  var baseText=label.textContent;
+  label.innerHTML=baseText+' <span style="color:#f59e0b;font-weight:600">&mdash; Sincronizando sheet...</span>';
   try{
     var drive=await fetchDriveOrders();
     if(drive.length>0){
       allMerged=mergeOrders(localOrders,drive,fileOrders);
       renderModule();
-    }
-  }catch(e){}
+      label=document.getElementById('period-label');
+      label.style.transition='background .4s';label.style.background='rgba(34,197,94,.15)';
+      setTimeout(function(){label.style.background='';},2000);
+    }else{label.innerHTML=baseText;}
+  }catch(e){label.innerHTML=baseText+' <span style="color:#ef4444">(sin conexion al sheet)</span>';console.warn('KPI drive fetch error',e);}
 })();
 </script>
 <script src="js/swipe-nav.js"></script>
