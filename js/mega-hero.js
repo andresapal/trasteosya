@@ -10,7 +10,7 @@
 
   const slides = Array.from(root.querySelectorAll('.mega-hero__slide'));
   const navs   = Array.from(root.querySelectorAll('.mega-hero__nav button'));
-  const INTERVAL = 6000;
+  const INTERVAL = 7000;
   let current = 0;
   let timer = null;
 

@@ -11,21 +11,40 @@
     const mobile = document.querySelector('.nav__mobile');
     if (!burger || !mobile) return;
 
-    burger.addEventListener('click', function () {
-      const isOpen = burger.classList.toggle('is-open');
-      mobile.classList.toggle('is-open', isOpen);
-      burger.setAttribute('aria-expanded', String(isOpen));
-      document.body.style.overflow = isOpen ? 'hidden' : '';
+    function closeMenu() {
+      burger.classList.remove('is-open');
+      mobile.classList.remove('is-open');
+      burger.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+    function openMenu() {
+      burger.classList.add('is-open');
+      mobile.classList.add('is-open');
+      burger.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    burger.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (burger.classList.contains('is-open')) closeMenu();
+      else openMenu();
     });
 
-    // Cierra el menú al hacer clic en un enlace
+    // Cierra al hacer clic en un enlace del drawer
     mobile.querySelectorAll('a').forEach(function (a) {
-      a.addEventListener('click', function () {
-        burger.classList.remove('is-open');
-        mobile.classList.remove('is-open');
-        burger.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
-      });
+      a.addEventListener('click', closeMenu);
+    });
+
+    // Cierra al tocar fuera del drawer
+    document.addEventListener('click', function (e) {
+      if (!mobile.classList.contains('is-open')) return;
+      if (mobile.contains(e.target) || burger.contains(e.target)) return;
+      closeMenu();
+    });
+
+    // Cierra con tecla Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && mobile.classList.contains('is-open')) closeMenu();
     });
   }
 
