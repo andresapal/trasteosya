@@ -6,6 +6,9 @@
 (function () {
   'use strict';
 
+  var _e=function(c){return String.fromCodePoint(c);};
+  var E={casa:_e(0x1F3E0),cam:_e(0x1F4F8),list:_e(0x1F4CB),dart:_e(0x1F3AF),hands:_e(0x1F91D),cal:_e(0x1F4C5),check:_e(0x2705),money:_e(0x1F4B0),pin:_e(0x1F4CD),person:_e(0x1F464),phone:_e(0x1F4F1),email:_e(0x1F4E7),truck:_e(0x1F69A),pkg:_e(0x1F4E6),chat:_e(0x1F4AC),clock:_e(0x23F0),globe:_e(0x1F310),bell:_e(0x1F514),cart:_e(0x1F6D2),ruler:_e(0x1F4D0)};
+
   /* ---------- CONFIG (rellena las 3 claves) ---------- */
   const CONFIG = {
     // 1) Web3Forms · gratis 250 envios/mes · https://web3forms.com
@@ -57,15 +60,15 @@
   }
 
   const OBSERVACIONES_CLIENTE =
-    '🏠 ¡Gracias por confiar en Trasteos Ya!\n\n' +
+    E.casa+' ¡Gracias por confiar en Trasteos Ya!\n\n' +
     'Queremos que tu mudanza sea una experiencia tranquila y sin sorpresas. Para darte el precio más preciso, te agradecemos mucho si nos compartes:\n\n' +
-    '📸 Fotos o videos de lo que vamos a transportar y de los accesos (entrada del edificio, parqueadero, ascensor).\n\n' +
-    '📋 Cuéntanos si hay algo especial que debamos saber:\n' +
+    E.cam+' Fotos o videos de lo que vamos a transportar y de los accesos (entrada del edificio, parqueadero, ascensor).\n\n' +
+    E.list+' Cuéntanos si hay algo especial que debamos saber:\n' +
     '  → Escaleras, caminados largos o restricciones de acceso\n' +
     '  → Artículos grandes o delicados (nevecón, secadora, piano, vidrios)\n' +
     '  → Si necesitas empaque, cajas o bodegaje\n\n' +
-    '🎯 Nuestro compromiso es darte un servicio planeado, sin contratiempos y al mejor precio.\n\n' +
-    '¡Quedo atento a cualquier duda! 🤝\n\n' +
+    E.dart+' Nuestro compromiso es darte un servicio planeado, sin contratiempos y al mejor precio.\n\n' +
+    '¡Quedo atento a cualquier duda! '+E.hands+'\n\n' +
     'Equipo Trasteos Ya\n' +
     'trasteosya.online';
 
@@ -84,17 +87,17 @@
       } catch(e) { fechaStr = data.fecha; }
     }
     var lines = [
-      '🏠 *Cotización Trasteos Ya*',
+      E.casa+' *Cotización Trasteos Ya*',
       '',
       nombre ? (saludo + ', aquí va tu cotización:') : '',
-      fechaStr ? ('📅 ' + fechaStr) : '',
-      (data.origen || data.destino) ? ('📍 ' + (data.origen||'-') + ' → ' + (data.destino||'-')) : '',
+      fechaStr ? (E.cal+' ' + fechaStr) : '',
+      (data.origen || data.destino) ? (E.pin+' ' + (data.origen||'-') + ' → ' + (data.destino||'-')) : '',
       '',
       '*Mudanza:*',
       '• Trasteo Urbano ' + t.label + ': ' + COP(t.precio),
       '  (' + t.tamano + ')',
       '',
-      '✅ *Total: ' + COP(t.precio) + '*',
+      E.check+' *Total: ' + COP(t.precio) + '*',
       '',
       OBSERVACIONES_CLIENTE
     ];
@@ -107,16 +110,16 @@
     if (cotizacion) {
       return 'https://wa.me/' + getPhone() + '?text=' + encodeURIComponent(cotizacion);
     }
-    var lines = ['🏠 Hola, acabo de solicitar una cotización desde el sitio web.', ''];
-    if (data.nombre)   lines.push('👤 ' + data.nombre);
-    if (data.email)    lines.push('📧 ' + data.email);
-    if (data.servicio) lines.push('🚚 Servicio: ' + data.servicio);
-    if (data.origen)   lines.push('📍 ' + data.origen + ' → ' + (data.destino||''));
-    if (data.destino && !data.origen) lines.push('📍 Destino: ' + data.destino);
-    if (data.tamano)   lines.push('📦 Tamaño: ' + data.tamano);
-    if (data.fecha)    lines.push('📅 Fecha: ' + data.fecha);
-    if (data.detalles) lines.push('💬 ' + data.detalles);
-    lines.push('', '¡Quedo atento, gracias! 🤝', '', 'Equipo Trasteos Ya · trasteosya.online');
+    var lines = [E.casa+' Hola, acabo de solicitar una cotización desde el sitio web.', ''];
+    if (data.nombre)   lines.push(E.person+' ' + data.nombre);
+    if (data.email)    lines.push(E.email+' ' + data.email);
+    if (data.servicio) lines.push(E.truck+' Servicio: ' + data.servicio);
+    if (data.origen)   lines.push(E.pin+' ' + data.origen + ' → ' + (data.destino||''));
+    if (data.destino && !data.origen) lines.push(E.pin+' Destino: ' + data.destino);
+    if (data.tamano)   lines.push(E.pkg+' Tamaño: ' + data.tamano);
+    if (data.fecha)    lines.push(E.cal+' Fecha: ' + data.fecha);
+    if (data.detalles) lines.push(E.chat+' ' + data.detalles);
+    lines.push('', '¡Quedo atento, gracias! '+E.hands, '', 'Equipo Trasteos Ya · trasteosya.online');
     return 'https://wa.me/' + getPhone() + '?text=' + encodeURIComponent(lines.join('\n'));
   }
 
@@ -151,27 +154,27 @@
     try {
       var cotizacion = buildCotizacionHogar(data);
       var lines = [
-        '🔔 *Nueva cotización · Trasteos Ya*',
+        E.bell+' *Nueva cotización · Trasteos Ya*',
         '',
-        '📋 *Origen:* ' + source,
-        '👤 *Nombre:* ' + (data.nombre || '-'),
-        '📱 *WhatsApp:* ' + (data.telefono || '-'),
-        '📧 *Email:* ' + (data.email || '-'),
-        '🛒 *Servicio:* ' + (data.servicio || '-'),
-        '📍 *Ruta:* ' + (data.origen || '-') + ' → ' + (data.destino || '-'),
-        '📦 *Tamaño:* ' + (data.tamano || '-'),
-        '📅 *Fecha:* ' + (data.fecha || '-'),
-        '💬 *Detalles:* ' + (data.detalles || '-'),
+        E.list+' *Origen:* ' + source,
+        E.person+' *Nombre:* ' + (data.nombre || '-'),
+        E.phone+' *WhatsApp:* ' + (data.telefono || '-'),
+        E.email+' *Email:* ' + (data.email || '-'),
+        E.cart+' *Servicio:* ' + (data.servicio || '-'),
+        E.pin+' *Ruta:* ' + (data.origen || '-') + ' → ' + (data.destino || '-'),
+        E.pkg+' *Tamaño:* ' + (data.tamano || '-'),
+        E.cal+' *Fecha:* ' + (data.fecha || '-'),
+        E.chat+' *Detalles:* ' + (data.detalles || '-'),
         '',
-        '⏰ ' + new Date().toLocaleString('es-CO'),
-        '🌐 https://trasteosya.online'
+        E.clock+' ' + new Date().toLocaleString('es-CO'),
+        E.globe+' https://trasteosya.online'
       ];
       if (cotizacion) {
         var t = TARIFAS_HOGAR[data.hogar_camion];
         lines.push('', '─── COTIZACIÓN ENVIADA AL CLIENTE ───', '');
-        lines.push('🚚 *Vehículo:* ' + t.label);
-        lines.push('💰 *Tarifa:* ' + COP(t.precio));
-        lines.push('📐 *Perfil:* ' + t.tamano);
+        lines.push(E.truck+' *Vehículo:* ' + t.label);
+        lines.push(E.money+' *Tarifa:* ' + COP(t.precio));
+        lines.push(E.ruler+' *Perfil:* ' + t.tamano);
       }
       var url = 'https://api.telegram.org/bot' + CONFIG.TELEGRAM_BOT_TOKEN + '/sendMessage';
       await fetch(url, {
@@ -192,26 +195,26 @@
     try {
       var cotizacion = buildCotizacionHogar(data);
       var lines = [
-        '🔔 *Nueva cotización · Trasteos Ya*',
+        E.bell+' *Nueva cotización · Trasteos Ya*',
         '',
-        '📋 Origen: ' + source,
-        '👤 ' + (data.nombre || '-'),
-        '📱 ' + (data.telefono || '-'),
-        '📧 ' + (data.email || '-'),
-        '🛒 ' + (data.servicio || '-'),
-        '📍 ' + (data.origen || '-') + ' → ' + (data.destino || '-'),
-        '📦 ' + (data.tamano || '-'),
-        '📅 ' + (data.fecha || '-'),
-        '💬 ' + (data.detalles || '-'),
+        E.list+' Origen: ' + source,
+        E.person+' ' + (data.nombre || '-'),
+        E.phone+' ' + (data.telefono || '-'),
+        E.email+' ' + (data.email || '-'),
+        E.cart+' ' + (data.servicio || '-'),
+        E.pin+' ' + (data.origen || '-') + ' → ' + (data.destino || '-'),
+        E.pkg+' ' + (data.tamano || '-'),
+        E.cal+' ' + (data.fecha || '-'),
+        E.chat+' ' + (data.detalles || '-'),
         '',
-        '⏰ ' + new Date().toLocaleString('es-CO'),
-        '🌐 https://trasteosya.online'
+        E.clock+' ' + new Date().toLocaleString('es-CO'),
+        E.globe+' https://trasteosya.online'
       ];
       if (cotizacion) {
         var t = TARIFAS_HOGAR[data.hogar_camion];
         lines.push('', '── COTIZACIÓN ENVIADA ──');
-        lines.push('🚚 ' + t.label + ': ' + COP(t.precio));
-        lines.push('📐 ' + t.tamano);
+        lines.push(E.truck+' ' + t.label + ': ' + COP(t.precio));
+        lines.push(E.ruler+' ' + t.tamano);
       }
       var text = encodeURIComponent(lines.join('\n'));
       var url = 'https://api.callmebot.com/whatsapp.php' +
@@ -288,7 +291,7 @@
       fd.set('access_key', CONFIG.WEB3FORMS_KEY);
     }
     fd.set('_source', source);
-    fd.set('subject', '🔔 Nueva cotización · ' + source + ' · ' + (data.nombre || 'cliente'));
+    fd.set('subject', E.bell+' Nueva cotización · ' + source + ' · ' + (data.nombre || 'cliente'));
     fd.set('from_name', 'Sitio web Trasteos Ya');
 
     // Auto-respuesta al cliente (Web3Forms la envia al email del cliente)
