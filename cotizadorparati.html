@@ -615,6 +615,8 @@ const COT_SHEET_URL='https://script.google.com/macros/s/AKfycbzk3szEtCvnMKaXqZw6
 const BACKUP_APIKEY='TrasteosYa-2026-Backup';
 const NOTIFY={TG_TOKEN:'8815751812:AAEGlCiQAZKSamRUfD5r0lmzjLTRAaFcdqw',TG_CHAT:'1081707115',CMB_PHONE:'573143095194',CMB_KEY:'9452184'};
 const OPERADOR_WA='573143095194';
+const _e=function(c){return String.fromCodePoint(c);};
+const E={casa:_e(0x1F3E0),phone:_e(0x1F4F1),pin:_e(0x1F4CD),check:_e(0x2705),dart:_e(0x1F3AF),hands:_e(0x1F91D),wave:_e(0x1F44B),truck:_e(0x1F69A),money:_e(0x1F4B0),pkg:_e(0x1F4E6),cal:_e(0x1F4C5),bill:_e(0x1F4B5),office:_e(0x1F3E2),person:_e(0x1F464),clock:_e(0x23F0)};
 
 /* ========= PRECIOS (venta que el cliente ve al final; costo para admin) ========= */
 const CAMION={pequeno:{l:'Camión pequeño',v:580000,c:420000},mediano:{l:'Camión mediano',v:730000,c:570000},grande:{l:'Camión grande',v:870000,c:710000}};
@@ -848,10 +850,10 @@ $$('#viv-grid .opt').forEach(o=>o.addEventListener('click',()=>{
 /* ========= OFICINA ========= */
 function oficinaFlow(){
   stepDone('vivienda');
-  const msg='Hola, soy '+(S.nombre||'un cliente')+' 👋 Estoy interesado en una cotización para mudanza de OFICINA. Les comparto fotos/video del espacio para que puedan darme un estimado.';
+  const msg='Hola, soy '+(S.nombre||'un cliente')+' '+E.wave+' Estoy interesado en una cotización para mudanza de OFICINA. Les comparto fotos/video del espacio para que puedan darme un estimado.';
   const waClient='https://wa.me/'+OPERADOR_WA+'?text='+encodeURIComponent(msg);
   // dispara notificacion automatica al operador
-  notifyOperador('🏢 *Nueva solicitud de OFICINA*\n👤 '+(S.nombre||'-')+'\n📱 '+(S.whatsapp||'-')+'\n\nRequiere contacto para servicio de oficina.');
+  notifyOperador(E.office+' *Nueva solicitud de OFICINA*\n'+E.person+' '+(S.nombre||'-')+'\n'+E.phone+' '+(S.whatsapp||'-')+'\n\nRequiere contacto para servicio de oficina.');
   // reemplaza contenido de la card vivienda por mensaje
   const c=$('#c-vivienda');
   c.innerHTML='<div class="msgbox"><div class="msgbox-icon">🏢</div><div class="msgbox-title">Servicio de oficina</div><div class="msgbox-text">Envíanos tu WhatsApp con el detalle específico de tu servicio de oficina. Requerimos, en principio, <b>fotos o video</b> del lugar. Así te contactaremos ya con avances y una propuesta ajustada a tu requerimiento.</div><a class="msgbox-btn" href="'+waClient+'" target="_blank" rel="noopener">📲 Escríbenos por WhatsApp</a></div>';
@@ -874,9 +876,9 @@ function checkNacional(){
   if(otra){
     clearTimeout(_pending);
     stepDone('ruta');
-    const msg='Hola, soy '+(S.nombre||'un cliente')+' 👋 Me gustaría cotizar un trasteo de '+S.origen+' a '+S.destino+'. ¿Me pueden ayudar con un estimado?';
+    const msg='Hola, soy '+(S.nombre||'un cliente')+' '+E.wave+' Me gustaría cotizar un trasteo de '+S.origen+' a '+S.destino+'. ¿Me pueden ayudar con un estimado?';
     const wa='https://wa.me/'+OPERADOR_WA+'?text='+encodeURIComponent(msg);
-    notifyOperador('🚚 *Solicitud trasteo OTRA CIUDAD*\n👤 '+(S.nombre||'-')+'\n📱 '+(S.whatsapp||'-')+'\n📍 '+S.origen+' → '+S.destino);
+    notifyOperador(E.truck+' *Solicitud trasteo OTRA CIUDAD*\n'+E.person+' '+(S.nombre||'-')+'\n'+E.phone+' '+(S.whatsapp||'-')+'\n'+E.pin+' '+S.origen+' → '+S.destino);
     box.innerHTML='<div class="msgbox" style="margin-top:16px"><div class="msgbox-icon">🚚</div><div class="msgbox-title">Trasteo a otra ciudad</div><div class="msgbox-text">Los trasteos hacia otras ciudades los cotizamos de forma personalizada para darte el mejor precio. Escríbenos y te atendemos de inmediato.</div><a class="msgbox-btn" href="'+wa+'" target="_blank" rel="noopener">📲 Cotizar por WhatsApp</a></div>';
     box.scrollIntoView({behavior:'smooth',block:'center'});
   } else {box.innerHTML='';}
@@ -1191,7 +1193,7 @@ function saveBackend(lines,total){
   lines.forEach(function(l){var c=cats[l.cat]||cats.adicionales;c.items.push(l);c.t+=l.v;});
   var detalle='';
   Object.keys(cats).forEach(function(k){var c=cats[k];if(!c.items.length)return;detalle+='\n*'+c.l+': '+COP(c.t)+'*\n';c.items.forEach(function(l){detalle+='  - '+l.l+': '+COP(l.v)+(l.est?' (est)':'')+'\n';});});
-  const tg='💰 *Nueva cotización WEB*\n👤 '+S.nombre+'\n📱 '+S.whatsapp+'\n🏠 '+VIV_LABEL[S.vivienda]+'\n📍 '+S.origen+' → '+S.destino+'\n📦 Empaque '+S.empaque.tipo+'\n'+detalle+'\n💵 *Total: '+COP(total)+'*';
+  const tg=E.money+' *Nueva cotización WEB*\n'+E.person+' '+S.nombre+'\n'+E.phone+' '+S.whatsapp+'\n'+E.casa+' '+VIV_LABEL[S.vivienda]+'\n'+E.pin+' '+S.origen+' → '+S.destino+'\n'+E.pkg+' Empaque '+S.empaque.tipo+'\n'+detalle+'\n'+E.bill+' *Total: '+COP(total)+'*';
   notifyOperador(tg);
   notifyWhatsApp(tg);
 }
@@ -1199,18 +1201,19 @@ function notifyOperador(text){
   fetch('https://api.telegram.org/bot'+NOTIFY.TG_TOKEN+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:NOTIFY.TG_CHAT,text:text,parse_mode:'Markdown'})}).catch(()=>{});
 }
 function notifyWhatsApp(text){
-  var clean=text.replace(/\*/g,'').replace(/💰|👤|📱|🏠|📍|📦|💵/g,'').trim();
+  var emojiRx=new RegExp([E.money,E.person,E.phone,E.casa,E.pin,E.pkg,E.bill].join('|'),'g');
+  var clean=text.replace(/\*/g,'').replace(emojiRx,'').trim();
   fetch('https://api.callmebot.com/whatsapp.php?phone='+NOTIFY.CMB_PHONE+'&text='+encodeURIComponent(clean)+'&apikey='+NOTIFY.CMB_KEY).catch(()=>{});
 }
 
 /* ========= WHATSAPP (texto al cliente) ========= */
 function buildCotMsg(prefix){
   const lines=S._lines||[];
-  let msg=(prefix||'')+'🏠 *Cotización Trasteos Ya*\n\nHola '+S.nombre+', aquí va tu cotización:\n📱 '+S.whatsapp+'\n📍 '+S.origen+' → '+S.destino+'\n\n';
+  let msg=(prefix||'')+E.casa+' *Cotización Trasteos Ya*\n\nHola '+S.nombre+', aquí va tu cotización:\n'+E.phone+' '+S.whatsapp+'\n'+E.pin+' '+S.origen+' → '+S.destino+'\n\n';
   var cats={trasteo:{label:'Trasteo',items:[],t:0},empaque:{label:'Empaque',items:[],t:0},inst:{label:'Instalaciones',items:[],t:0},adicionales:{label:'Otros servicios',items:[],t:0},bodegaje:{label:'Bodegaje',items:[],t:0}};
   lines.forEach(function(l){var c=cats[l.cat]||cats.adicionales;c.items.push(l);c.t+=l.v;});
   Object.keys(cats).forEach(function(k){var c=cats[k];if(!c.items.length)return;msg+='*'+c.label+': '+COP(c.t)+'*\n';c.items.forEach(function(l){msg+='  • '+l.l+': '+COP(l.v)+(l.est?' (estimado)':'')+'\n';});msg+='\n';});
-  msg+='✅ *Total estimado: '+COP(S._total)+'*\n\n🎯 Este valor es un estimado que puede ajustarse al validar en sitio. Sin compromiso.\n\n¡Quedo atento a tus dudas! 🤝\n*Equipo Trasteos Ya*\ntrasteosya.online';
+  msg+=E.check+' *Total estimado: '+COP(S._total)+'*\n\n'+E.dart+' Este valor es un estimado que puede ajustarse al validar en sitio. Sin compromiso.\n\n'+String.fromCodePoint(0xA1)+'Quedo atento a tus dudas! '+E.hands+'\n*Equipo Trasteos Ya*\ntrasteosya.online';
   return msg;
 }
 $('#btn-wa').addEventListener('click',()=>{
@@ -1222,7 +1225,7 @@ $('#btn-wa').addEventListener('click',()=>{
 
 /* ========= INQUIETUDES: WhatsApp al operador con toda la cotización ========= */
 $('#btn-inq').addEventListener('click',()=>{
-  const msg=buildCotMsg('Hola equipo 👋 Tengo algunas preguntas sobre esta cotización:\n\n');
+  const msg=buildCotMsg('Hola equipo '+E.wave+' Tengo algunas preguntas sobre esta cotización:\n\n');
   const wa='https://wa.me/'+OPERADOR_WA+'?text='+encodeURIComponent(msg);
   window.open(wa,'_blank','noopener');
   setTimeout(showSentConfirm,800);

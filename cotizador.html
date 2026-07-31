@@ -933,21 +933,23 @@ function closeMobilePDF(){document.getElementById("pdf-modal").style.display="no
 
 // ============ IMAGEN + WHATSAPP ============
 const LINK_TY="trasteosya.online";
+const _e=function(c){return String.fromCodePoint(c);};
+const E={casa:_e(0x1F3E0),cam:_e(0x1F4F8),list:_e(0x1F4CB),dart:_e(0x1F3AF),hands:_e(0x1F91D),cal:_e(0x1F4C5),check:_e(0x2705),gift:_e(0x1F381),money:_e(0x1F4B0),clip:_e(0x1F4CE),truck:_e(0x1F69A),bell:_e(0x1F514),person:_e(0x1F464),phone:_e(0x1F4F1),clock:_e(0x23F0),globe:_e(0x1F310),warn:_e(0x26A0)};
 const OBSERVACIONES=
-`🏠 *¡Gracias por confiar en Trasteos Ya!*
+E.casa+` *¡Gracias por confiar en Trasteos Ya!*
 
 Queremos que tu mudanza sea una experiencia tranquila y sin sorpresas. Para darte el precio más preciso, te agradecemos mucho si nos compartes:
 
-📸 Fotos o videos de lo que vamos a transportar y de los accesos (entrada del edificio, parqueadero, ascensor).
+`+E.cam+` Fotos o videos de lo que vamos a transportar y de los accesos (entrada del edificio, parqueadero, ascensor).
 
-📋 Cuéntanos si hay algo especial que debamos saber:
+`+E.list+` Cuéntanos si hay algo especial que debamos saber:
   → Escaleras, caminados largos o restricciones de acceso
   → Artículos grandes o delicados (nevecón, secadora, piano, vidrios)
   → Si necesitas empaque, cajas o bodegaje
 
-🎯 Nuestro compromiso es darte un servicio planeado, sin contratiempos y al mejor precio.
+`+E.dart+` Nuestro compromiso es darte un servicio planeado, sin contratiempos y al mejor precio.
 
-¡Quedo atento a cualquier duda! 🤝
+¡Quedo atento a cualquier duda! `+E.hands+`
 
 *Equipo Trasteos Ya*
 ${LINK_TY}`;
@@ -1021,7 +1023,7 @@ async function generarImagenYWA(){
     const subV=lines.reduce((a,l)=>a+(l.noV?0:l.v),0);
     const dcto=Math.min(numVal("descuento"),subV);
     const total=subV-dcto;
-    const msg=`🏠 *Cotización Trasteos Ya*\n${cliente?"Hola "+cliente+", aquí va tu cotización:\n":""}\n💰 *Total: ${COP(total)}*\n\n📎 _Te adjunto la imagen con el detalle completo._\n\n${OBSERVACIONES}`;
+    const msg=E.casa+` *Cotización Trasteos Ya*\n${cliente?"Hola "+cliente+", aquí va tu cotización:\n":""}\n`+E.money+` *Total: ${COP(total)}*\n\n`+E.clip+` _Te adjunto la imagen con el detalle completo._\n\n${OBSERVACIONES}`;
     setTimeout(()=>{
       window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`,"_blank","noopener,noreferrer");
     },500);
@@ -1051,9 +1053,9 @@ function sendWA(){
   const fecha=document.getElementById("fecha").value;
   let fechaFmt=fecha;
   try{const[y,m,d]=fecha.split("-").map(Number);fechaFmt=new Date(y,(m||1)-1,d||1).toLocaleDateString("es-CO",{day:"2-digit",month:"long",year:"numeric"});}catch{}
-  let msg=`🏠 *Cotización Trasteos Ya*\n`;
+  let msg=E.casa+` *Cotización Trasteos Ya*\n`;
   if(cliente)msg+=`Hola ${cliente}, aquí va el detalle de tu cotización:\n`;
-  msg+=`📅 ${fechaFmt}\n\n`;
+  msg+=E.cal+` ${fechaFmt}\n\n`;
   const GRUPOS=[["trasteo","Mudanza"],["empaque","Empaque"],["instalaciones","Instalaciones"],["desempaque","Desempaque"],["bodegaje","Bodegaje"],["adicionales","Adicionales"]];
   GRUPOS.forEach(([cat,titulo])=>{
     const items=lines.filter(l=>l.cat===cat&&!l.noV&&l.v>0);
@@ -1062,11 +1064,11 @@ function sendWA(){
     }
   });
   if(dcto>0){
-    msg+=`\n💰 Total: ${COP(subV)}`;
-    msg+=`\n🎁 Descuento: - ${COP(dcto)}`;
-    msg+=`\n✅ *Gran Total: ${COP(total)}*`;
+    msg+=`\n`+E.money+` Total: ${COP(subV)}`;
+    msg+=`\n`+E.gift+` Descuento: - ${COP(dcto)}`;
+    msg+=`\n`+E.check+` *Gran Total: ${COP(total)}*`;
   } else {
-    msg+=`\n✅ *Total: ${COP(subV)}*`;
+    msg+=`\n`+E.check+` *Total: ${COP(subV)}*`;
   }
   msg+=`\n\n${OBSERVACIONES}`;
   window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`,"_blank","noopener,noreferrer");
@@ -1116,7 +1118,7 @@ function _guardarCotParaOS(lines,cliente,tel,fecha,subV,dcto,total){
     localStorage.setItem(COT_CACHE_KEY,JSON.stringify(cache));
     // Alerta cuando se acerque al límite
     if(cache.length>=900){
-      var aviso='⚠️ *Alerta: Cache de cotizaciones al '+Math.round(cache.length/10)+'%*\n\nTienes '+cache.length+' de '+COT_MAX+' cotizaciones guardadas localmente.\n\nDescarga el backup desde el navegador antes de que se llene.\n\n⏰ '+new Date().toLocaleString('es-CO');
+      var aviso=E.warn+' *Alerta: Cache de cotizaciones al '+Math.round(cache.length/10)+'%*\n\nTienes '+cache.length+' de '+COT_MAX+' cotizaciones guardadas localmente.\n\nDescarga el backup desde el navegador antes de que se llene.\n\n'+E.clock+' '+new Date().toLocaleString('es-CO');
       fetch('https://api.telegram.org/bot'+_NOTIFY.TG_TOKEN+'/sendMessage',{
         method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({chat_id:_NOTIFY.TG_CHAT,text:aviso,parse_mode:'Markdown'})
@@ -1145,14 +1147,14 @@ function _notificarCotizacion(lines,subV,dcto,total){
   // Telegram
   try{
     const tg=[
-      '🔔 *Cotización enviada · Cotizador Interactivo*','',
-      '👤 *Cliente:* '+cliente,
-      '📱 *Tel:* '+tel,
-      '📅 *Fecha:* '+fecha,'',
-      '📋 *Detalle:*',resumen,
+      E.bell+' *Cotización enviada · Cotizador Interactivo*','',
+      E.person+' *Cliente:* '+cliente,
+      E.phone+' *Tel:* '+tel,
+      E.cal+' *Fecha:* '+fecha,'',
+      E.list+' *Detalle:*',resumen,
       dcto>0?('Descuento: -'+COP(dcto)+'\n*Total: '+totalFmt+'*'):('*Total: '+totalFmt+'*'),'',
-      '⏰ '+new Date().toLocaleString('es-CO'),
-      '🌐 trasteosya.online'
+      E.clock+' '+new Date().toLocaleString('es-CO'),
+      E.globe+' trasteosya.online'
     ];
     fetch('https://api.telegram.org/bot'+_NOTIFY.TG_TOKEN+'/sendMessage',{
       method:'POST',headers:{'Content-Type':'application/json'},
@@ -1161,14 +1163,14 @@ function _notificarCotizacion(lines,subV,dcto,total){
   }catch(e){}
   // WhatsApp CallMeBot
   try{
-    const wa='🔔 Cotización enviada\n👤 '+cliente+'\n📱 '+tel+'\n📅 '+fecha+'\n💰 Total: '+totalFmt+'\n⏰ '+new Date().toLocaleString('es-CO');
+    const wa=E.bell+' Cotización enviada\n'+E.person+' '+cliente+'\n'+E.phone+' '+tel+'\n'+E.cal+' '+fecha+'\n'+E.money+' Total: '+totalFmt+'\n'+E.clock+' '+new Date().toLocaleString('es-CO');
     fetch('https://api.callmebot.com/whatsapp.php?phone='+_NOTIFY.CMB_PHONE+'&text='+encodeURIComponent(wa)+'&apikey='+_NOTIFY.CMB_KEY,{method:'GET',mode:'no-cors'}).catch(function(){});
   }catch(e){}
   // Email via Web3Forms
   try{
     const fd=new FormData();
     fd.set('access_key',_NOTIFY.W3F_KEY);
-    fd.set('subject','🔔 Cotización interactiva · '+cliente);
+    fd.set('subject',E.bell+' Cotización interactiva · '+cliente);
     fd.set('from_name','Cotizador Trasteos Ya');
     fd.set('replyto',_NOTIFY.EMAIL_TO);
     fd.set('Origen','Cotizador interactivo');
