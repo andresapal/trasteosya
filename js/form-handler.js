@@ -30,15 +30,15 @@
     OPEN_WA_AFTER_SUBMIT: true,
 
     // Mensaje de auto-respuesta enviado por email al cliente
-    CLIENT_AUTOREPLY_SUBJECT: 'Recibimos tu solicitud · Trasteos Ya',
+    CLIENT_AUTOREPLY_SUBJECT: '¡Recibimos tu solicitud! · Trasteos Ya',
     CLIENT_AUTOREPLY_BODY:
       '¡Hola!\n\n' +
-      'Te has contactado con Trasteos Ya. Tu solicitud de cotización ya está en nuestras manos ' +
-      'y un coordinador te responderá por WhatsApp en menos de 15 minutos hábiles.\n\n' +
-      'Mientras tanto, si tienes algo urgente, escríbenos al 314 309 5194.\n\n' +
-      '¡Gracias por confiar en nosotros!\n' +
-      '— Equipo Trasteos Ya · 15 años moviendo Bogotá\n' +
-      '🌐 https://trasteosya.online'
+      'Tu solicitud de cotización ya está en nuestras manos. Un coordinador de Trasteos Ya ' +
+      'te contactará por WhatsApp en menos de 15 minutos hábiles con todos los detalles.\n\n' +
+      'Si tienes algo urgente, escríbenos al 314 309 5194.\n\n' +
+      '¡Gracias por confiar en nosotros! Queremos que tu mudanza sea tranquila y sin sorpresas.\n\n' +
+      'Equipo Trasteos Ya · 15 años moviendo Bogotá\n' +
+      'https://trasteosya.online'
   };
 
   function getPhone() {
@@ -57,15 +57,16 @@
   }
 
   const OBSERVACIONES_CLIENTE =
-    'Muchas gracias por contactarnos.\n\n' +
-    'Con el fin de brindarle una cotización lo más precisa posible y evitar posibles ajustes durante la prestación del servicio, nos permitimos compartir las siguientes observaciones:\n\n' +
-    '• Agradecemos enviarnos fotografías o videos de los artículos a transportar y de los accesos en origen y destino. Esto nos ayuda a calcular adecuadamente los recursos necesarios.\n' +
-    '• Es importante informarnos si existen escaleras, caminados largos, restricciones de acceso, reservas de ascensor o cualquier condición especial que pueda afectar el desarrollo de la mudanza.\n' +
-    '• Si cuenta con artículos especiales como nevecón, secadora, muebles de gran tamaño o elementos delicados, le agradecemos indicarlo previamente.\n' +
-    '• En caso de requerir servicios adicionales como empaque, suministro de cajas, bodegaje o instalaciones, por favor háganoslo saber con anticipación.\n\n' +
-    'Nuestro objetivo es ofrecerle un servicio con el costo más aterrizado posible, sin contratiempos y con la mejor planeación para su presupuesto y su mudanza.\n\n' +
-    'Cordialmente,\n' +
-    'Trasteos Ya\n' +
+    '🏠 ¡Gracias por confiar en Trasteos Ya!\n\n' +
+    'Queremos que tu mudanza sea una experiencia tranquila y sin sorpresas. Para darte el precio más preciso, te agradecemos mucho si nos compartes:\n\n' +
+    '📸 Fotos o videos de lo que vamos a transportar y de los accesos (entrada del edificio, parqueadero, ascensor).\n\n' +
+    '📋 Cuéntanos si hay algo especial que debamos saber:\n' +
+    '  → Escaleras, caminados largos o restricciones de acceso\n' +
+    '  → Artículos grandes o delicados (nevecón, secadora, piano, vidrios)\n' +
+    '  → Si necesitas empaque, cajas o bodegaje\n\n' +
+    '🎯 Nuestro compromiso es darte un servicio planeado, sin contratiempos y al mejor precio.\n\n' +
+    '¡Quedo atento a cualquier duda! 🤝\n\n' +
+    'Equipo Trasteos Ya\n' +
     'trasteosya.online';
 
   function buildCotizacionHogar(data) {
@@ -83,17 +84,17 @@
       } catch(e) { fechaStr = data.fecha; }
     }
     var lines = [
-      '*Cotización Trasteos Ya*',
-      nombre ? ('Cliente: ' + nombre) : '',
-      fechaStr ? ('Fecha estimada: ' + fechaStr) : '',
+      '🏠 *Cotización Trasteos Ya*',
+      '',
+      nombre ? (saludo + ', aquí va tu cotización:') : '',
+      fechaStr ? ('📅 ' + fechaStr) : '',
+      (data.origen || data.destino) ? ('📍 ' + (data.origen||'-') + ' → ' + (data.destino||'-')) : '',
       '',
       '*Mudanza:*',
       '• Trasteo Urbano ' + t.label + ': ' + COP(t.precio),
       '  (' + t.tamano + ')',
       '',
-      '*Total: ' + COP(t.precio) + '*',
-      '',
-      (data.origen || data.destino) ? ('Ruta: ' + (data.origen||'-') + ' → ' + (data.destino||'-')) : '',
+      '✅ *Total: ' + COP(t.precio) + '*',
       '',
       OBSERVACIONES_CLIENTE
     ];
@@ -106,16 +107,16 @@
     if (cotizacion) {
       return 'https://wa.me/' + getPhone() + '?text=' + encodeURIComponent(cotizacion);
     }
-    var lines = ['Acabo de enviar una cotización por el sitio web.', ''];
-    if (data.nombre)   lines.push('Nombre: ' + data.nombre);
-    if (data.email)    lines.push('Email: ' + data.email);
-    if (data.servicio) lines.push('Servicio: ' + data.servicio);
-    if (data.origen)   lines.push('Origen: ' + data.origen);
-    if (data.destino)  lines.push('Destino: ' + data.destino);
-    if (data.tamano)   lines.push('Tamaño: ' + data.tamano);
-    if (data.fecha)    lines.push('Fecha estimada: ' + data.fecha);
-    if (data.detalles) lines.push('Detalles: ' + data.detalles);
-    lines.push('', '¡Quedo atento a su respuesta!', '', '— Trasteos Ya · trasteosya.online');
+    var lines = ['🏠 Hola, acabo de solicitar una cotización desde el sitio web.', ''];
+    if (data.nombre)   lines.push('👤 ' + data.nombre);
+    if (data.email)    lines.push('📧 ' + data.email);
+    if (data.servicio) lines.push('🚚 Servicio: ' + data.servicio);
+    if (data.origen)   lines.push('📍 ' + data.origen + ' → ' + (data.destino||''));
+    if (data.destino && !data.origen) lines.push('📍 Destino: ' + data.destino);
+    if (data.tamano)   lines.push('📦 Tamaño: ' + data.tamano);
+    if (data.fecha)    lines.push('📅 Fecha: ' + data.fecha);
+    if (data.detalles) lines.push('💬 ' + data.detalles);
+    lines.push('', '¡Quedo atento, gracias! 🤝', '', 'Equipo Trasteos Ya · trasteosya.online');
     return 'https://wa.me/' + getPhone() + '?text=' + encodeURIComponent(lines.join('\n'));
   }
 
