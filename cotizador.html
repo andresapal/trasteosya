@@ -166,6 +166,9 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
 .hist-btn-export{background:var(--brand);color:#fff}
 .hist-btn-clear{background:#fee2e2;color:#dc2626}
 .hist-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
+.hc-del{width:26px;height:26px;border:none;border-radius:50%;background:#fee2e2;color:#dc2626;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center;margin-left:6px;transition:.15s;flex-shrink:0}
+.hc-del:hover{background:#dc2626;color:#fff}
+.hc-actions{display:flex;align-items:center;gap:4px;flex-shrink:0}
 </style>
 <link rel="stylesheet" href="css/access-gate.css?v=18"></head>
 <body data-gate="enabled">
@@ -1595,8 +1598,9 @@ function _renderHistList(list){
     }
     html+='<div class="hist-card" id="hcard-'+i+'">';
     html+='<div class="hc-top"><span class="hc-name" onclick="cargarDesdHistorial('+i+')">'+escH(e.cliente||'-')+'</span>';
-    html+='<span><span class="hc-total">'+COP(e.total||0)+'</span>';
-    html+='<button class="hc-estado '+estadoCls+'" onclick="event.stopPropagation();toggleEstado('+i+')">'+estado+'</button></span></div>';
+    html+='<div class="hc-actions"><span class="hc-total">'+COP(e.total||0)+'</span>';
+    html+='<button class="hc-estado '+estadoCls+'" onclick="event.stopPropagation();toggleEstado('+i+')">'+estado+'</button>';
+    html+='<button class="hc-del" onclick="event.stopPropagation();eliminarCotizacion('+i+')" title="Eliminar">&#x2715;</button></div></div>';
     html+='<div class="hc-date">'+escH(fecha)+(e.telefono?' &middot; Tel: '+escH(e.telefono):'')+'</div>';
     if(items)html+='<div class="hc-items">'+escH(items)+'</div>';
     // Detail toggle
@@ -1643,6 +1647,22 @@ async function toggleEstado(i){
       meta:{cliente:e.cliente,fecha:e.fecha,estado:nuevoEstado}
     }),redirect:'follow'});
   }catch(ex){console.warn('Update estado:',ex);}
+}
+async function eliminarCotizacion(i){
+  _loadHistCache();
+  var e=_histCache[i];if(!e)return;
+  if(!confirm('Eliminar cotización de "'+e.cliente+'"?\nFecha: '+(e.fecha||'-')+'\nTotal: '+COP(e.total||0)+'\n\nSe eliminará del historial local y del Sheet.'))return;
+  var cliente=e.cliente||'';
+  var fecha=e.fecha||'';
+  _histCache.splice(i,1);
+  localStorage.setItem('ty_cot_cache',JSON.stringify(_histCache));
+  _renderHistList(_histCache);
+  try{
+    await fetch(COT_SHEET_URL,{method:'POST',body:JSON.stringify({
+      type:'delete_cotizacion',apikey:BACKUP_APIKEY,
+      meta:{cliente:cliente,fecha:fecha}
+    }),redirect:'follow'});
+  }catch(ex){console.warn('Delete sheet:',ex);}
 }
 function escH(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 function cargarDesdHistorial(idx){
