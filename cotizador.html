@@ -169,6 +169,13 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
 .hc-del{width:26px;height:26px;border:none;border-radius:50%;background:#fee2e2;color:#dc2626;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center;margin-left:6px;transition:.15s;flex-shrink:0}
 .hc-del:hover{background:#dc2626;color:#fff}
 .hc-actions{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.ac-dropdown{display:none;position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:100;max-height:180px;overflow-y:auto}
+.ac-dropdown.show{display:block}
+.ac-item{padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover,.ac-item.active{background:#f0f4ff}
+.ac-item .ac-name{font-weight:700;color:var(--dark)}
+.ac-item .ac-tel{font-size:12px;color:var(--muted)}
 </style>
 <link rel="stylesheet" href="css/access-gate.css?v=18"></head>
 <body data-gate="enabled">
@@ -229,7 +236,7 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
       </div>
       <div class="card-body always-show">
         <div class="grid2">
-          <div class="field"><label>Nombre del cliente</label><input id="cliente" placeholder="Ej: JUAN PÉREZ" style="text-transform:uppercase" autocomplete="name" oninput="this.value=this.value.toUpperCase();recalc()" onchange="this.value=this.value.toUpperCase();recalc()"></div>
+          <div class="field" style="position:relative"><label>Nombre del cliente</label><input id="cliente" name="cliente" placeholder="Ej: JUAN PÉREZ" style="text-transform:uppercase" autocomplete="name" oninput="buscarCliente(this.value.toUpperCase());recalc()" onblur="this.value=this.value.toUpperCase()" onchange="this.value=this.value.toUpperCase();recalc()"><div id="cliente-sugerencias" class="ac-dropdown"></div></div>
           <div class="field"><label>Fecha</label><input id="fecha" type="date" oninput="recalc()"></div>
         </div>
         <div class="field"><label>Teléfono (para WhatsApp)</label><input id="telefono" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="573001234567" oninput="this.value=this.value.replace(/\D/g,'');recalc()"></div>
@@ -1562,6 +1569,44 @@ function syncDrawer(){
 // Old modal functions (no-op now)
 function showMobilePDF(){}
 function closeMobilePDF(){}
+
+// ============ AUTOCOMPLETAR CLIENTES ============
+function buscarCliente(q){
+  var dd=document.getElementById('cliente-sugerencias');
+  q=(q||'').trim().toUpperCase();
+  if(q.length<2){dd.classList.remove('show');dd.innerHTML='';return;}
+  try{var cache=JSON.parse(localStorage.getItem('ty_cot_cache')||'[]');}catch(_){return;}
+  var vistos={};
+  var matches=[];
+  cache.forEach(function(e){
+    var nombre=(e.cliente||'').toUpperCase();
+    if(!nombre||vistos[nombre])return;
+    if(nombre.indexOf(q)>=0){
+      vistos[nombre]=1;
+      matches.push({nombre:e.cliente,tel:e.telefono||''});
+    }
+  });
+  if(!matches.length){dd.classList.remove('show');dd.innerHTML='';return;}
+  dd.innerHTML=matches.slice(0,5).map(function(m,i){
+    return '<div class="ac-item" onmousedown="seleccionarCliente('+i+')" data-nombre="'+escH(m.nombre)+'" data-tel="'+escH(m.tel)+'"><span class="ac-name">'+escH(m.nombre)+'</span><span class="ac-tel">'+escH(m.tel)+'</span></div>';
+  }).join('');
+  dd.classList.add('show');
+}
+function seleccionarCliente(i){
+  var dd=document.getElementById('cliente-sugerencias');
+  var item=dd.querySelectorAll('.ac-item')[i];
+  if(!item)return;
+  document.getElementById('cliente').value=item.getAttribute('data-nombre');
+  var tel=item.getAttribute('data-tel');
+  if(tel)document.getElementById('telefono').value=tel;
+  dd.classList.remove('show');
+  dd.innerHTML='';
+  recalc();
+}
+document.addEventListener('click',function(e){
+  var dd=document.getElementById('cliente-sugerencias');
+  if(dd&&!dd.parentElement.contains(e.target)){dd.classList.remove('show');}
+});
 
 // ============ HISTORIAL DE COTIZACIONES ============
 var _histCache=[];

@@ -98,6 +98,13 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
 .th-b{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .td-sub{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .td-emp{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ac-dropdown{display:none;position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:100;max-height:180px;overflow-y:auto}
+.ac-dropdown.show{display:block}
+.ac-item{padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover{background:#f0f4ff}
+.ac-item .ac-name{font-weight:700;color:#1f2937}
+.ac-item .ac-sub{font-size:12px;color:#9ca3af}
 </style>
 <link rel="stylesheet" href="css/access-gate.css?v=18"><meta name="robots" content="noindex,nofollow">
 <!-- Librerias para backup automatico a Drive (captura preview -> PDF) -->
@@ -169,7 +176,7 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
     </div>
     <div id="s-cli" class="card-body">
       <div class="grid2">
-        <div class="fgroup"><label>Cliente / Contacto *</label><input id="cliente" placeholder="NOMBRE DEL CLIENTE" autocomplete="name" style="text-transform:uppercase" oninput="st('cliente',up(this));syncContacto()" onchange="st('cliente',up(this));syncContacto()"/></div>
+        <div class="fgroup" style="position:relative"><label>Cliente / Contacto *</label><input id="cliente" placeholder="NOMBRE DEL CLIENTE" autocomplete="name" style="text-transform:uppercase" oninput="st('cliente',this.value.toUpperCase());syncContacto();acBuscar('cliente')" onblur="this.value=this.value.toUpperCase()" onchange="st('cliente',up(this));syncContacto()"/><div id="ac-cliente" class="ac-dropdown"></div></div>
         <div class="fgroup"><label>Teléfono cliente</label><input id="telefono" type="tel" placeholder="3XX XXX XXXX" autocomplete="tel" oninput="st('telefono',this.value);syncContacto()" onchange="st('telefono',this.value);syncContacto()"/></div>
       </div>
       <hr class="sep"/>
@@ -194,7 +201,7 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
     </div>
     <div id="s-veh" class="card-body">
       <div class="grid3">
-        <div class="fgroup"><label>Conductor</label><input id="conductor" placeholder="NOMBRE CONDUCTOR" autocomplete="name" style="text-transform:uppercase" oninput="st('conductor',up(this))" onchange="st('conductor',up(this))"/></div>
+        <div class="fgroup" style="position:relative"><label>Conductor</label><input id="conductor" placeholder="NOMBRE CONDUCTOR" autocomplete="name" style="text-transform:uppercase" oninput="st('conductor',this.value.toUpperCase());acBuscar('conductor')" onblur="this.value=this.value.toUpperCase()" onchange="st('conductor',up(this))"/><div id="ac-conductor" class="ac-dropdown"></div></div>
         <div class="fgroup"><label>Cédula conductor</label><input id="conductorCedula" inputmode="numeric" placeholder="0.000.000.000" oninput="st('conductorCedula',fmtCed(this.value));this.value=state.conductorCedula"/></div>
         <div class="fgroup"><label>Celular conductor</label><input id="conductorCelular" type="tel" placeholder="300 XXX XXX" autocomplete="tel" oninput="st('conductorCelular',this.value)" onchange="st('conductorCelular',this.value)"/></div>
         <div class="fgroup"><label>Placa</label><input id="placa" placeholder="ABC-123" oninput="st('placa',up(this))"/></div>
@@ -480,7 +487,7 @@ function renderOps(){
     <div style="display:grid;grid-template-columns:34px 1fr 1.8fr 60px 32px;gap:8px;align-items:center;margin-bottom:7px">
       <div style="background:${o.esEmp?'#4b5563':'#f0f2f5'};color:${o.esEmp?'#fff':'#6b7280'};border-radius:6px;font-size:${o.esEmp?'11':'12'}px;font-weight:700;text-align:center;padding:5px 0">${o.esEmp?"E":i+1}</div>
       <input value="${o.cedula}" placeholder="Cédula" oninput="state.personas[${i}].cedula=fmtCed(this.value);this.value=state.personas[${i}].cedula"/>
-      <input value="${o.nombre}" placeholder="NOMBRE" style="text-transform:uppercase" oninput="state.personas[${i}].nombre=this.value.toUpperCase()"/>
+      <div style="position:relative"><input value="${o.nombre}" placeholder="NOMBRE" style="text-transform:uppercase" oninput="state.personas[${i}].nombre=this.value.toUpperCase();acBuscar('op',${i})" onblur="this.value=this.value.toUpperCase()" autocomplete="name"/><div id="ac-op-${i}" class="ac-dropdown"></div></div>
       <label style="display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;font-size:11px;text-transform:none;color:#374151">
         <input type="checkbox" ${o.esEmp?"checked":""} onchange="state.personas[${i}].esEmp=this.checked;renderOps()" style="width:auto;accent-color:#4b5563"/> Emp.
       </label>
@@ -1212,6 +1219,95 @@ const printWithColors=()=>{
 };
 // ============ GUARDAR / CARGAR ÓRDENES ============
 const OS_PREFIX='ty_os_';
+// ============ AUTOCOMPLETAR (clientes, conductores, operarios) ============
+function _acData(){
+  var clientes={},conductores={},operarios={};
+  try{
+    var cotCache=JSON.parse(localStorage.getItem('ty_cot_cache')||'[]');
+    cotCache.forEach(function(c){
+      var n=(c.cliente||'').trim().toUpperCase();
+      if(n&&!clientes[n])clientes[n]={nombre:c.cliente,tel:c.telefono||''};
+    });
+  }catch(_){}
+  try{
+    var idx=JSON.parse(localStorage.getItem('ty_os_index')||'[]');
+    idx.forEach(function(e){
+      try{
+        var os=JSON.parse(localStorage.getItem(e.key)||'null');
+        if(!os)return;
+        var cl=(os.cliente||'').trim().toUpperCase();
+        if(cl&&!clientes[cl])clientes[cl]={nombre:os.cliente,tel:os.telefono||''};
+        var co=(os.conductor||'').trim().toUpperCase();
+        if(co&&!conductores[co])conductores[co]={nombre:os.conductor,ced:os.conductorCedula||'',cel:os.conductorCelular||''};
+        (os.personas||[]).forEach(function(p){
+          var pn=(p.nombre||'').trim().toUpperCase();
+          if(pn&&!operarios[pn])operarios[pn]={nombre:p.nombre,ced:p.cedula||''};
+        });
+      }catch(_){}
+    });
+  }catch(_){}
+  return{clientes:clientes,conductores:conductores,operarios:operarios};
+}
+function acBuscar(tipo,opIdx){
+  var input,dd,q,data=_acData(),matches=[];
+  if(tipo==='cliente'){
+    input=document.getElementById('cliente');dd=document.getElementById('ac-cliente');
+    q=(input.value||'').trim().toUpperCase();
+    if(q.length<2){dd.classList.remove('show');dd.innerHTML='';return;}
+    Object.values(data.clientes).forEach(function(c){if(c.nombre.toUpperCase().indexOf(q)>=0)matches.push(c);});
+    dd.innerHTML=matches.slice(0,5).map(function(m,i){
+      return '<div class="ac-item" onmousedown="acSelCliente('+i+')" data-n="'+_escAc(m.nombre)+'" data-t="'+_escAc(m.tel)+'"><span class="ac-name">'+_escAc(m.nombre)+'</span><span class="ac-sub">'+_escAc(m.tel)+'</span></div>';
+    }).join('');
+  }else if(tipo==='conductor'){
+    input=document.getElementById('conductor');dd=document.getElementById('ac-conductor');
+    q=(input.value||'').trim().toUpperCase();
+    if(q.length<2){dd.classList.remove('show');dd.innerHTML='';return;}
+    Object.values(data.conductores).forEach(function(c){if(c.nombre.toUpperCase().indexOf(q)>=0)matches.push(c);});
+    dd.innerHTML=matches.slice(0,5).map(function(m,i){
+      return '<div class="ac-item" onmousedown="acSelConductor('+i+')" data-n="'+_escAc(m.nombre)+'" data-ced="'+_escAc(m.ced)+'" data-cel="'+_escAc(m.cel)+'"><span class="ac-name">'+_escAc(m.nombre)+'</span><span class="ac-sub">'+_escAc(m.ced)+'</span></div>';
+    }).join('');
+  }else if(tipo==='op'){
+    dd=document.getElementById('ac-op-'+opIdx);
+    q=(state.personas[opIdx].nombre||'').trim().toUpperCase();
+    if(!dd||q.length<2){if(dd)dd.classList.remove('show');return;}
+    Object.values(data.operarios).forEach(function(o){if(o.nombre.toUpperCase().indexOf(q)>=0)matches.push(o);});
+    dd.innerHTML=matches.slice(0,5).map(function(m,i){
+      return '<div class="ac-item" onmousedown="acSelOp('+opIdx+','+i+')" data-n="'+_escAc(m.nombre)+'" data-ced="'+_escAc(m.ced)+'"><span class="ac-name">'+_escAc(m.nombre)+'</span><span class="ac-sub">'+_escAc(m.ced)+'</span></div>';
+    }).join('');
+  }
+  if(matches.length)dd.classList.add('show');else{dd.classList.remove('show');dd.innerHTML='';}
+}
+function _escAc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+function acSelCliente(i){
+  var dd=document.getElementById('ac-cliente');
+  var el=dd.querySelectorAll('.ac-item')[i];if(!el)return;
+  var n=el.getAttribute('data-n'),t=el.getAttribute('data-t');
+  document.getElementById('cliente').value=n;state.cliente=n;
+  if(t){document.getElementById('telefono').value=t;state.telefono=t;}
+  syncContacto();dd.classList.remove('show');
+}
+function acSelConductor(i){
+  var dd=document.getElementById('ac-conductor');
+  var el=dd.querySelectorAll('.ac-item')[i];if(!el)return;
+  var n=el.getAttribute('data-n'),ced=el.getAttribute('data-ced'),cel=el.getAttribute('data-cel');
+  document.getElementById('conductor').value=n;state.conductor=n;
+  if(ced){document.getElementById('conductorCedula').value=ced;state.conductorCedula=ced;}
+  if(cel){document.getElementById('conductorCelular').value=cel;state.conductorCelular=cel;}
+  dd.classList.remove('show');
+}
+function acSelOp(opIdx,i){
+  var dd=document.getElementById('ac-op-'+opIdx);
+  var el=dd.querySelectorAll('.ac-item')[i];if(!el)return;
+  state.personas[opIdx].nombre=el.getAttribute('data-n');
+  state.personas[opIdx].cedula=el.getAttribute('data-ced')||'';
+  dd.classList.remove('show');renderOps();
+}
+document.addEventListener('click',function(e){
+  document.querySelectorAll('.ac-dropdown.show').forEach(function(dd){
+    if(!dd.parentElement.contains(e.target))dd.classList.remove('show');
+  });
+});
+
 function guardarOS(){
   try{
     const key=OS_PREFIX+(state.numeroOS||'temp');
