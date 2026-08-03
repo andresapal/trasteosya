@@ -125,7 +125,7 @@
     if (!isOperator()) return;
     if (document.querySelector('.ty-op-toolbar')) return;
     const bar = document.createElement('div');
-    bar.className = 'ty-op-toolbar ty-op-toolbar--hidden';
+    bar.className = 'ty-op-toolbar' + (window.innerWidth > 640 ? ' ty-op-toolbar--hidden' : '');
     var darkIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
     var lightIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
     bar.innerHTML =
@@ -148,30 +148,22 @@
       }
     };
 
-    // Trigger zone: show toolbar when cursor/finger near bottom edge
-    const trigger = document.createElement('div');
-    trigger.className = 'ty-op-trigger';
-    document.body.appendChild(trigger);
-    trigger.addEventListener('mouseenter', function () { bar.classList.remove('ty-op-toolbar--hidden'); });
-    bar.addEventListener('mouseleave', function (e) {
-      if (!bar.contains(e.relatedTarget) && e.relatedTarget !== trigger) {
-        bar.classList.add('ty-op-toolbar--hidden');
-      }
-    });
-    // Mobile: tap trigger zone to toggle
-    trigger.addEventListener('touchstart', function (e) {
-      e.preventDefault();
-      bar.classList.toggle('ty-op-toolbar--hidden');
-    }, { passive: false });
-    // Also show/hide on swipe up from bottom
-    let touchStartY = 0;
-    document.addEventListener('touchstart', function (e) { touchStartY = e.touches[0].clientY; }, { passive: true });
-    document.addEventListener('touchend', function (e) {
-      const dy = touchStartY - e.changedTouches[0].clientY;
-      const fromBottom = window.innerHeight - touchStartY;
-      if (dy > 40 && fromBottom < 80) bar.classList.remove('ty-op-toolbar--hidden');
-      else if (dy < -40 && !bar.contains(e.target)) bar.classList.add('ty-op-toolbar--hidden');
-    }, { passive: true });
+    // Hide swipe-nav-dots since toolbar already has page links
+    var dots = document.querySelector('.swipe-nav-dots');
+    if (dots) dots.style.display = 'none';
+
+    // Desktop: trigger zone + hover show/hide
+    if (window.innerWidth > 640) {
+      var trigger = document.createElement('div');
+      trigger.className = 'ty-op-trigger';
+      document.body.appendChild(trigger);
+      trigger.addEventListener('mouseenter', function () { bar.classList.remove('ty-op-toolbar--hidden'); });
+      bar.addEventListener('mouseleave', function (e) {
+        if (!bar.contains(e.relatedTarget) && e.relatedTarget !== trigger) {
+          bar.classList.add('ty-op-toolbar--hidden');
+        }
+      });
+    }
   }
 
   // ============ INIT ============
