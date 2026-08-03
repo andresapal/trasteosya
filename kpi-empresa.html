@@ -393,7 +393,12 @@ async function fetchDriveCots(){
   try{var url=COT_SHEET_URL+'?action=cotizaciones&apikey='+BACKUP_APIKEY;
     var r=await fetch(url,{redirect:'follow'});var data=await r.json();
     if((data.success||data.ok)&&data.cotizaciones){
-      driveCots=data.cotizaciones.map(function(c){
+      var delKeys=[];
+      try{delKeys=JSON.parse(localStorage.getItem('ty_cot_deleted')||'[]');}catch(_){}
+      driveCots=data.cotizaciones.filter(function(c){
+        var k=String(c['CLIENTE']||'').trim().toUpperCase()+'|'+String(c['FECHA']||'').substring(0,10);
+        return delKeys.indexOf(k)<0;
+      }).map(function(c){
         var total=+c['INGRESO TOTAL']||+c['INGRESO']||0;
         var ingEmp=+c['ING EMPAQUE']||+c['ING EMP']||((+c['ING VINIPEL']||0)+(+c['ING BURBUJA']||0)+(+c['ING CAJAS']||0)+(+c['ING CRAFT']||0)+(+c['ING CARTON CORRUGADO']||0));
         var ingInst=+c['ING INSTALACIONES TOTAL']||+c['ING INST']||+c['ING INSTALACIONES']||0;

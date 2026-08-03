@@ -1699,15 +1699,33 @@ async function eliminarCotizacion(i){
   if(!confirm('Eliminar cotización de "'+e.cliente+'"?\nFecha: '+(e.fecha||'-')+'\nTotal: '+COP(e.total||0)+'\n\nSe eliminará del historial local y del Sheet.'))return;
   var cliente=e.cliente||'';
   var fecha=e.fecha||'';
-  _histCache.splice(i,1);
-  localStorage.setItem('ty_cot_cache',JSON.stringify(_histCache));
-  _renderHistList(_histCache);
+  var delKey=cliente.toUpperCase()+'|'+fecha;
+  // 1. Borrar del Sheet primero
+  var sheetOk=false;
   try{
-    await fetch(COT_SHEET_URL,{method:'POST',body:JSON.stringify({
+    var resp=await fetch(COT_SHEET_URL,{method:'POST',body:JSON.stringify({
       type:'delete_cotizacion',apikey:BACKUP_APIKEY,
       meta:{cliente:cliente,fecha:fecha}
     }),redirect:'follow'});
+    var result=await resp.json();
+    sheetOk=result&&result.ok;
   }catch(ex){console.warn('Delete sheet:',ex);}
+  if(!sheetOk){
+    if(!confirm('No se pudo confirmar el borrado en el Sheet.\n\nEliminar solo del historial local de todas formas?'))return;
+  }
+  // 2. Borrar del cache local
+  _histCache.splice(i,1);
+  localStorage.setItem('ty_cot_cache',JSON.stringify(_histCache));
+  // 3. Guardar en lista de eliminados para que sincronizar no lo re-agregue
+  _addDeletedKey(delKey);
+  _renderHistList(_histCache);
+}
+function _getDeletedKeys(){
+  try{return JSON.parse(localStorage.getItem('ty_cot_deleted')||'[]');}catch(_){return[];}
+}
+function _addDeletedKey(key){
+  var keys=_getDeletedKeys();
+  if(keys.indexOf(key)<0){keys.push(key);localStorage.setItem('ty_cot_deleted',JSON.stringify(keys));}
 }
 function escH(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 function cargarDesdHistorial(idx){
@@ -1744,6 +1762,7 @@ async function sincronizarSheet(){
       _loadHistCache();
       var localKeys={};
       _histCache.forEach(function(c){localKeys[(c.cliente||'').toUpperCase()+'|'+(c.fecha||'')]=1;});
+      var deletedKeys=_getDeletedKeys();
       var added=0;
       data.cotizaciones.forEach(function(c){
         var cliente=String(c.CLIENTE||'').trim();
@@ -1752,6 +1771,7 @@ async function sincronizarSheet(){
         else fecha=String(fecha).substring(0,10);
         var key=cliente.toUpperCase()+'|'+fecha;
         if(localKeys[key])return;
+        if(deletedKeys.indexOf(key)>=0)return;
         var total=parseFloat(c['INGRESO TOTAL']||c['INGRESO']||0)||0;
         var costo=parseFloat(c['COSTO TOTAL']||0)||0;
         var estado=String(c.ESTADO||'COTIZADO').toUpperCase();

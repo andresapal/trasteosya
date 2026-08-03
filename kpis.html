@@ -232,8 +232,12 @@ async function fetchCotVendidas(){
     var url=COT_SHEET_URL+'?action=cotizaciones&apikey='+BACKUP_APIKEY;
     var r=await fetch(url,{redirect:'follow'});var d=await r.json();
     if(d.ok&&d.cotizaciones){
+      var delKeys=[];
+      try{delKeys=JSON.parse(localStorage.getItem('ty_cot_deleted')||'[]');}catch(_){}
       cotVendidas=d.cotizaciones.filter(function(c){
-        return String(c.ESTADO||'').toUpperCase().trim()==='VENDIDO';
+        if(String(c.ESTADO||'').toUpperCase().trim()!=='VENDIDO')return false;
+        var k=String(c.CLIENTE||'').trim().toUpperCase()+'|'+String(c.FECHA||'').substring(0,10);
+        return delKeys.indexOf(k)<0;
       }).map(function(c){
         var fecha=c.FECHA||'';
         if(fecha&&typeof fecha==='object'&&fecha.getTime)fecha='';
