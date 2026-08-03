@@ -179,6 +179,54 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 .cot-badge:disabled{opacity:.5;cursor:wait}
 @media(max-width:600px){.cot-row{flex-wrap:wrap;gap:6px}.cot-total{min-width:auto}}
 
+/* Cuentas de cobro */
+.cdc-section{margin-top:20px}
+.cdc-trigger{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--ty-card,#fff);border:1.5px solid var(--ty-border,#e2e5ea);border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;color:var(--ty-dark,#0A1845);user-select:none;transition:all .2s}
+.cdc-trigger:hover{border-color:#1B3E8C;background:rgba(27,62,140,.03)}
+.cdc-trigger .cdc-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#1B3E8C,#0A1845);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-right:10px;flex-shrink:0}
+.cdc-trigger .cdc-left{display:flex;align-items:center}
+.cdc-trigger .cdc-arrow{font-size:12px;color:var(--ty-muted,#9ca3af);transition:transform .25s}
+.cdc-trigger.open .cdc-arrow{transform:rotate(90deg)}
+.cdc-panel{max-height:0;overflow:hidden;transition:max-height .35s ease;border:1.5px solid var(--ty-border,#e2e5ea);border-top:none;border-radius:0 0 12px 12px}
+.cdc-panel.open{max-height:4000px}
+.cdc-panel-inner{padding:16px}
+.cdc-form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cdc-form .full{grid-column:1/-1}
+.cdc-form label{font-size:11px;font-weight:600;color:var(--ty-muted,#6b7280);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;display:block}
+.cdc-form input,.cdc-form textarea,.cdc-form select{width:100%;padding:8px 10px;border:1.5px solid var(--ty-border,#e2e5ea);border-radius:8px;font-size:13px;font-family:inherit;background:var(--ty-card,#fff);color:var(--ty-dark,#0A1845)}
+.cdc-form textarea{resize:vertical;min-height:50px}
+.cdc-items{margin:10px 0}
+.cdc-item-row{display:grid;grid-template-columns:1fr 120px 36px;gap:6px;margin-bottom:6px;align-items:end}
+.cdc-item-row input{padding:7px 8px;border:1.5px solid var(--ty-border,#e2e5ea);border-radius:8px;font-size:13px;font-family:inherit}
+.cdc-item-del{width:32px;height:32px;border:none;border-radius:8px;background:rgba(227,6,19,.08);color:#E30613;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cdc-item-del:hover{background:rgba(227,6,19,.18)}
+.cdc-add-item{font-size:12px;color:#1B3E8C;cursor:pointer;font-weight:600;background:none;border:none;padding:4px 0}
+.cdc-add-item:hover{text-decoration:underline}
+.cdc-total-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:2px solid var(--ty-border,#e2e5ea);margin-top:8px;font-weight:700;font-size:16px;color:var(--ty-dark,#0A1845)}
+.cdc-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.cdc-btn{padding:10px 18px;border-radius:10px;font-weight:600;font-size:13px;border:none;cursor:pointer;font-family:inherit}
+.cdc-btn-primary{background:linear-gradient(135deg,#1B3E8C,#0A1845);color:#fff}
+.cdc-btn-primary:hover{box-shadow:0 4px 14px rgba(27,62,140,.3)}
+.cdc-btn-secondary{background:rgba(27,62,140,.08);color:#1B3E8C;border:1.5px solid rgba(27,62,140,.2)}
+.cdc-btn-secondary:hover{background:rgba(27,62,140,.15)}
+.cdc-history{margin-top:16px;border-top:1.5px solid var(--ty-border,#e2e5ea);padding-top:12px}
+.cdc-hist-title{font-size:13px;font-weight:700;color:var(--ty-dark,#0A1845);margin-bottom:8px}
+.cdc-hist-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid var(--ty-border,#e2e5ea);border-radius:8px;margin-bottom:4px;font-size:12px;transition:all .15s}
+.cdc-hist-row:hover{border-color:#1B3E8C;background:rgba(27,62,140,.02)}
+.cdc-hist-num{font-weight:700;color:#1B3E8C;min-width:70px}
+.cdc-hist-cli{flex:1;color:var(--ty-dark,#0A1845);margin:0 8px}
+.cdc-hist-val{font-weight:600;color:var(--ty-dark,#0A1845);min-width:90px;text-align:right}
+.cdc-hist-date{color:var(--ty-muted,#9ca3af);min-width:80px;text-align:right}
+.cdc-hist-actions{display:flex;gap:4px;margin-left:8px}
+.cdc-hist-btn{width:28px;height:28px;border:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;background:rgba(27,62,140,.06);color:#1B3E8C}
+.cdc-hist-btn:hover{background:rgba(27,62,140,.15)}
+@media(max-width:600px){
+  .cdc-form{grid-template-columns:1fr}
+  .cdc-item-row{grid-template-columns:1fr 100px 32px}
+  .cdc-hist-row{flex-wrap:wrap;gap:4px}
+  .cdc-hist-val,.cdc-hist-date{min-width:auto}
+}
+
 /* Print */
 @media print{
   .header,.period-bar,.mod-tabs,.swipe-nav-dots,.ty-lock-btn,.ty-op-toolbar,.ty-gate-modal,.ty-op-trigger{display:none!important}
@@ -657,6 +705,237 @@ function drawGauge(canvasId,value,color){
 }
 
 /* ============================================
+   CUENTAS DE COBRO
+   ============================================ */
+var CDC_KEY='ty_cdc_list';
+function cdcLoad(){try{return JSON.parse(localStorage.getItem(CDC_KEY)||'[]');}catch(_){return[];}}
+function cdcSave(list){try{localStorage.setItem(CDC_KEY,JSON.stringify(list));}catch(_){}}
+function cdcNextNum(){
+  var list=cdcLoad();
+  if(list.length===0) return 956;
+  var max=0;list.forEach(function(c){var n=parseInt(String(c.numero).replace(/\D/g,''));if(n>max)max=n;});
+  return max+1;
+}
+function cdcFmtMoney(v){return '$'+String(Math.round(v)||0).replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+function cdcNumToWords(n){
+  var UNIDADES=['','UN','DOS','TRES','CUATRO','CINCO','SEIS','SIETE','OCHO','NUEVE'];
+  var DECENAS=['','DIEZ','VEINTE','TREINTA','CUARENTA','CINCUENTA','SESENTA','SETENTA','OCHENTA','NOVENTA'];
+  var CENTENAS=['','CIENTO','DOSCIENTOS','TRESCIENTOS','CUATROCIENTOS','QUINIENTOS','SEISCIENTOS','SETECIENTOS','OCHOCIENTOS','NOVECIENTOS'];
+  var ESPECIALES={11:'ONCE',12:'DOCE',13:'TRECE',14:'CATORCE',15:'QUINCE',16:'DIECISEIS',17:'DIECISIETE',18:'DIECIOCHO',19:'DIECINUEVE',21:'VEINTIUN',22:'VEINTIDOS',23:'VEINTITRES',24:'VEINTICUATRO',25:'VEINTICINCO',26:'VEINTISEIS',27:'VEINTISIETE',28:'VEINTIOCHO',29:'VEINTINUEVE'};
+  if(n===0) return 'CERO PESOS';
+  if(n===100) return 'CIEN';
+  function bloque(x){
+    if(x===0)return '';
+    if(x===100)return 'CIEN';
+    if(x<10)return UNIDADES[x];
+    if(ESPECIALES[x])return ESPECIALES[x];
+    if(x<100){var d=Math.floor(x/10),u=x%10;return DECENAS[d]+(u?' Y '+UNIDADES[u]:'');}
+    var c=Math.floor(x/100),r=x%100;
+    return CENTENAS[c]+(r?' '+bloque(r):'');
+  }
+  var parts=[];
+  var millones=Math.floor(n/1000000);
+  var miles=Math.floor((n%1000000)/1000);
+  var resto=n%1000;
+  if(millones===1) parts.push('UN MILLON');
+  else if(millones>1) parts.push(bloque(millones)+' MILLONES');
+  if(miles===1) parts.push('MIL');
+  else if(miles>1) parts.push(bloque(miles)+' MIL');
+  if(resto>0) parts.push(bloque(resto));
+  return parts.join(' ')+' PESOS';
+}
+function renderCDCSection(){
+  var list=cdcLoad();
+  var h='<div class="cdc-section">';
+  h+='<div class="cdc-trigger" onclick="this.classList.toggle(\'open\');this.nextElementSibling.classList.toggle(\'open\')">'
+    +'<div class="cdc-left"><div class="cdc-icon">$</div><span>Cuentas de Cobro</span></div>'
+    +'<span class="cdc-arrow">&#9654;</span></div>';
+  h+='<div class="cdc-panel"><div class="cdc-panel-inner">';
+  h+='<div class="cdc-form" id="cdc-form">'
+    +'<div><label>No. Cuenta</label><input id="cdc-num" value="CTY'+cdcNextNum()+'" style="font-weight:700;color:#1B3E8C"/></div>'
+    +'<div><label>Fecha</label><input type="date" id="cdc-fecha" value="'+new Date().toISOString().slice(0,10)+'"/></div>'
+    +'<div><label>Cliente / Empresa</label><input id="cdc-cliente" placeholder="NOMBRE O RAZON SOCIAL" style="text-transform:uppercase" autocapitalize="words"/></div>'
+    +'<div><label>NIT / C.C.</label><input id="cdc-nit" placeholder="900.000.000-0"/></div>'
+    +'<div class="full"><label>Concepto</label><input id="cdc-concepto" value="SERVICIO DE TRANSPORTE SEGUN RELACION ANEXA" style="text-transform:uppercase"/></div>'
+    +'</div>';
+  h+='<div class="cdc-items" id="cdc-items">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><label style="font-size:11px;font-weight:600;color:var(--ty-muted,#6b7280);text-transform:uppercase;letter-spacing:.05em">Detalle</label>'
+    +'<button class="cdc-add-item" onclick="cdcAddItem()">+ Agregar linea</button></div>'
+    +'<div id="cdc-item-list"></div>'
+    +'</div>';
+  h+='<div class="cdc-total-row"><span>TOTAL</span><span id="cdc-total">$0</span></div>';
+  h+='<div class="cdc-actions">'
+    +'<button class="cdc-btn cdc-btn-primary" onclick="cdcGenerarPDF()">Generar PDF</button>'
+    +'<button class="cdc-btn cdc-btn-secondary" onclick="cdcGuardar()">Guardar</button>'
+    +'<button class="cdc-btn cdc-btn-secondary" onclick="cdcLimpiar()">Nueva</button>'
+    +'</div>';
+  if(list.length>0){
+    h+='<div class="cdc-history"><div class="cdc-hist-title">Historial ('+list.length+')</div>';
+    list.forEach(function(c,i){
+      h+='<div class="cdc-hist-row">'
+        +'<span class="cdc-hist-num">'+c.numero+'</span>'
+        +'<span class="cdc-hist-cli">'+c.cliente+'</span>'
+        +'<span class="cdc-hist-val">'+cdcFmtMoney(c.total)+'</span>'
+        +'<span class="cdc-hist-date">'+c.fecha+'</span>'
+        +'<span class="cdc-hist-actions">'
+        +'<button class="cdc-hist-btn" onclick="cdcCargar('+i+')" title="Cargar">&#9998;</button>'
+        +'<button class="cdc-hist-btn" onclick="cdcRegenPDF('+i+')" title="PDF">&#8681;</button>'
+        +'</span></div>';
+    });
+    h+='</div>';
+  }
+  h+='</div></div></div>';
+  return h;
+}
+var _cdcItems=[{desc:'',valor:0}];
+function cdcRenderItems(){
+  var el=document.getElementById('cdc-item-list');if(!el)return;
+  var h='';
+  _cdcItems.forEach(function(it,i){
+    h+='<div class="cdc-item-row">'
+      +'<input placeholder="Descripcion" value="'+(it.desc||'').replace(/"/g,'&quot;')+'" oninput="_cdcItems['+i+'].desc=this.value" style="text-transform:uppercase"/>'
+      +'<input type="number" placeholder="Valor" value="'+(it.valor||'')+'" oninput="_cdcItems['+i+'].valor=parseInt(this.value)||0;cdcRecalcTotal()"/>'
+      +(i>0?'<button class="cdc-item-del" onclick="_cdcItems.splice('+i+',1);cdcRenderItems();cdcRecalcTotal()">x</button>':'<div></div>')
+      +'</div>';
+  });
+  el.innerHTML=h;
+}
+function cdcAddItem(){_cdcItems.push({desc:'',valor:0});cdcRenderItems();}
+function cdcRecalcTotal(){
+  var sum=0;_cdcItems.forEach(function(it){sum+=it.valor||0;});
+  var el=document.getElementById('cdc-total');if(el)el.textContent=cdcFmtMoney(sum);
+}
+function cdcGuardar(){
+  var num=(document.getElementById('cdc-num').value||'').trim();
+  var cliente=(document.getElementById('cdc-cliente').value||'').trim().toUpperCase();
+  var nit=(document.getElementById('cdc-nit').value||'').trim();
+  var concepto=(document.getElementById('cdc-concepto').value||'').trim().toUpperCase();
+  var fecha=(document.getElementById('cdc-fecha').value||'');
+  if(!cliente){alert('Falta el nombre del cliente');return;}
+  var total=0;_cdcItems.forEach(function(it){total+=it.valor||0;});
+  var entry={numero:num,cliente:cliente,nit:nit,concepto:concepto,fecha:fecha,items:JSON.parse(JSON.stringify(_cdcItems)),total:total,saved:new Date().toISOString()};
+  var list=cdcLoad();
+  var existing=list.findIndex(function(c){return c.numero===num;});
+  if(existing>=0) list[existing]=entry; else list.unshift(entry);
+  cdcSave(list);
+  alert('Cuenta '+num+' guardada');
+}
+function cdcLimpiar(){
+  _cdcItems=[{desc:'',valor:0}];
+  document.getElementById('cdc-num').value='CTY'+cdcNextNum();
+  document.getElementById('cdc-cliente').value='';
+  document.getElementById('cdc-nit').value='';
+  document.getElementById('cdc-concepto').value='SERVICIO DE TRANSPORTE SEGUN RELACION ANEXA';
+  document.getElementById('cdc-fecha').value=new Date().toISOString().slice(0,10);
+  cdcRenderItems();cdcRecalcTotal();
+}
+function cdcCargar(idx){
+  var list=cdcLoad();var c=list[idx];if(!c)return;
+  document.getElementById('cdc-num').value=c.numero;
+  document.getElementById('cdc-cliente').value=c.cliente;
+  document.getElementById('cdc-nit').value=c.nit||'';
+  document.getElementById('cdc-concepto').value=c.concepto||'';
+  document.getElementById('cdc-fecha').value=c.fecha||'';
+  _cdcItems=c.items&&c.items.length?JSON.parse(JSON.stringify(c.items)):[{desc:'',valor:0}];
+  cdcRenderItems();cdcRecalcTotal();
+  var trigger=document.querySelector('.cdc-trigger');
+  if(trigger&&!trigger.classList.contains('open')){trigger.classList.add('open');trigger.nextElementSibling.classList.add('open');}
+  document.getElementById('cdc-num').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function cdcRegenPDF(idx){
+  var list=cdcLoad();var c=list[idx];if(!c)return;
+  cdcCargar(idx);
+  setTimeout(cdcGenerarPDF,300);
+}
+function cdcGenerarPDF(){
+  if(typeof window.jspdf==='undefined'){alert('Cargando librerias, intenta de nuevo en 2 segundos');return;}
+  var num=(document.getElementById('cdc-num').value||'').trim();
+  var cliente=(document.getElementById('cdc-cliente').value||'').trim().toUpperCase();
+  var nit=(document.getElementById('cdc-nit').value||'').trim();
+  var concepto=(document.getElementById('cdc-concepto').value||'').trim().toUpperCase();
+  var fecha=(document.getElementById('cdc-fecha').value||'');
+  if(!cliente){alert('Falta el nombre del cliente');return;}
+  var total=0;_cdcItems.forEach(function(it){total+=it.valor||0;});
+
+  var {jsPDF}=window.jspdf;
+  var doc=new jsPDF({orientation:'portrait',unit:'mm',format:'letter'});
+  var W=doc.internal.pageSize.getWidth();
+  var y=30;
+
+  doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(27,62,140);
+  doc.text('DOCUMENTO EQUIVALENTE A FACTURA '+num,W/2,y,{align:'center'});
+  y+=7;
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(100);
+  doc.text('Decreto Reglamentario No. 522 de marzo 07 de 2003',W/2,y,{align:'center'});
+  y+=14;
+
+  doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(40);
+  doc.text(cliente,W/2,y,{align:'center'});y+=6;
+  doc.setFont('helvetica','normal');doc.setFontSize(10);
+  doc.text('NIT '+nit,W/2,y,{align:'center'});y+=10;
+
+  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(27,62,140);
+  doc.text('DEBE A',W/2,y,{align:'center'});y+=8;
+
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(40);
+  doc.text('ANDRES APARICIO',W/2,y,{align:'center'});y+=5;
+  doc.setFont('helvetica','normal');doc.setFontSize(10);
+  doc.text('C.C. 79.981.036',W/2,y,{align:'center'});y+=12;
+
+  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(27,62,140);
+  doc.text('POR CONCEPTO DE',W/2,y,{align:'center'});y+=7;
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(40);
+  var cLines=doc.splitTextToSize(concepto,160);
+  doc.text(cLines,W/2,y,{align:'center'});y+=cLines.length*5+8;
+
+  // Items table
+  doc.setDrawColor(200);doc.setLineWidth(0.3);
+  _cdcItems.forEach(function(it){
+    if(!it.desc&&!it.valor)return;
+    doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(40);
+    doc.text((it.desc||'').toUpperCase(),25,y);
+    doc.text(cdcFmtMoney(it.valor),W-25,y,{align:'right'});
+    y+=6;
+  });
+
+  y+=4;doc.setLineWidth(0.5);doc.setDrawColor(27,62,140);
+  doc.line(25,y,W-25,y);y+=8;
+  doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(27,62,140);
+  doc.text('TOTAL',25,y);
+  doc.text(cdcFmtMoney(total),W-25,y,{align:'right'});
+  y+=10;
+
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(40);
+  doc.text('SON: '+cdcNumToWords(total)+' ('+cdcFmtMoney(total)+')',W/2,y,{align:'center'});
+  y+=14;
+
+  doc.setFontSize(9);doc.setTextColor(80);
+  var banco='FAVOR HACER TRANSFERENCIA A CUENTA DE AHORROS DAVIVIENDA A NOMBRE';
+  doc.text(banco,W/2,y,{align:'center'});y+=5;
+  doc.text('ANDRES APARICIO No. 4884 2294 1358',W/2,y,{align:'center'});y+=5;
+  doc.text('LLAVE @DAVI3143095194 | NEQUI 3143095194',W/2,y,{align:'center'});y+=10;
+
+  doc.setFontSize(8);doc.setTextColor(120);
+  doc.text('NO ESTA SUJETA A RETENCION EN LA FUENTE',W/2,y,{align:'center'});y+=4;
+  var fechaLarga=fecha?new Date(fecha+'T12:00:00').toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric'}):'';
+  doc.text('BOGOTA D.C. '+fechaLarga.toUpperCase(),W/2,y,{align:'center'});y+=16;
+
+  doc.setLineWidth(0.4);doc.setDrawColor(40);doc.line(W/2-40,y,W/2+40,y);y+=5;
+  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(40);
+  doc.text('ANDRES APARICIO ALVAREZ',W/2,y,{align:'center'});y+=5;
+  doc.setFont('helvetica','normal');doc.setFontSize(9);
+  doc.text('NIT. 79.981.036',W/2,y,{align:'center'});
+
+  doc.setFontSize(7);doc.setTextColor(180);
+  doc.text('Trasteos Ya - trasteosya.online',W/2,270,{align:'center'});
+
+  var fn=num.replace(/\s/g,'_')+' '+cliente.replace(/[^A-Z0-9 ]/g,'')+'.pdf';
+  doc.save(fn);
+
+  cdcGuardar();
+}
+
+/* ============================================
    MODULE: INGRESOS
    ============================================ */
 function renderIngresos(orders,allOrders,prevOrders){
@@ -845,7 +1124,13 @@ function renderIngresos(orders,allOrders,prevOrders){
     +'<div class="chart-box"><div class="chart-title">Nuevos vs Recurrentes</div><div class="chart-canvas"><canvas id="ch-clientes"></canvas></div></div>'
     +'</div>';
 
+  // Cuentas de cobro
+  html+=renderCDCSection();
+
   container.innerHTML=html;
+
+  // Init CDC items
+  cdcRenderItems();cdcRecalcTotal();
 
   // === RENDER GAUGES ===
   drawGauge('gauge-efec',efectividad,efectividad>=50?'#15803d':efectividad>=25?'#d97706':'#E30613');
