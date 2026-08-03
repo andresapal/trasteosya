@@ -176,7 +176,7 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
     </div>
     <div id="s-cli" class="card-body">
       <div class="grid2">
-        <div class="fgroup" style="position:relative"><label>Cliente / Contacto *</label><input id="cliente" placeholder="NOMBRE DEL CLIENTE" autocomplete="name" style="text-transform:uppercase" oninput="st('cliente',this.value.toUpperCase());syncContacto();acBuscar('cliente')" onblur="this.value=this.value.toUpperCase()" onchange="st('cliente',up(this));syncContacto()"/><div id="ac-cliente" class="ac-dropdown"></div></div>
+        <div class="fgroup" style="position:relative"><label>Cliente / Contacto *</label><input id="cliente" placeholder="NOMBRE DEL CLIENTE" autocomplete="name" autocapitalize="words" style="text-transform:uppercase" oninput="st('cliente',this.value);syncContacto();acBuscar('cliente')" onblur="this.value=this.value.toUpperCase();st('cliente',this.value)" onchange="st('cliente',this.value.toUpperCase());syncContacto()"/><div id="ac-cliente" class="ac-dropdown"></div></div>
         <div class="fgroup"><label>Teléfono cliente</label><input id="telefono" type="tel" placeholder="3XX XXX XXXX" autocomplete="tel" oninput="st('telefono',this.value);syncContacto()" onchange="st('telefono',this.value);syncContacto()"/></div>
       </div>
       <hr class="sep"/>
@@ -201,10 +201,10 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
     </div>
     <div id="s-veh" class="card-body">
       <div class="grid3">
-        <div class="fgroup" style="position:relative"><label>Conductor</label><input id="conductor" placeholder="NOMBRE CONDUCTOR" autocomplete="name" style="text-transform:uppercase" oninput="st('conductor',this.value.toUpperCase());acBuscar('conductor')" onblur="this.value=this.value.toUpperCase()" onchange="st('conductor',up(this))"/><div id="ac-conductor" class="ac-dropdown"></div></div>
+        <div class="fgroup" style="position:relative"><label>Conductor</label><input id="conductor" placeholder="NOMBRE CONDUCTOR" autocomplete="name" autocapitalize="words" style="text-transform:uppercase" oninput="st('conductor',this.value);acBuscar('conductor')" onblur="this.value=this.value.toUpperCase();st('conductor',this.value)" onchange="st('conductor',this.value.toUpperCase())"/><div id="ac-conductor" class="ac-dropdown"></div></div>
         <div class="fgroup"><label>Cédula conductor</label><input id="conductorCedula" inputmode="numeric" placeholder="0.000.000.000" oninput="st('conductorCedula',fmtCed(this.value));this.value=state.conductorCedula"/></div>
         <div class="fgroup"><label>Celular conductor</label><input id="conductorCelular" type="tel" placeholder="300 XXX XXX" autocomplete="tel" oninput="st('conductorCelular',this.value)" onchange="st('conductorCelular',this.value)"/></div>
-        <div class="fgroup"><label>Placa</label><input id="placa" placeholder="ABC-123" style="text-transform:uppercase" oninput="st('placa',this.value.toUpperCase())" onblur="this.value=this.value.toUpperCase()"/></div>
+        <div class="fgroup"><label>Placa</label><input id="placa" placeholder="ABC-123" style="text-transform:uppercase" oninput="st('placa',this.value)" onblur="this.value=this.value.toUpperCase();st('placa',this.value)"/></div>
         <div class="fgroup"><label># Operarios</label><input type="number" id="numOperarios" min="0" value="0" oninput="st('numOperarios',+this.value||0)"/></div>
         <div class="fgroup"><label>Tipo vehículo</label>
           <select id="tipoVehiculo" onchange="st('tipoVehiculo',this.value)">
@@ -487,7 +487,7 @@ function renderOps(){
     <div style="display:grid;grid-template-columns:34px 1fr 1.8fr 60px 32px;gap:8px;align-items:center;margin-bottom:7px">
       <div style="background:${o.esEmp?'#4b5563':'#f0f2f5'};color:${o.esEmp?'#fff':'#6b7280'};border-radius:6px;font-size:${o.esEmp?'11':'12'}px;font-weight:700;text-align:center;padding:5px 0">${o.esEmp?"E":i+1}</div>
       <input value="${o.cedula}" placeholder="Cédula" oninput="state.personas[${i}].cedula=fmtCed(this.value);this.value=state.personas[${i}].cedula"/>
-      <div style="position:relative"><input value="${o.nombre}" placeholder="NOMBRE" style="text-transform:uppercase" oninput="state.personas[${i}].nombre=this.value.toUpperCase();acBuscar('op',${i})" onblur="this.value=this.value.toUpperCase()" autocomplete="name"/><div id="ac-op-${i}" class="ac-dropdown"></div></div>
+      <div style="position:relative"><input value="${o.nombre}" placeholder="NOMBRE" autocapitalize="words" style="text-transform:uppercase" oninput="state.personas[${i}].nombre=this.value;acBuscar('op',${i})" onblur="this.value=this.value.toUpperCase();state.personas[${i}].nombre=this.value" autocomplete="name"/><div id="ac-op-${i}" class="ac-dropdown"></div></div>
       <label style="display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;font-size:11px;text-transform:none;color:#374151">
         <input type="checkbox" ${o.esEmp?"checked":""} onchange="state.personas[${i}].esEmp=this.checked;renderOps()" style="width:auto;accent-color:#4b5563"/> Emp.
       </label>
@@ -508,7 +508,7 @@ const ciudadSel=(val,kind,pid)=>{
     <select onchange="updP('${kind}','${pid}','ciudad',this.value==='OTRO'?'':this.value);if(this.value!=='OTRO')renderParadas()">
       ${CIUDADES.map(c=>`<option value="${c}"${c===sv?" selected":""}>${c}</option>`).join("")}
     </select>
-    ${isOtro||sv==="OTRO"?`<input value="${isOtro?val:""}" placeholder="CIUDAD" style="margin-top:5px" oninput="updP('${kind}','${pid}','ciudad',this.value.toUpperCase())"/>`:""}
+    ${isOtro||sv==="OTRO"?`<input value="${isOtro?val:""}" placeholder="CIUDAD" style="margin-top:5px" oninput="updP('${kind}','${pid}','ciudad',this.value)" onblur="this.value=this.value.toUpperCase();updP('${kind}','${pid}','ciudad',this.value)"/>`:""}
   </div>`;
 };
 
@@ -526,11 +526,11 @@ const renderParada=(p,i,kind,multi)=>{
         ${isEnt?'<div class="input-hint">Editar para destinos nacionales</div>':""}
       </div>
       <div class="fgroup"><label>Hora ${isEnt?"Est.":""}</label><input type="time" value="${p.hora}" oninput="updP('${kind}','${p.id}','hora',this.value)"/></div>
-      <div class="fgroup col-full"><label>${isEnt?'Dirección Destino':'Dirección Origen'}</label><input id="dir-${kind}-${p.id}" class="places-ac" data-kind="${kind}" data-pid="${p.id}" value="${p.direccion}" style="text-transform:uppercase" autocomplete="off" placeholder="${isEnt?'Escribe dirección destino...':'Escribe dirección origen...'}" oninput="updP('${kind}','${p.id}','direccion',this.value.toUpperCase())"/></div>
-      <div class="fgroup"><label>Contacto 1</label><input value="${p.contacto1}" style="text-transform:uppercase" autocomplete="name" oninput="updP('${kind}','${p.id}','contacto1',this.value.toUpperCase())" onblur="this.value=this.value.toUpperCase()" onchange="updP('${kind}','${p.id}','contacto1',up(this))"/></div>
+      <div class="fgroup col-full"><label>${isEnt?'Dirección Destino':'Dirección Origen'}</label><input id="dir-${kind}-${p.id}" class="places-ac" data-kind="${kind}" data-pid="${p.id}" value="${p.direccion}" style="text-transform:uppercase" autocomplete="off" placeholder="${isEnt?'Escribe dirección destino...':'Escribe dirección origen...'}" oninput="updP('${kind}','${p.id}','direccion',this.value)" onblur="this.value=this.value.toUpperCase();updP('${kind}','${p.id}','direccion',this.value)"/></div>
+      <div class="fgroup"><label>Contacto 1</label><input value="${p.contacto1}" style="text-transform:uppercase" autocomplete="name" autocapitalize="words" oninput="updP('${kind}','${p.id}','contacto1',this.value)" onblur="this.value=this.value.toUpperCase();updP('${kind}','${p.id}','contacto1',this.value)" onchange="updP('${kind}','${p.id}','contacto1',this.value.toUpperCase())"/></div>
       <div class="fgroup"><label>Teléfono 1</label><input value="${p.telefono1}" type="tel" autocomplete="tel" oninput="updP('${kind}','${p.id}','telefono1',this.value)" onchange="updP('${kind}','${p.id}','telefono1',this.value)"/></div>
       <div class="fgroup"><label>Email</label><input value="${p.email}" type="email" autocomplete="email" oninput="updP('${kind}','${p.id}','email',this.value)" onchange="updP('${kind}','${p.id}','email',this.value)"/></div>
-      <div class="fgroup"><label>Contacto 2</label><input value="${p.contacto2}" style="text-transform:uppercase" autocomplete="name" oninput="updP('${kind}','${p.id}','contacto2',this.value.toUpperCase())" onblur="this.value=this.value.toUpperCase()" onchange="updP('${kind}','${p.id}','contacto2',up(this))"/></div>
+      <div class="fgroup"><label>Contacto 2</label><input value="${p.contacto2}" style="text-transform:uppercase" autocomplete="name" autocapitalize="words" oninput="updP('${kind}','${p.id}','contacto2',this.value)" onblur="this.value=this.value.toUpperCase();updP('${kind}','${p.id}','contacto2',this.value)" onchange="updP('${kind}','${p.id}','contacto2',this.value.toUpperCase())"/></div>
       <div class="fgroup"><label>Teléfono 2</label><input value="${p.telefono2}" type="tel" autocomplete="tel" oninput="updP('${kind}','${p.id}','telefono2',this.value)" onchange="updP('${kind}','${p.id}','telefono2',this.value)"/></div>
     </div>
     ${multi?`<div style="text-align:right;margin-top:8px"><button class="btn-sm btn-danger-sm" onclick="delP('${kind}','${p.id}')">✕ Quitar</button></div>`:""}
