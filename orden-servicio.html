@@ -204,7 +204,7 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
         <div class="fgroup" style="position:relative"><label>Conductor</label><input id="conductor" placeholder="NOMBRE CONDUCTOR" autocomplete="name" style="text-transform:uppercase" oninput="st('conductor',this.value.toUpperCase());acBuscar('conductor')" onblur="this.value=this.value.toUpperCase()" onchange="st('conductor',up(this))"/><div id="ac-conductor" class="ac-dropdown"></div></div>
         <div class="fgroup"><label>Cédula conductor</label><input id="conductorCedula" inputmode="numeric" placeholder="0.000.000.000" oninput="st('conductorCedula',fmtCed(this.value));this.value=state.conductorCedula"/></div>
         <div class="fgroup"><label>Celular conductor</label><input id="conductorCelular" type="tel" placeholder="300 XXX XXX" autocomplete="tel" oninput="st('conductorCelular',this.value)" onchange="st('conductorCelular',this.value)"/></div>
-        <div class="fgroup"><label>Placa</label><input id="placa" placeholder="ABC-123" oninput="st('placa',up(this))"/></div>
+        <div class="fgroup"><label>Placa</label><input id="placa" placeholder="ABC-123" style="text-transform:uppercase" oninput="st('placa',this.value.toUpperCase())" onblur="this.value=this.value.toUpperCase()"/></div>
         <div class="fgroup"><label># Operarios</label><input type="number" id="numOperarios" min="0" value="0" oninput="st('numOperarios',+this.value||0)"/></div>
         <div class="fgroup"><label>Tipo vehículo</label>
           <select id="tipoVehiculo" onchange="st('tipoVehiculo',this.value)">
@@ -527,10 +527,10 @@ const renderParada=(p,i,kind,multi)=>{
       </div>
       <div class="fgroup"><label>Hora ${isEnt?"Est.":""}</label><input type="time" value="${p.hora}" oninput="updP('${kind}','${p.id}','hora',this.value)"/></div>
       <div class="fgroup col-full"><label>${isEnt?'Dirección Destino':'Dirección Origen'}</label><input id="dir-${kind}-${p.id}" class="places-ac" data-kind="${kind}" data-pid="${p.id}" value="${p.direccion}" style="text-transform:uppercase" autocomplete="off" placeholder="${isEnt?'Escribe dirección destino...':'Escribe dirección origen...'}" oninput="updP('${kind}','${p.id}','direccion',this.value.toUpperCase())"/></div>
-      <div class="fgroup"><label>Contacto 1</label><input value="${p.contacto1}" style="text-transform:uppercase" autocomplete="name" oninput="updP('${kind}','${p.id}','contacto1',up(this))" onchange="updP('${kind}','${p.id}','contacto1',up(this))"/></div>
+      <div class="fgroup"><label>Contacto 1</label><input value="${p.contacto1}" style="text-transform:uppercase" autocomplete="name" oninput="updP('${kind}','${p.id}','contacto1',this.value.toUpperCase())" onblur="this.value=this.value.toUpperCase()" onchange="updP('${kind}','${p.id}','contacto1',up(this))"/></div>
       <div class="fgroup"><label>Teléfono 1</label><input value="${p.telefono1}" type="tel" autocomplete="tel" oninput="updP('${kind}','${p.id}','telefono1',this.value)" onchange="updP('${kind}','${p.id}','telefono1',this.value)"/></div>
       <div class="fgroup"><label>Email</label><input value="${p.email}" type="email" autocomplete="email" oninput="updP('${kind}','${p.id}','email',this.value)" onchange="updP('${kind}','${p.id}','email',this.value)"/></div>
-      <div class="fgroup"><label>Contacto 2</label><input value="${p.contacto2}" style="text-transform:uppercase" autocomplete="name" oninput="updP('${kind}','${p.id}','contacto2',up(this))" onchange="updP('${kind}','${p.id}','contacto2',up(this))"/></div>
+      <div class="fgroup"><label>Contacto 2</label><input value="${p.contacto2}" style="text-transform:uppercase" autocomplete="name" oninput="updP('${kind}','${p.id}','contacto2',this.value.toUpperCase())" onblur="this.value=this.value.toUpperCase()" onchange="updP('${kind}','${p.id}','contacto2',up(this))"/></div>
       <div class="fgroup"><label>Teléfono 2</label><input value="${p.telefono2}" type="tel" autocomplete="tel" oninput="updP('${kind}','${p.id}','telefono2',this.value)" onchange="updP('${kind}','${p.id}','telefono2',this.value)"/></div>
     </div>
     ${multi?`<div style="text-align:right;margin-top:8px"><button class="btn-sm btn-danger-sm" onclick="delP('${kind}','${p.id}')">✕ Quitar</button></div>`:""}
@@ -1096,6 +1096,7 @@ async function enviarOSWhatsApp(){
     if(!state.cliente.trim()){showToast('Falta el nombre del cliente',true);return;}
     if(!state.telefono.trim()){showToast('Falta el WhatsApp del cliente',true);return;}
     guardarOS();
+    try{sessionStorage.setItem('ty_load_os',OS_PREFIX+(state.numeroOS||'temp'));}catch(_){}
     if(typeof html2canvas==='undefined'||typeof window.jspdf==='undefined'){
       showToast('Espera, librerias cargando...',true);
       setTimeout(enviarOSWhatsApp,1200); return;
@@ -1312,12 +1313,18 @@ function guardarOS(){
   try{
     const key=OS_PREFIX+(state.numeroOS||'temp');
     const data={...state,_saved:new Date().toISOString()};
-    localStorage.setItem(key,JSON.stringify(data));
+    try{localStorage.setItem(key,JSON.stringify(data));}catch(qe){
+      // Quota exceeded — try without signatures/photos
+      const lite={...data,firmaCliente1:'',firmaCliente2:'',firmaConductor:'',firmaBodega:'',fotoVehiculo:''};
+      try{localStorage.setItem(key,JSON.stringify(lite));}catch(_){
+        showToast('Sin espacio para guardar la OS — borra ordenes antiguas',true);return false;
+      }
+      showToast('OS guardada sin firmas (memoria llena)');
+    }
     const idx=JSON.parse(localStorage.getItem('ty_os_index')||'[]');
     const entry={key:key,os:state.numeroOS,cliente:state.cliente,fecha:state.cargueFecha||state.fecha,saved:data._saved};
     const existing=idx.findIndex(e=>e.key===key);
     if(existing>=0)idx[existing]=entry;else idx.unshift(entry);
-    // Auto-clean entries older than 15 days
     var cutoff=Date.now()-15*24*60*60*1000;
     var cleaned=idx.filter(function(e){
       if(!e.saved)return true;
@@ -1327,7 +1334,8 @@ function guardarOS(){
     });
     if(cleaned.length>50)cleaned.length=50;
     localStorage.setItem('ty_os_index',JSON.stringify(cleaned));
-  }catch(e){console.warn('Error guardando OS:',e);}
+    return true;
+  }catch(e){console.warn('Error guardando OS:',e);showToast('Error guardando la OS',true);return false;}
 }
 function exportarOSjson(data){
   try{
@@ -1402,7 +1410,7 @@ function cargarOSModal(){
   document.body.appendChild(modal);
 }
 
-const handleNueva=()=>{if(!confirm("¿Nueva OS? Se perderá lo no guardado."))return;location.reload();};
+const handleNueva=()=>{if(!confirm("¿Nueva OS? Se perderá lo no guardado."))return;try{sessionStorage.removeItem('ty_load_os');}catch(_){}location.reload();};
 const handleDuplicar=()=>{
   state.cliente="";state.telefono="";
   ["firmaCliente1","firmaCliente2","firmaConductor","firmaBodega"].forEach(k=>state[k]="");
@@ -1414,8 +1422,16 @@ const handleDuplicar=()=>{
   showToast("Duplicada — completa el nuevo cliente.");
 };
 
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='hidden'&&state.cliente.trim()){
+    guardarOS();
+    try{sessionStorage.setItem('ty_load_os',OS_PREFIX+(state.numeroOS||'temp'));}catch(_){}
+  }
+});
+window.addEventListener('beforeunload',function(){
+  if(state.cliente.trim()) guardarOS();
+});
 window.onload=()=>{
-  // LOGO_SRC se usa solo para PDF — el header usa logo.svg (sin fondo blanco)
   const loadKey=sessionStorage.getItem('ty_load_os');
   if(loadKey){sessionStorage.removeItem('ty_load_os');cargarOSdesdeStorage(loadKey);return;}
   document.getElementById("fecha").value=state.fecha;
