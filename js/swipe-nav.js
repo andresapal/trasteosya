@@ -5,7 +5,8 @@
     {path:'/orden-servicio.html',label:'Orden de Servicio'},
     {path:'/kpis.html',label:'KPI General'},
     {path:'/kpi-empresa.html',label:'KPI Empresa'},
-    {path:'/campanas.html',label:'Campañas'}
+    {path:'/campanas.html',label:'Campañas'},
+    {path:'/finanzas.html',label:'Finanzas'}
   ];
 
   var currentIdx=-1;
