@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Finanzas · Trasteos Ya</title>
+<link rel="icon" type="image/svg+xml" href="/assets/img/logo.svg"/>
+<link rel="alternate icon" type="image/png" href="/assets/img/logo.png"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ty-blue:#1B3E8C;--ty-red:#E30613;--ty-dark:#1a1a2e;
+  --ty-bg:#f0f2f5;--ty-card:rgba(255,255,255,.92);--ty-border:rgba(226,229,234,.6);
+  --ty-muted:#6b7280;--ty-green:#15803d;--ty-orange:#d97706;--ty-teal:#0d9488;
+  --radius:16px;--glass:rgba(255,255,255,.55);
+  --shine:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%)
+}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;background:linear-gradient(135deg,#eef1f8 0%,#e8edf5 40%,#f0f2f5 100%);color:var(--ty-dark);min-height:100vh}
+
+/* Dark mode */
+body.ty-dark{--ty-bg:#0f0f1a;--ty-card:rgba(30,30,50,.92);--ty-border:rgba(80,80,120,.3);--ty-dark:#e8e8f0;--ty-muted:#9ca3af;background:linear-gradient(135deg,#0f0f1a 0%,#1a1a2e 100%)}
+
+/* Header */
+.header{background:rgba(255,255,255,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(27,62,140,.12);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 20px rgba(27,62,140,.06)}
+body.ty-dark .header{background:rgba(20,20,40,.85);border-bottom-color:rgba(100,100,160,.2)}
+.header img{height:42px}
+.header h1{font-size:16px;font-weight:700;color:var(--ty-blue);margin-left:12px}
+body.ty-dark .header h1{color:#7b9cf5}
+.header-left{display:flex;align-items:center}
+.header-nav{display:flex;gap:8px;align-items:center}
+.header-nav a{font-size:11px;color:var(--ty-blue);font-weight:600;text-decoration:none;padding:5px 10px;border-radius:8px;border:1px solid rgba(27,62,140,.15);background:rgba(27,62,140,.04);transition:all .2s}
+.header-nav a:hover{background:var(--ty-blue);color:#fff;box-shadow:0 2px 8px rgba(27,62,140,.25)}
+body.ty-dark .header-nav a{color:#7b9cf5;border-color:rgba(123,156,245,.2);background:rgba(123,156,245,.06)}
+body.ty-dark .header-nav a:hover{background:#7b9cf5;color:#0f0f1a}
+
+.container{max-width:900px;margin:0 auto;padding:20px 16px 100px}
+
+/* Module tabs */
+.fin-tabs{display:flex;background:rgba(27,62,140,.06);border-radius:12px;padding:3px;margin-bottom:20px;gap:2px}
+.fin-tab{flex:1;padding:10px 6px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--ty-muted);transition:all .25s;font-family:inherit;text-align:center}
+.fin-tab:hover{color:var(--ty-blue)}
+.fin-tab.active{background:#fff;color:var(--ty-blue);box-shadow:0 2px 8px rgba(27,62,140,.12)}
+body.ty-dark .fin-tabs{background:rgba(123,156,245,.08)}
+body.ty-dark .fin-tab.active{background:rgba(40,40,70,.9);color:#7b9cf5}
+
+.fin-view{display:none}
+.fin-view.active{display:block}
+
+/* CDC styles */
+.cdc-section{margin-top:0}
+.cdc-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cdc-form .full{grid-column:1/-1}
+.cdc-form label{font-size:11px;font-weight:600;color:var(--ty-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;display:block}
+.cdc-form input,.cdc-form textarea,.cdc-form select{width:100%;padding:10px 12px;border:1.5px solid var(--ty-border);border-radius:10px;font-size:14px;font-family:inherit;background:var(--ty-card);color:var(--ty-dark);transition:border-color .2s}
+.cdc-form input:focus,.cdc-form textarea:focus{outline:none;border-color:var(--ty-blue);box-shadow:0 0 0 3px rgba(27,62,140,.08)}
+.cdc-form textarea{resize:vertical;min-height:50px}
+body.ty-dark .cdc-form input,body.ty-dark .cdc-form textarea{background:rgba(40,40,70,.6);border-color:rgba(80,80,120,.4);color:#e8e8f0}
+body.ty-dark .cdc-form input:focus,body.ty-dark .cdc-form textarea:focus{border-color:#7b9cf5;box-shadow:0 0 0 3px rgba(123,156,245,.15)}
+
+.cdc-items{margin:14px 0}
+.cdc-items-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cdc-items-header label{font-size:11px;font-weight:600;color:var(--ty-muted);text-transform:uppercase;letter-spacing:.05em}
+.cdc-item-row{display:grid;grid-template-columns:1fr 140px 36px;gap:8px;margin-bottom:8px;align-items:end}
+.cdc-item-row input{padding:9px 10px;border:1.5px solid var(--ty-border);border-radius:10px;font-size:14px;font-family:inherit;background:var(--ty-card);color:var(--ty-dark)}
+.cdc-item-row input:focus{outline:none;border-color:var(--ty-blue)}
+body.ty-dark .cdc-item-row input{background:rgba(40,40,70,.6);border-color:rgba(80,80,120,.4);color:#e8e8f0}
+.cdc-item-del{width:34px;height:34px;border:none;border-radius:8px;background:rgba(227,6,19,.08);color:#E30613;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.cdc-item-del:hover{background:rgba(227,6,19,.2)}
+.cdc-add-item{font-size:12px;color:var(--ty-blue);cursor:pointer;font-weight:600;background:none;border:none;padding:4px 0;font-family:inherit}
+.cdc-add-item:hover{text-decoration:underline}
+
+.cdc-total-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-top:2px solid var(--ty-border);margin-top:10px;font-weight:800;font-size:20px;color:var(--ty-dark)}
+body.ty-dark .cdc-total-row{border-color:rgba(80,80,120,.4)}
+
+.cdc-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.cdc-btn{padding:12px 22px;border-radius:12px;font-weight:600;font-size:14px;border:none;cursor:pointer;font-family:inherit;transition:all .2s}
+.cdc-btn-primary{background:linear-gradient(135deg,#1B3E8C,#0A1845);color:#fff;box-shadow:0 2px 8px rgba(27,62,140,.2)}
+.cdc-btn-primary:hover{box-shadow:0 4px 16px rgba(27,62,140,.35);transform:translateY(-1px)}
+.cdc-btn-secondary{background:rgba(27,62,140,.08);color:var(--ty-blue);border:1.5px solid rgba(27,62,140,.2)}
+.cdc-btn-secondary:hover{background:rgba(27,62,140,.15)}
+body.ty-dark .cdc-btn-secondary{background:rgba(123,156,245,.08);color:#7b9cf5;border-color:rgba(123,156,245,.2)}
+
+/* History */
+.cdc-history{margin-top:24px;border-top:1.5px solid var(--ty-border);padding-top:16px}
+body.ty-dark .cdc-history{border-color:rgba(80,80,120,.4)}
+.cdc-hist-title{font-size:14px;font-weight:700;color:var(--ty-dark);margin-bottom:10px}
+.cdc-hist-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--ty-border);border-radius:10px;margin-bottom:6px;font-size:13px;transition:all .15s;background:var(--ty-card)}
+.cdc-hist-row:hover{border-color:var(--ty-blue);background:rgba(27,62,140,.02);box-shadow:0 2px 8px rgba(27,62,140,.06)}
+body.ty-dark .cdc-hist-row{background:rgba(40,40,70,.4);border-color:rgba(80,80,120,.3)}
+body.ty-dark .cdc-hist-row:hover{border-color:#7b9cf5;background:rgba(123,156,245,.05)}
+.cdc-hist-num{font-weight:700;color:var(--ty-blue);min-width:70px}
+body.ty-dark .cdc-hist-num{color:#7b9cf5}
+.cdc-hist-cli{flex:1;color:var(--ty-dark);margin:0 8px}
+.cdc-hist-val{font-weight:600;color:var(--ty-dark);min-width:100px;text-align:right}
+.cdc-hist-date{color:var(--ty-muted);min-width:80px;text-align:right}
+.cdc-hist-actions{display:flex;gap:4px;margin-left:8px}
+.cdc-hist-btn{width:30px;height:30px;border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;background:rgba(27,62,140,.06);color:var(--ty-blue);transition:background .15s}
+.cdc-hist-btn:hover{background:rgba(27,62,140,.15)}
+body.ty-dark .cdc-hist-btn{background:rgba(123,156,245,.08);color:#7b9cf5}
+
+/* Empty state */
+.fin-empty{text-align:center;padding:60px 20px;color:var(--ty-muted)}
+.fin-empty svg{width:64px;height:64px;margin-bottom:16px;opacity:.4}
+.fin-empty h3{font-size:16px;margin-bottom:6px;color:var(--ty-dark)}
+.fin-empty p{font-size:13px}
+
+/* Responsive */
+@media(max-width:640px){
+  .header{padding:8px 12px}
+  .header h1{font-size:14px}
+  .header img{height:34px}
+  .container{padding:12px 10px 100px}
+  .cdc-form{grid-template-columns:1fr}
+  .cdc-item-row{grid-template-columns:1fr 100px 32px}
+  .cdc-hist-row{flex-wrap:wrap;gap:4px}
+  .cdc-hist-val,.cdc-hist-date{min-width:auto}
+  .cdc-actions{flex-direction:column}
+  .cdc-btn{width:100%;text-align:center}
+}
+
+/* Print */
+@media print{
+  .header,.fin-tabs,.swipe-nav-dots,.ty-lock-btn,.ty-op-toolbar,.ty-gate-modal,.ty-op-trigger{display:none!important}
+  body{background:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .container{padding:0;max-width:100%}
+}
+</style>
+<link rel="stylesheet" href="css/access-gate.css?v=19"/>
+</head>
+<body data-gate="admin-only">
+
+<div class="header">
+  <div class="header-left">
+    <a href="index.html"><img src="/assets/img/logo.png" alt="Trasteos Ya"/></a>
+    <h1>Finanzas</h1>
+  </div>
+  <div class="header-nav">
+    <a href="kpi-empresa.html">KPIs</a>
+    <a href="cotizador.html">Cotizador</a>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Module tabs -->
+  <div class="fin-tabs">
+    <button class="fin-tab active" data-mod="cobros">Cuentas de Cobro</button>
+    <button class="fin-tab" data-mod="resumen">Resumen</button>
+  </div>
+
+  <!-- Cuentas de Cobro -->
+  <div class="fin-view active" id="view-cobros"></div>
+
+  <!-- Resumen (placeholder) -->
+  <div class="fin-view" id="view-resumen">
+    <div class="fin-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 7h6m-6 4h6m-6 4h4M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/></svg>
+      <h3>Resumen financiero</h3>
+      <p>Proximamente: flujo de caja, gastos, e indicadores financieros</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Tab switching */
+document.querySelectorAll('.fin-tab').forEach(function(tab){
+  tab.addEventListener('click',function(){
+    document.querySelectorAll('.fin-tab').forEach(function(t){t.classList.remove('active');});
+    document.querySelectorAll('.fin-view').forEach(function(v){v.classList.remove('active');});
+    tab.classList.add('active');
+    document.getElementById('view-'+tab.dataset.mod).classList.add('active');
+  });
+});
+
+/* ============================================
+   CUENTAS DE COBRO
+   ============================================ */
+var CDC_KEY='ty_cdc_list';
+function cdcLoad(){try{return JSON.parse(localStorage.getItem(CDC_KEY)||'[]');}catch(_){return[];}}
+function cdcSave(list){try{localStorage.setItem(CDC_KEY,JSON.stringify(list));}catch(_){}}
+function cdcNextNum(){
+  var list=cdcLoad();
+  if(list.length===0) return 956;
+  var max=0;list.forEach(function(c){var n=parseInt(String(c.numero).replace(/\D/g,''));if(n>max)max=n;});
+  return max+1;
+}
+function cdcFmtMoney(v){return '$'+String(Math.round(v)||0).replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+function cdcNumToWords(n){
+  var UNIDADES=['','UN','DOS','TRES','CUATRO','CINCO','SEIS','SIETE','OCHO','NUEVE'];
+  var DECENAS=['','DIEZ','VEINTE','TREINTA','CUARENTA','CINCUENTA','SESENTA','SETENTA','OCHENTA','NOVENTA'];
+  var CENTENAS=['','CIENTO','DOSCIENTOS','TRESCIENTOS','CUATROCIENTOS','QUINIENTOS','SEISCIENTOS','SETECIENTOS','OCHOCIENTOS','NOVECIENTOS'];
+  var ESPECIALES={11:'ONCE',12:'DOCE',13:'TRECE',14:'CATORCE',15:'QUINCE',16:'DIECISEIS',17:'DIECISIETE',18:'DIECIOCHO',19:'DIECINUEVE',21:'VEINTIUN',22:'VEINTIDOS',23:'VEINTITRES',24:'VEINTICUATRO',25:'VEINTICINCO',26:'VEINTISEIS',27:'VEINTISIETE',28:'VEINTIOCHO',29:'VEINTINUEVE'};
+  if(n===0) return 'CERO PESOS';
+  if(n===100) return 'CIEN';
+  function bloque(x){
+    if(x===0)return '';
+    if(x===100)return 'CIEN';
+    if(x<10)return UNIDADES[x];
+    if(ESPECIALES[x])return ESPECIALES[x];
+    if(x<100){var d=Math.floor(x/10),u=x%10;return DECENAS[d]+(u?' Y '+UNIDADES[u]:'');}
+    var c=Math.floor(x/100),r=x%100;
+    return CENTENAS[c]+(r?' '+bloque(r):'');
+  }
+  var parts=[];
+  var millones=Math.floor(n/1000000);
+  var miles=Math.floor((n%1000000)/1000);
+  var resto=n%1000;
+  if(millones===1) parts.push('UN MILLON');
+  else if(millones>1) parts.push(bloque(millones)+' MILLONES');
+  if(miles===1) parts.push('MIL');
+  else if(miles>1) parts.push(bloque(miles)+' MIL');
+  if(resto>0) parts.push(bloque(resto));
+  return parts.join(' ')+' PESOS';
+}
+
+var _cdcItems=[{desc:'',valor:0}];
+
+function renderCobros(){
+  var list=cdcLoad();
+  var h='<div class="cdc-section">';
+  h+='<div class="cdc-form" id="cdc-form">'
+    +'<div><label>No. Cuenta</label><input id="cdc-num" value="CTY'+cdcNextNum()+'" style="font-weight:700;color:var(--ty-blue)"/></div>'
+    +'<div><label>Fecha</label><input type="date" id="cdc-fecha" value="'+new Date().toISOString().slice(0,10)+'"/></div>'
+    +'<div><label>Cliente / Empresa</label><input id="cdc-cliente" placeholder="NOMBRE O RAZON SOCIAL" style="text-transform:uppercase" autocapitalize="words" onblur="this.value=this.value.toUpperCase()"/></div>'
+    +'<div><label>NIT / C.C.</label><input id="cdc-nit" placeholder="900.000.000-0"/></div>'
+    +'<div class="full"><label>Concepto</label><input id="cdc-concepto" value="SERVICIO DE TRANSPORTE SEGUN RELACION ANEXA" style="text-transform:uppercase" onblur="this.value=this.value.toUpperCase()"/></div>'
+    +'</div>';
+  h+='<div class="cdc-items">'
+    +'<div class="cdc-items-header"><label>Detalle</label>'
+    +'<button class="cdc-add-item" onclick="cdcAddItem()">+ Agregar linea</button></div>'
+    +'<div id="cdc-item-list"></div>'
+    +'</div>';
+  h+='<div class="cdc-total-row"><span>TOTAL</span><span id="cdc-total">$0</span></div>';
+  h+='<div class="cdc-actions">'
+    +'<button class="cdc-btn cdc-btn-primary" onclick="cdcGenerarPDF()">Generar PDF</button>'
+    +'<button class="cdc-btn cdc-btn-secondary" onclick="cdcGuardar()">Guardar</button>'
+    +'<button class="cdc-btn cdc-btn-secondary" onclick="cdcLimpiar()">Nueva</button>'
+    +'</div>';
+  if(list.length>0){
+    h+='<div class="cdc-history"><div class="cdc-hist-title">Historial ('+list.length+')</div>';
+    list.forEach(function(c,i){
+      h+='<div class="cdc-hist-row">'
+        +'<span class="cdc-hist-num">'+c.numero+'</span>'
+        +'<span class="cdc-hist-cli">'+c.cliente+'</span>'
+        +'<span class="cdc-hist-val">'+cdcFmtMoney(c.total)+'</span>'
+        +'<span class="cdc-hist-date">'+c.fecha+'</span>'
+        +'<span class="cdc-hist-actions">'
+        +'<button class="cdc-hist-btn" onclick="cdcCargar('+i+')" title="Cargar">&#9998;</button>'
+        +'<button class="cdc-hist-btn" onclick="cdcRegenPDF('+i+')" title="PDF">&#8681;</button>'
+        +'</span></div>';
+    });
+    h+='</div>';
+  }
+  h+='</div>';
+  document.getElementById('view-cobros').innerHTML=h;
+  cdcRenderItems();cdcRecalcTotal();
+}
+
+function cdcRenderItems(){
+  var el=document.getElementById('cdc-item-list');if(!el)return;
+  var h='';
+  _cdcItems.forEach(function(it,i){
+    h+='<div class="cdc-item-row">'
+      +'<input placeholder="Descripcion" value="'+(it.desc||'').replace(/"/g,'&quot;')+'" oninput="_cdcItems['+i+'].desc=this.value" style="text-transform:uppercase" onblur="this.value=this.value.toUpperCase()"/>'
+      +'<input type="number" placeholder="Valor" value="'+(it.valor||'')+'" oninput="_cdcItems['+i+'].valor=parseInt(this.value)||0;cdcRecalcTotal()"/>'
+      +(i>0?'<button class="cdc-item-del" onclick="_cdcItems.splice('+i+',1);cdcRenderItems();cdcRecalcTotal()">x</button>':'<div></div>')
+      +'</div>';
+  });
+  el.innerHTML=h;
+}
+function cdcAddItem(){_cdcItems.push({desc:'',valor:0});cdcRenderItems();}
+function cdcRecalcTotal(){
+  var sum=0;_cdcItems.forEach(function(it){sum+=it.valor||0;});
+  var el=document.getElementById('cdc-total');if(el)el.textContent=cdcFmtMoney(sum);
+}
+function cdcGuardar(){
+  var num=(document.getElementById('cdc-num').value||'').trim();
+  var cliente=(document.getElementById('cdc-cliente').value||'').trim().toUpperCase();
+  var nit=(document.getElementById('cdc-nit').value||'').trim();
+  var concepto=(document.getElementById('cdc-concepto').value||'').trim().toUpperCase();
+  var fecha=(document.getElementById('cdc-fecha').value||'');
+  if(!cliente){alert('Falta el nombre del cliente');return;}
+  var total=0;_cdcItems.forEach(function(it){total+=it.valor||0;});
+  var entry={numero:num,cliente:cliente,nit:nit,concepto:concepto,fecha:fecha,items:JSON.parse(JSON.stringify(_cdcItems)),total:total,saved:new Date().toISOString()};
+  var list=cdcLoad();
+  var existing=list.findIndex(function(c){return c.numero===num;});
+  if(existing>=0) list[existing]=entry; else list.unshift(entry);
+  cdcSave(list);
+  alert('Cuenta '+num+' guardada');
+  renderCobros();
+}
+function cdcLimpiar(){
+  _cdcItems=[{desc:'',valor:0}];
+  document.getElementById('cdc-num').value='CTY'+cdcNextNum();
+  document.getElementById('cdc-cliente').value='';
+  document.getElementById('cdc-nit').value='';
+  document.getElementById('cdc-concepto').value='SERVICIO DE TRANSPORTE SEGUN RELACION ANEXA';
+  document.getElementById('cdc-fecha').value=new Date().toISOString().slice(0,10);
+  cdcRenderItems();cdcRecalcTotal();
+}
+function cdcCargar(idx){
+  var list=cdcLoad();var c=list[idx];if(!c)return;
+  document.getElementById('cdc-num').value=c.numero;
+  document.getElementById('cdc-cliente').value=c.cliente;
+  document.getElementById('cdc-nit').value=c.nit||'';
+  document.getElementById('cdc-concepto').value=c.concepto||'';
+  document.getElementById('cdc-fecha').value=c.fecha||'';
+  _cdcItems=c.items&&c.items.length?JSON.parse(JSON.stringify(c.items)):[{desc:'',valor:0}];
+  cdcRenderItems();cdcRecalcTotal();
+  document.getElementById('cdc-num').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function cdcRegenPDF(idx){
+  var list=cdcLoad();var c=list[idx];if(!c)return;
+  cdcCargar(idx);
+  setTimeout(cdcGenerarPDF,300);
+}
+function cdcGenerarPDF(){
+  if(typeof window.jspdf==='undefined'){
+    alert('Cargando libreria PDF, intenta de nuevo en 2 segundos');
+    return;
+  }
+  var num=(document.getElementById('cdc-num').value||'').trim();
+  var cliente=(document.getElementById('cdc-cliente').value||'').trim().toUpperCase();
+  var nit=(document.getElementById('cdc-nit').value||'').trim();
+  var concepto=(document.getElementById('cdc-concepto').value||'').trim().toUpperCase();
+  var fecha=(document.getElementById('cdc-fecha').value||'');
+  if(!cliente){alert('Falta el nombre del cliente');return;}
+  var total=0;_cdcItems.forEach(function(it){total+=it.valor||0;});
+
+  var {jsPDF}=window.jspdf;
+  var doc=new jsPDF({orientation:'portrait',unit:'mm',format:'letter'});
+  var W=doc.internal.pageSize.getWidth();
+  var y=30;
+
+  doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(27,62,140);
+  doc.text('DOCUMENTO EQUIVALENTE A FACTURA '+num,W/2,y,{align:'center'});
+  y+=7;
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(100);
+  doc.text('Decreto Reglamentario No. 522 de marzo 07 de 2003',W/2,y,{align:'center'});
+  y+=14;
+
+  doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(40);
+  doc.text(cliente,W/2,y,{align:'center'});y+=6;
+  doc.setFont('helvetica','normal');doc.setFontSize(10);
+  doc.text('NIT '+nit,W/2,y,{align:'center'});y+=10;
+
+  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(27,62,140);
+  doc.text('DEBE A',W/2,y,{align:'center'});y+=8;
+
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(40);
+  doc.text('ANDRES APARICIO',W/2,y,{align:'center'});y+=5;
+  doc.setFont('helvetica','normal');doc.setFontSize(10);
+  doc.text('C.C. 79.981.036',W/2,y,{align:'center'});y+=12;
+
+  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(27,62,140);
+  doc.text('POR CONCEPTO DE',W/2,y,{align:'center'});y+=7;
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(40);
+  var cLines=doc.splitTextToSize(concepto,160);
+  doc.text(cLines,W/2,y,{align:'center'});y+=cLines.length*5+8;
+
+  _cdcItems.forEach(function(it){
+    if(!it.desc&&!it.valor)return;
+    doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(40);
+    doc.text((it.desc||'').toUpperCase(),25,y);
+    doc.text(cdcFmtMoney(it.valor),W-25,y,{align:'right'});
+    y+=6;
+  });
+
+  y+=4;doc.setLineWidth(0.5);doc.setDrawColor(27,62,140);
+  doc.line(25,y,W-25,y);y+=8;
+  doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(27,62,140);
+  doc.text('TOTAL',25,y);
+  doc.text(cdcFmtMoney(total),W-25,y,{align:'right'});
+  y+=10;
+
+  doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(40);
+  doc.text('SON: '+cdcNumToWords(total)+' ('+cdcFmtMoney(total)+')',W/2,y,{align:'center'});
+  y+=14;
+
+  doc.setFontSize(9);doc.setTextColor(80);
+  doc.text('FAVOR HACER TRANSFERENCIA A CUENTA DE AHORROS DAVIVIENDA A NOMBRE',W/2,y,{align:'center'});y+=5;
+  doc.text('ANDRES APARICIO No. 4884 2294 1358',W/2,y,{align:'center'});y+=5;
+  doc.text('LLAVE @DAVI3143095194 | NEQUI 3143095194',W/2,y,{align:'center'});y+=10;
+
+  doc.setFontSize(8);doc.setTextColor(120);
+  doc.text('NO ESTA SUJETA A RETENCION EN LA FUENTE',W/2,y,{align:'center'});y+=4;
+  var fechaLarga=fecha?new Date(fecha+'T12:00:00').toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric'}):'';
+  doc.text('BOGOTA D.C. '+fechaLarga.toUpperCase(),W/2,y,{align:'center'});y+=16;
+
+  doc.setLineWidth(0.4);doc.setDrawColor(40);doc.line(W/2-40,y,W/2+40,y);y+=5;
+  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(40);
+  doc.text('ANDRES APARICIO ALVAREZ',W/2,y,{align:'center'});y+=5;
+  doc.setFont('helvetica','normal');doc.setFontSize(9);
+  doc.text('NIT. 79.981.036',W/2,y,{align:'center'});
+
+  doc.setFontSize(7);doc.setTextColor(180);
+  doc.text('Trasteos Ya - trasteosya.online',W/2,270,{align:'center'});
+
+  var fn=num.replace(/\s/g,'_')+' '+cliente.replace(/[^A-Z0-9 ]/g,'')+'.pdf';
+  doc.save(fn);
+
+  cdcGuardar();
+}
+
+// Init
+renderCobros();
+</script>
+<script src="js/swipe-nav.js"></script>
+<script src="js/access-gate.js?v=19"></script>
+</body>
+</html>
