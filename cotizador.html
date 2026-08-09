@@ -1646,18 +1646,21 @@ function _renderHistList(list){
     html+='<div class="hc-actions"><span class="hc-total">'+COP(e.total||0)+'</span>';
     html+='<button class="hc-estado '+estadoCls+'" onclick="event.stopPropagation();toggleEstado('+i+')">'+estado+'</button>';
     html+='<button class="hc-del" onclick="event.stopPropagation();eliminarCotizacion('+i+')" title="Eliminar">&#x2715;</button></div></div>';
-    html+='<div class="hc-date">'+escH(fecha)+(e.telefono?' &middot; Tel: '+escH(e.telefono):'')+'</div>';
-    if(items)html+='<div class="hc-items">'+escH(items)+'</div>';
+    html+='<div class="hc-date">'+escH(fecha)+(e.telefono?' &middot; Tel: '+escH(e.telefono):'')+(e.fuente?' &middot; '+escH(e.fuente):'')+'</div>';
+    if(e.origen||e.destino)html+='<div class="hc-items" style="color:#1B3E8C;font-weight:600">'+escH(e.origen||'?')+' → '+escH(e.destino||'?')+'</div>';
+    else if(items)html+='<div class="hc-items">'+escH(items)+'</div>';
     // Detail toggle
     html+='<span class="hc-toggle" onclick="event.stopPropagation();toggleDetalle('+i+')">Ver detalle &#9660;</span>';
     html+='<div class="hc-detail" id="hdet-'+i+'">';
     if(e.items&&e.items.length){
       html+='<table>';
       e.items.forEach(function(it){
-        if(it.v>0||it.c>0)html+='<tr><td>'+escH(it.l)+'</td><td>'+COP(it.v||0)+'</td></tr>';
+        if(it.v>0||it.c>0)html+='<tr><td>'+escH(it.l)+(it.detail?' <span style="color:#aaa;font-size:11px">'+escH(it.detail)+'</span>':'')+'</td><td>'+COP(it.v||0)+'</td></tr>';
       });
       html+='</table>';
       if(e.costo)html+='<div style="margin-top:6px;font-size:11px;color:#888">Costo: '+COP(e.costo)+' &middot; Utilidad: '+COP((e.total||0)-(e.costo||0))+'</div>';
+    }else{
+      html+='<div style="font-size:11px;color:#888">Total: '+COP(e.total||0)+(e.costo?' &middot; Costo: '+COP(e.costo):'')+'</div>';
     }
     if(e.empaque){
       var parts=[];
@@ -1666,6 +1669,11 @@ function _renderHistList(list){
       if(e.empaque.burbuja)parts.push('Burbuja: '+e.empaque.burbuja);
       if(e.empaque.cajas)parts.push('Cajas: '+e.empaque.cajas);
       if(parts.length)html+='<div style="margin-top:4px;font-size:11px;color:#888">Empaque: '+parts.join(', ')+'</div>';
+    }
+    if(e.telefono){
+      var tel=e.telefono.replace(/[^0-9]/g,'');
+      if(tel.length===10&&tel.charAt(0)==='3')tel='57'+tel;
+      if(tel.length>=10)html+='<div style="margin-top:6px"><a href="https://wa.me/'+tel+'" target="_blank" rel="noopener" style="color:#25D366;font-size:11px;font-weight:600;text-decoration:none">WhatsApp '+escH(e.telefono)+'</a></div>';
     }
     html+='</div></div>';
   });
@@ -1775,9 +1783,35 @@ async function sincronizarSheet(){
         var total=parseFloat(c['INGRESO TOTAL']||c['INGRESO']||0)||0;
         var costo=parseFloat(c['COSTO TOTAL']||0)||0;
         var estado=String(c.ESTADO||'COTIZADO').toUpperCase();
+        // Build items from Sheet columns
+        var items=[];
+        var ingTrans=parseFloat(c['ING TRANSPORTE']||c['ING TRANS']||0)||0;
+        var ingEmp=parseFloat(c['ING EMPAQUE']||c['ING EMP']||0)||
+          ((parseFloat(c['ING VINIPEL']||0)||0)+(parseFloat(c['ING BURBUJA']||0)||0)+(parseFloat(c['ING CAJAS']||0)||0)+(parseFloat(c['ING CRAFT']||0)||0)+(parseFloat(c['ING CARTON CORRUGADO']||0)||0));
+        var ingInst=parseFloat(c['ING INSTALACIONES TOTAL']||c['ING INST']||c['ING INSTALACIONES']||0)||0;
+        var ingBod=parseFloat(c['ING BODEGAJE']||0)||0;
+        var ingCam=parseFloat(c['ING CAMINADOS']||0)||0;
+        var ingEsc=parseFloat(c['ING ESCALERAS']||0)||0;
+        var ingPar=parseFloat(c['ING PARADAS ADICIONAL']||0)||0;
+        var ingFach=parseFloat(c['INGRESO FACHADA']||0)||0;
+        var costoTras=parseFloat(c['COSTO TRASTEO']||c['COSTO TRANS']||0)||0;
+        var costoEmp=parseFloat(c['COSTO TOTAL EMPAQUE-']||c['COSTO TOTAL EMPAQUE']||c['COSTO EMP']||0)||0;
+        var costoInst=parseFloat(c['COSTO TOTAL INSTALACIONES']||c['COSTO INST']||0)||0;
+        if(ingTrans)items.push({cat:'trasteo',l:'Transporte',v:ingTrans,c:costoTras,qty:1});
+        if(ingEmp)items.push({cat:'empaque',l:'Empaque',v:ingEmp,c:costoEmp,qty:1});
+        if(ingInst)items.push({cat:'inst',l:'Instalaciones',v:ingInst,c:costoInst,qty:1});
+        if(ingBod)items.push({cat:'adicionales',l:'Bodegaje',v:ingBod,c:parseFloat(c['COSTO BODEGAJE']||0)||0,qty:1});
+        if(ingCam)items.push({cat:'adicionales',l:'Caminados',v:ingCam,c:parseFloat(c['COSTO CAMINADO']||0)||0,qty:1});
+        if(ingEsc)items.push({cat:'adicionales',l:'Escaleras',v:ingEsc,c:parseFloat(c['COSTO ESCALERAS']||0)||0,qty:1});
+        if(ingPar)items.push({cat:'adicionales',l:'Paradas adicionales',v:ingPar,c:parseFloat(c['COSTO PARADA ADICIONAL']||0)||0,qty:1});
+        if(ingFach)items.push({cat:'adicionales',l:'Fachada',v:ingFach,c:parseFloat(c['COSTO FACHADA O VACIO']||0)||0,qty:1});
+        // If no breakdown but total exists, add single item
+        if(!items.length&&total)items.push({cat:'trasteo',l:'Servicio de mudanza',v:total,c:costo,qty:1});
+        var empaque={craft:parseFloat(c['ING CRAFT']||0)||0,vinipel:parseFloat(c['ING VINIPEL']||0)||0,burbuja:parseFloat(c['ING BURBUJA']||0)||0,cajas:parseFloat(c['ING CAJAS']||0)||0};
         _histCache.unshift({
           cliente:cliente,telefono:String(c.TELEFONO||''),fecha:fecha,
-          items:[],empaque:{craft:0,vinipel:0,burbuja:0,cajas:0},
+          origen:c.ORIGEN||'',destino:c.DESTINO||'',tipo:c.TIPO||'',fuente:c.FUENTE||'',
+          items:items,empaque:empaque,
           total:total,costo:costo,estado:estado,saved:new Date().toISOString()
         });
         localKeys[key]=1;

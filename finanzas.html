@@ -107,7 +107,7 @@ body.ty-dark .cot-section{border-color:rgba(80,80,120,.4)}
 .cot-header h3{font-size:14px;font-weight:700;color:var(--ty-dark)}
 .cot-header .cot-count{font-size:11px;font-weight:500;color:var(--ty-muted)}
 .cot-list{display:flex;flex-direction:column;gap:6px}
-.cot-row{display:flex;align-items:center;gap:10px;background:var(--ty-card);border:1px solid var(--ty-border);border-radius:12px;padding:10px 14px;transition:box-shadow .2s}
+.cot-row{display:flex;align-items:center;gap:10px;background:var(--ty-card);border:1px solid var(--ty-border);border-radius:12px;padding:10px 14px;transition:box-shadow .2s;cursor:pointer}
 .cot-row:hover{box-shadow:0 2px 12px rgba(27,62,140,.1)}
 body.ty-dark .cot-row{background:rgba(40,40,70,.4);border-color:rgba(80,80,120,.3)}
 body.ty-dark .cot-row:hover{border-color:#7b9cf5;box-shadow:0 2px 12px rgba(123,156,245,.15)}
@@ -122,6 +122,39 @@ body.ty-dark .cot-row:hover{border-color:#7b9cf5;box-shadow:0 2px 12px rgba(123,
 .cot-badge.vendido:hover{background:rgba(21,128,61,.25)}
 .cot-badge:disabled{opacity:.5;cursor:wait}
 .cot-loading{text-align:center;padding:30px;color:var(--ty-muted);font-size:13px}
+
+/* Cotización search */
+.cot-search{width:100%;padding:8px 12px;border:1.5px solid var(--ty-border);border-radius:10px;font-size:13px;background:var(--ty-card);color:var(--ty-dark);margin-bottom:10px;outline:none}
+.cot-search:focus{border-color:var(--ty-blue);box-shadow:0 0 0 3px rgba(27,62,140,.1)}
+body.ty-dark .cot-search{background:rgba(40,40,70,.6);border-color:rgba(80,80,120,.4);color:#e8e8f0}
+body.ty-dark .cot-search:focus{border-color:#7b9cf5}
+
+.cot-row-wrap{margin-bottom:6px}
+
+/* Expandable detail */
+.cot-detail{display:none;background:var(--ty-card);border:1px solid var(--ty-border);border-top:none;border-radius:0 0 12px 12px;padding:12px 14px;font-size:12px;margin-top:-7px}
+.cot-detail.open{display:block}
+body.ty-dark .cot-detail{background:rgba(40,40,70,.5);border-color:rgba(80,80,120,.3)}
+.cot-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
+@media(max-width:480px){.cot-detail-grid{grid-template-columns:1fr}}
+.cot-detail-item{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.04)}
+body.ty-dark .cot-detail-item{border-bottom-color:rgba(255,255,255,.06)}
+.cot-detail-label{color:var(--ty-muted)}
+.cot-detail-val{font-weight:700;color:var(--ty-dark)}
+.cot-detail-section{font-weight:700;color:var(--ty-blue);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-top:8px;margin-bottom:4px;grid-column:1/-1}
+body.ty-dark .cot-detail-section{color:#7b9cf5}
+.cot-detail-ruta{font-size:12px;color:var(--ty-blue);font-weight:600;margin-bottom:6px}
+body.ty-dark .cot-detail-ruta{color:#7b9cf5}
+.cot-detail-profit{display:flex;justify-content:space-between;padding:6px 0;margin-top:6px;border-top:1.5px solid var(--ty-border);font-weight:700;font-size:13px}
+.cot-detail-profit .profit-pos{color:var(--ty-green)}
+.cot-detail-profit .profit-neg{color:var(--ty-red)}
+.cot-toggle{font-size:10px;color:var(--ty-muted);margin-left:4px;transition:transform .2s;display:inline-block}
+.cot-toggle.open{transform:rotate(180deg)}
+
+/* Show more button */
+.cot-show-more{display:block;width:100%;padding:10px;border:1.5px dashed var(--ty-border);border-radius:10px;background:none;color:var(--ty-blue);font-size:12px;font-weight:600;cursor:pointer;margin-top:8px;transition:all .15s}
+.cot-show-more:hover{background:rgba(27,62,140,.04);border-color:var(--ty-blue)}
+body.ty-dark .cot-show-more{color:#7b9cf5;border-color:rgba(80,80,120,.4)}
 
 /* Empty state */
 .fin-empty{text-align:center;padding:60px 20px;color:var(--ty-muted)}
@@ -466,11 +499,21 @@ async function fetchDriveCots(){
         var fechaRaw=c['FECHA']||c['TIMESTAMP']||'';
         var fecha=(typeof fechaRaw==='string'&&fechaRaw.length>=10)?fechaRaw.substring(0,10):
           (fechaRaw&&fechaRaw.toISOString?fechaRaw.toISOString().substring(0,10):'');
+        var origen=c['ORIGEN']||'';
+        var destino=c['DESTINO']||'';
+        var tipo=c['TIPO']||c['VIVIENDA']||'';
+        var ingBod=+c['ING BODEGAJE']||0;
+        var ingCam=+c['ING CAMINADOS']||0;
+        var ingEsc=+c['ING ESCALERAS']||0;
+        var ingPar=+c['ING PARADAS ADICIONAL']||0;
+        var ingFach=+c['INGRESO FACHADA']||0;
         return{cliente:c['CLIENTE']||'',telefono:String(c['TELEFONO']||''),fecha:fecha,
           timestamp:c['TIMESTAMP']||'',hora:c['HORA']||'',fuente:c['FUENTE']||'',
+          origen:origen,destino:destino,tipo:tipo,
           total:total,costo:costoTot,estado:String(c['ESTADO']||'').toUpperCase(),
           ingEmp:ingEmp,ingInst:ingInst,ingOtros:ingOtros,
-          ingTrans:ingTrans,costoEmp:costoEmp,costoInst:costoInst,costoOtros:costoOtros};
+          ingTrans:ingTrans,ingBod:ingBod,ingCam:ingCam,ingEsc:ingEsc,ingPar:ingPar,ingFach:ingFach,
+          costoEmp:costoEmp,costoInst:costoInst,costoOtros:costoOtros};
       });
     }
   }catch(e){console.warn('Finanzas: no Drive cots',e);}
@@ -538,42 +581,109 @@ async function toggleEstado(btn,cliente,fecha,nuevoEstado){
   fetchDriveCots().then(function(){renderCotizaciones();}).catch(function(){});
 }
 
-function renderCotizaciones(){
+var _allCotsRendered=[];
+var _cotShowAll=false;
+var _COT_INITIAL=15;
+
+function renderCotizaciones(filtro){
   var cotCacheAll=getAllCots();
-  var threeWeeksAgo=new Date();threeWeeksAgo.setDate(threeWeeksAgo.getDate()-21);
-  var threeWeeksStr=threeWeeksAgo.toISOString().substring(0,10);
-  var recentCots=cotCacheAll.filter(function(c){return(c.fecha||'')>=threeWeeksStr;});
-  recentCots.sort(function(a,b){return(b.fecha||'').localeCompare(a.fecha||'');});
+  cotCacheAll.sort(function(a,b){return(b.fecha||'').localeCompare(a.fecha||'');});
 
   var el=document.getElementById('cot-mgmt-content');
   if(!el)return;
 
-  if(recentCots.length===0){
+  // Apply search filter
+  var q=(filtro||'').trim().toUpperCase();
+  var filtered=q?cotCacheAll.filter(function(c){
+    return(c.cliente||'').toUpperCase().indexOf(q)>=0||(c.telefono||'').indexOf(q)>=0||(c.origen||'').toUpperCase().indexOf(q)>=0||(c.destino||'').toUpperCase().indexOf(q)>=0;
+  }):cotCacheAll;
+
+  _allCotsRendered=filtered;
+
+  if(filtered.length===0){
     el.innerHTML='<div class="cot-section"><div class="cot-header"><h3>Gestion de Cotizaciones</h3></div>'
-      +'<div style="text-align:center;padding:30px;color:var(--ty-muted)"><p>Sin cotizaciones en las ultimas 3 semanas</p></div></div>';
+      +'<input class="cot-search" id="cotSearch" type="text" placeholder="Buscar por nombre, telefono, origen o destino..." value="'+(filtro||'')+'" oninput="renderCotizaciones(this.value)">'
+      +'<div style="text-align:center;padding:30px;color:var(--ty-muted)"><p>'+(q?'Sin resultados para "'+q+'"':'Sin cotizaciones registradas')+'</p></div></div>';
     return;
   }
 
+  var showCount=_cotShowAll?filtered.length:Math.min(_COT_INITIAL,filtered.length);
   var h='<div class="cot-section">';
-  h+='<div class="cot-header"><h3>Gestion de Cotizaciones</h3><span class="cot-count">Ultimas 3 semanas · '+recentCots.length+' cotizaciones</span></div>';
+  h+='<div class="cot-header"><h3>Gestion de Cotizaciones</h3><span class="cot-count">'+filtered.length+' cotizaciones'+(q?' encontradas':'')+'</span></div>';
+  h+='<input class="cot-search" id="cotSearch" type="text" placeholder="Buscar por nombre, telefono, origen o destino..." value="'+(filtro||'').replace(/"/g,'&quot;')+'" oninput="renderCotizaciones(this.value)">';
   h+='<div class="cot-list">';
-  for(var ci=0;ci<recentCots.length;ci++){
-    var cc=recentCots[ci];
+  for(var ci=0;ci<showCount;ci++){
+    var cc=filtered[ci];
     var isV=_isVendido(cc);
     var badgeCls=isV?'vendido':'cotizado';
     var badgeTxt=isV?'VENDIDO':'COTIZADO';
     var nextEstado=isV?'COTIZADO':'VENDIDO';
     var cli=(cc.cliente||'').replace(/'/g,"\\'");
     var fch=(cc.fecha||'').replace(/'/g,"\\'");
-    h+='<div class="cot-row">'
-      +'<div class="cot-info"><div class="cot-name">'+(cc.cliente||'Sin nombre')+'</div>'
+    h+='<div class="cot-row-wrap">';
+    h+='<div class="cot-row" onclick="toggleCotDetail('+ci+')">'
+      +'<div class="cot-info"><div class="cot-name">'+(cc.cliente||'Sin nombre')+' <span class="cot-toggle" id="cot-tog-'+ci+'">&#9660;</span></div>'
       +'<div class="cot-meta">'+(cc.telefono||'')+(cc.fecha?' · '+cc.fecha:'')+(cc.hora?' '+cc.hora:'')+(cc.fuente?' · '+cc.fuente:'')+'</div></div>'
       +'<div class="cot-total">'+cdcFmtMoney(cc.total)+'</div>'
-      +'<button class="cot-badge '+badgeCls+'" onclick="toggleEstado(this,\''+cli+'\',\''+fch+'\',\''+nextEstado+'\')">'+badgeTxt+'</button>'
+      +'<button class="cot-badge '+badgeCls+'" onclick="event.stopPropagation();toggleEstado(this,\''+cli+'\',\''+fch+'\',\''+nextEstado+'\')">'+badgeTxt+'</button>'
       +'</div>';
+    // Detail panel
+    h+='<div class="cot-detail" id="cot-det-'+ci+'">';
+    if(cc.origen||cc.destino)h+='<div class="cot-detail-ruta">'+(cc.origen||'?')+' &rarr; '+(cc.destino||'?')+'</div>';
+    if(cc.tipo)h+='<div style="font-size:11px;color:var(--ty-muted);margin-bottom:6px">'+cc.tipo+'</div>';
+    h+='<div class="cot-detail-grid">';
+    // Ingresos
+    h+='<div class="cot-detail-section">Ingresos</div>';
+    if(cc.ingTrans)h+='<div class="cot-detail-item"><span class="cot-detail-label">Transporte</span><span class="cot-detail-val">'+cdcFmtMoney(cc.ingTrans)+'</span></div>';
+    if(cc.ingEmp)h+='<div class="cot-detail-item"><span class="cot-detail-label">Empaque</span><span class="cot-detail-val">'+cdcFmtMoney(cc.ingEmp)+'</span></div>';
+    if(cc.ingInst)h+='<div class="cot-detail-item"><span class="cot-detail-label">Instalaciones</span><span class="cot-detail-val">'+cdcFmtMoney(cc.ingInst)+'</span></div>';
+    if(cc.ingBod)h+='<div class="cot-detail-item"><span class="cot-detail-label">Bodegaje</span><span class="cot-detail-val">'+cdcFmtMoney(cc.ingBod)+'</span></div>';
+    if(cc.ingCam)h+='<div class="cot-detail-item"><span class="cot-detail-label">Caminados</span><span class="cot-detail-val">'+cdcFmtMoney(cc.ingCam)+'</span></div>';
+    if(cc.ingEsc)h+='<div class="cot-detail-item"><span class="cot-detail-label">Escaleras</span><span class="cot-detail-val">'+cdcFmtMoney(cc.ingEsc)+'</span></div>';
+    if(cc.ingPar)h+='<div class="cot-detail-item"><span class="cot-detail-label">Paradas adic.</span><span class="cot-detail-val">'+cdcFmtMoney(cc.ingPar)+'</span></div>';
+    if(cc.ingFach)h+='<div class="cot-detail-item"><span class="cot-detail-label">Fachada</span><span class="cot-detail-val">'+cdcFmtMoney(cc.ingFach)+'</span></div>';
+    var ingSum=(cc.ingTrans||0)+(cc.ingEmp||0)+(cc.ingInst||0)+(cc.ingBod||0)+(cc.ingCam||0)+(cc.ingEsc||0)+(cc.ingPar||0)+(cc.ingFach||0);
+    if(!ingSum&&cc.total)h+='<div class="cot-detail-item"><span class="cot-detail-label">Total cotizado</span><span class="cot-detail-val">'+cdcFmtMoney(cc.total)+'</span></div>';
+    // Costos
+    if(cc.costo){
+      h+='<div class="cot-detail-section">Costos</div>';
+      if(cc.costoEmp)h+='<div class="cot-detail-item"><span class="cot-detail-label">Empaque</span><span class="cot-detail-val">'+cdcFmtMoney(cc.costoEmp)+'</span></div>';
+      if(cc.costoInst)h+='<div class="cot-detail-item"><span class="cot-detail-label">Instalaciones</span><span class="cot-detail-val">'+cdcFmtMoney(cc.costoInst)+'</span></div>';
+      if(cc.costoOtros)h+='<div class="cot-detail-item"><span class="cot-detail-label">Trasteo y otros</span><span class="cot-detail-val">'+cdcFmtMoney(cc.costoOtros)+'</span></div>';
+    }
+    h+='</div>';
+    // Utilidad
+    if(cc.total&&cc.costo){
+      var util=cc.total-cc.costo;
+      var pct=cc.total?Math.round(util/cc.total*100):0;
+      h+='<div class="cot-detail-profit"><span>Utilidad</span><span class="'+(util>=0?'profit-pos':'profit-neg')+'">'+cdcFmtMoney(util)+' ('+pct+'%)</span></div>';
+    }
+    // WhatsApp link
+    if(cc.telefono){
+      var tel=cc.telefono.replace(/[^0-9]/g,'');
+      if(tel&&tel.length>=10){
+        if(tel.length===10&&tel.charAt(0)==='3')tel='57'+tel;
+        h+='<a href="https://wa.me/'+tel+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:inline-block;margin-top:8px;padding:6px 14px;background:rgba(37,211,102,.12);color:#15803d;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none">WhatsApp '+cc.telefono+'</a>';
+      }
+    }
+    h+='</div></div>';
   }
-  h+='</div></div>';
+  h+='</div>';
+  if(!_cotShowAll&&filtered.length>_COT_INITIAL){
+    h+='<button class="cot-show-more" onclick="_cotShowAll=true;renderCotizaciones(document.getElementById(\'cotSearch\').value)">Ver todas ('+filtered.length+' cotizaciones)</button>';
+  }else if(_cotShowAll&&filtered.length>_COT_INITIAL){
+    h+='<button class="cot-show-more" onclick="_cotShowAll=false;renderCotizaciones(document.getElementById(\'cotSearch\').value)">Ver menos</button>';
+  }
+  h+='</div>';
   el.innerHTML=h;
+}
+
+function toggleCotDetail(i){
+  var det=document.getElementById('cot-det-'+i);
+  var tog=document.getElementById('cot-tog-'+i);
+  if(!det)return;
+  var open=det.classList.toggle('open');
+  if(tog)tog.classList.toggle('open',open);
 }
 
 /* ============================================
