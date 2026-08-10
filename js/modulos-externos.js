@@ -8,8 +8,7 @@
  *  PARA CAMBIAR LA DIRECCION DEL MODULO, EDITA SOLO ESTA LINEA:
  * ─────────────────────────────────────────────────────────────
  */
-var GEOPROSPECTOR_URL = ''; // <- cuando este publicado, pon aqui la direccion
-                            //    ej: 'https://prospector.trasteosya.online'
+var GEOPROSPECTOR_URL = ''; 'https://geoprospector.vercel.app/prospeccion/nueva';
 
 (function () {
   'use strict';
