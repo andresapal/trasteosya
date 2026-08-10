@@ -8,7 +8,7 @@
  *  PARA CAMBIAR LA DIRECCION DEL MODULO, EDITA SOLO ESTA LINEA:
  * ─────────────────────────────────────────────────────────────
  */
-var GEOPROSPECTOR_URL = ''; 'https://geoprospector.vercel.app/prospeccion/nueva';
+var GEOPROSPECTOR_URL = 'https://geoprospector.vercel.app/prospeccion/nueva';
 
 (function () {
   'use strict';
