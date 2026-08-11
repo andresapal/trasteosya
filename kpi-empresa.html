@@ -96,7 +96,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 .chart-box.chart-glow{box-shadow:0 6px 32px rgba(27,62,140,.22),0 0 0 2px rgba(27,62,140,.08);border-color:rgba(27,62,140,.3);transform:translateY(-1px)}
 .chart-title{font-size:13px;font-weight:700;color:var(--ty-dark);margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .chart-title .tag{font-size:9px;font-weight:600;padding:2px 8px;border-radius:10px;background:rgba(27,62,140,.06);color:var(--ty-blue)}
-.chart-canvas{position:relative;width:100%;max-height:280px;display:flex;justify-content:center;align-items:center}
+.chart-canvas{position:relative;width:100%;height:280px;display:flex;justify-content:center;align-items:center}
 .chart-canvas canvas{margin:0 auto}
 .chart-canvas canvas{transition:filter .2s ease}
 .chart-box:hover .chart-canvas canvas{filter:brightness(1.02)}
@@ -842,7 +842,7 @@ function renderIngresos(orders,allOrders,prevOrders){
   charts.cat=new Chart(document.getElementById('ch-cat'),{
     type:'bar',
     data:{labels:catLbls,datasets:[{data:catData,backgroundColor:PALETTE.slice(0,catLbls.length),borderRadius:8,borderSkipped:false}]},
-    options:{indexAxis:'y',responsive:true,animation:barAnim,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return catKeys.length?fmtM(ctx.raw):'Sin datos';}}}},scales:{x:{beginAtZero:true,ticks:{callback:function(v){return catKeys.length?'$'+Math.round(v/1000)+'k':'';}}},y:{grid:{display:false}}}}
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:barAnim,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return catKeys.length?fmtM(ctx.raw):'Sin datos';}}}},scales:{x:{beginAtZero:true,ticks:{callback:function(v){return catKeys.length?'$'+Math.round(v/1000)+'k':'';}}},y:{grid:{display:false}}}}
   });
 
   // 4. Top clients table
@@ -866,7 +866,7 @@ function renderIngresos(orders,allOrders,prevOrders){
   charts.dow=new Chart(document.getElementById('ch-dow'),{
     type:'bar',
     data:{labels:dowLabels,datasets:[{label:'Servicios',data:dowVals,backgroundColor:dowColors,borderRadius:8,borderSkipped:false}]},
-    options:{responsive:true,animation:barAnim,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}
+    options:{responsive:true,maintainAspectRatio:false,animation:barAnim,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}
   });
 
   // 6. Nuevo vs Recurrente
@@ -997,7 +997,7 @@ function renderEmpaque(orders,allOrders){
       {label:'Kraft',data:matByMonth.craft,backgroundColor:COLORS.orange,borderRadius:4,borderSkipped:false},
       {label:'Cajas',data:matByMonth.cajas,backgroundColor:COLORS.green,borderRadius:4,borderSkipped:false}
     ]},
-    options:{responsive:true,animation:barAnim,plugins:{legend:{position:'bottom',labels:{font:{size:11},usePointStyle:true,pointStyle:'circle'}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:'rgba(0,0,0,.04)'}}}}
+    options:{responsive:true,maintainAspectRatio:false,animation:barAnim,plugins:{legend:{position:'bottom',labels:{font:{size:11},usePointStyle:true,pointStyle:'circle'}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:'rgba(0,0,0,.04)'}}}}
   });
 
   // Adoption rate by month
@@ -1139,7 +1139,7 @@ function renderOperacion(orders,allOrders){
   charts.operarios=new Chart(document.getElementById('ch-operarios'),{
     type:'bar',
     data:{labels:opsTop.map(function(v){return v.key;}),datasets:[{data:opsTop.map(function(v){return v.val;}),backgroundColor:COLORS.blue,borderRadius:8,borderSkipped:false}]},
-    options:{responsive:true,animation:barAnim,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}
+    options:{responsive:true,maintainAspectRatio:false,animation:barAnim,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(0,0,0,.04)'}},x:{grid:{display:false}}}}
   });
 
   // Driver ranking table
@@ -1159,7 +1159,7 @@ function renderOperacion(orders,allOrders){
   charts.zonasOrig=new Chart(document.getElementById('ch-zonas-orig'),{
     type:'bar',
     data:{labels:origTop.map(function(v){return v.key;}),datasets:[{data:origTop.map(function(v){return v.val;}),backgroundColor:COLORS.blue,borderRadius:8,borderSkipped:false}]},
-    options:{indexAxis:'y',responsive:true,animation:barAnim,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}},y:{grid:{display:false}}}}
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:barAnim,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}},y:{grid:{display:false}}}}
   });
 
   // Top zones destino
@@ -1168,7 +1168,7 @@ function renderOperacion(orders,allOrders){
   charts.zonasDest=new Chart(document.getElementById('ch-zonas-dest'),{
     type:'bar',
     data:{labels:destTop.map(function(v){return v.key;}),datasets:[{data:destTop.map(function(v){return v.val;}),backgroundColor:COLORS.orange,borderRadius:8,borderSkipped:false}]},
-    options:{indexAxis:'y',responsive:true,animation:barAnim,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}},y:{grid:{display:false}}}}
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:barAnim,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}},y:{grid:{display:false}}}}
   });
 
   // Servicios por mes: urbano vs nacional
@@ -1186,7 +1186,7 @@ function renderOperacion(orders,allOrders){
       {label:'Urbano',data:smUrb,backgroundColor:COLORS.blue,borderRadius:4,borderSkipped:false},
       {label:'Nacional',data:smNac,backgroundColor:COLORS.orange,borderRadius:4,borderSkipped:false}
     ]},
-    options:{responsive:true,animation:barAnim,plugins:{legend:{position:'bottom',labels:{font:{size:11},usePointStyle:true,pointStyle:'circle'}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(0,0,0,.04)'}}}}
+    options:{responsive:true,maintainAspectRatio:false,animation:barAnim,plugins:{legend:{position:'bottom',labels:{font:{size:11},usePointStyle:true,pointStyle:'circle'}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(0,0,0,.04)'}}}}
   });
 
   // Operarios promedio por mes
@@ -1436,7 +1436,7 @@ function renderGeo(orders){
   charts.geoCiudades=new Chart(document.getElementById('ch-geo-ciudades'),{
     type:'bar',
     data:{labels:allCTop.map(function(v){return v.key;}),datasets:[{data:allCTop.map(function(v){return v.val;}),backgroundColor:PALETTE.slice(0,allCTop.length),borderRadius:8,borderSkipped:false}]},
-    options:{indexAxis:'y',responsive:true,animation:barAnim,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}},y:{grid:{display:false}}}}
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,animation:barAnim,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}},y:{grid:{display:false}}}}
   });
 
   // Load Leaflet and render maps
