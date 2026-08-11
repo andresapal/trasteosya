@@ -1121,9 +1121,6 @@ function _guardarCotParaOS(lines,cliente,tel,fecha,subV,dcto,total){
     var cache=[];
     try{cache=JSON.parse(localStorage.getItem(COT_CACHE_KEY)||'[]');}catch(_){}
     cache.unshift(entry);
-    // Auto-clean entries older than 15 days
-    var cutoff=Date.now()-30*24*60*60*1000;
-    cache=cache.filter(function(e){return !e.saved||new Date(e.saved).getTime()>cutoff;});
     if(cache.length>COT_MAX)cache.length=COT_MAX;
     localStorage.setItem(COT_CACHE_KEY,JSON.stringify(cache));
     // Alerta cuando se acerque al límite
@@ -1610,14 +1607,93 @@ document.addEventListener('click',function(e){
 
 // ============ HISTORIAL DE COTIZACIONES ============
 var _histCache=[];
+var _sheetCots=[];
 function _loadHistCache(){
   try{_histCache=JSON.parse(localStorage.getItem('ty_cot_cache')||'[]');}catch(_){_histCache=[];}
 }
-function abrirHistorial(){
+
+// Fetch from Sheet — single source of truth
+async function _fetchSheetCots(){
+  try{
+    var url=COT_SHEET_URL+'?action=cotizaciones&apikey='+BACKUP_APIKEY;
+    var r=await fetch(url,{redirect:'follow'});
+    var data=await r.json();
+    if((data.success||data.ok)&&data.cotizaciones){
+      var deletedKeys=_getDeletedKeys();
+      _sheetCots=data.cotizaciones.filter(function(c){
+        var k=String(c['CLIENTE']||'').trim().toUpperCase()+'|'+String(c['FECHA']||'').substring(0,10);
+        return deletedKeys.indexOf(k)<0;
+      }).map(function(c){
+        var cliente=String(c.CLIENTE||'').trim();
+        var fecha=c.FECHA||'';
+        if(fecha&&typeof fecha==='object'&&fecha.toISOString)fecha=fecha.toISOString().substring(0,10);
+        else fecha=String(fecha).substring(0,10);
+        var total=parseFloat(c['INGRESO TOTAL']||c['INGRESO']||0)||0;
+        var costo=parseFloat(c['COSTO TOTAL']||0)||0;
+        var estado=String(c.ESTADO||'COTIZADO').toUpperCase();
+        // Build items from Sheet columns
+        var items=[];
+        var ingTrans=parseFloat(c['ING TRANSPORTE']||c['ING TRANS']||0)||0;
+        var ingEmp=parseFloat(c['ING EMPAQUE']||c['ING EMP']||0)||
+          ((parseFloat(c['ING VINIPEL']||0)||0)+(parseFloat(c['ING BURBUJA']||0)||0)+(parseFloat(c['ING CAJAS']||0)||0)+(parseFloat(c['ING CRAFT']||0)||0)+(parseFloat(c['ING CARTON CORRUGADO']||0)||0));
+        var ingInst=parseFloat(c['ING INSTALACIONES TOTAL']||c['ING INST']||c['ING INSTALACIONES']||0)||0;
+        var ingBod=parseFloat(c['ING BODEGAJE']||0)||0;
+        var ingCam=parseFloat(c['ING CAMINADOS']||0)||0;
+        var ingEsc=parseFloat(c['ING ESCALERAS']||0)||0;
+        var costoTras=parseFloat(c['COSTO TRASTEO']||c['COSTO TRANS']||0)||0;
+        var costoEmp=parseFloat(c['COSTO TOTAL EMPAQUE-']||c['COSTO TOTAL EMPAQUE']||c['COSTO EMP']||0)||0;
+        var costoInst=parseFloat(c['COSTO TOTAL INSTALACIONES']||c['COSTO INST']||0)||0;
+        if(ingTrans)items.push({cat:'trasteo',l:'Transporte',v:ingTrans,c:costoTras,qty:1});
+        if(ingEmp)items.push({cat:'empaque',l:'Empaque',v:ingEmp,c:costoEmp,qty:1});
+        if(ingInst)items.push({cat:'inst',l:'Instalaciones',v:ingInst,c:costoInst,qty:1});
+        if(ingBod)items.push({cat:'adicionales',l:'Bodegaje',v:ingBod,c:parseFloat(c['COSTO BODEGAJE']||0)||0,qty:1});
+        if(ingCam)items.push({cat:'adicionales',l:'Caminados',v:ingCam,c:parseFloat(c['COSTO CAMINADO']||0)||0,qty:1});
+        if(ingEsc)items.push({cat:'adicionales',l:'Escaleras',v:ingEsc,c:parseFloat(c['COSTO ESCALERAS']||0)||0,qty:1});
+        if(!items.length&&total)items.push({cat:'trasteo',l:'Servicio de mudanza',v:total,c:costo,qty:1});
+        var empaque={craft:parseFloat(c['ING CRAFT']||0)||0,vinipel:parseFloat(c['ING VINIPEL']||0)||0,burbuja:parseFloat(c['ING BURBUJA']||0)||0,cajas:parseFloat(c['ING CAJAS']||0)||0};
+        return{cliente:cliente,telefono:String(c.TELEFONO||''),fecha:fecha,
+          origen:c.ORIGEN||'',destino:c.DESTINO||'',tipo:c.TIPO||'',fuente:c.FUENTE||'',
+          items:items,empaque:empaque,
+          total:total,costo:costo,estado:estado,saved:c.TIMESTAMP||''};
+      });
+    }
+  }catch(e){console.warn('Fetch sheet cots:',e);}
+  return _sheetCots;
+}
+
+// Merge: Sheet is primary, localStorage fills gaps (locally-created not yet in Sheet)
+function _mergeHistorial(){
+  var merged=[];var seen={};
+  // Sheet entries first (source of truth for estado)
+  _sheetCots.forEach(function(c){
+    var k=(c.cliente||'').toUpperCase()+'|'+(c.fecha||'').substring(0,10);
+    if(!seen[k]){seen[k]=1;merged.push(c);}
+  });
+  // Local entries that aren't in Sheet yet
+  _loadHistCache();
+  _histCache.forEach(function(c){
+    var k=(c.cliente||'').toUpperCase()+'|'+(c.fecha||'').substring(0,10);
+    if(!seen[k]){seen[k]=1;merged.push(c);}
+  });
+  // Sort by date desc
+  merged.sort(function(a,b){return(b.fecha||'').localeCompare(a.fecha||'');});
+  _histCache=merged;
+  // Persist merged cache so autocompletar and other features see it
+  localStorage.setItem('ty_cot_cache',JSON.stringify(merged));
+  return merged;
+}
+
+async function abrirHistorial(){
   _loadHistCache();
   document.getElementById('histBuscar').value='';
+  // Show immediately from cache
+  _histCache.sort(function(a,b){return(b.fecha||'').localeCompare(a.fecha||'');});
   _renderHistList(_histCache);
   document.getElementById('histOverlay').classList.add('open');
+  // Fetch fresh from Sheet and re-render
+  await _fetchSheetCots();
+  _mergeHistorial();
+  _renderHistList(_histCache);
 }
 function cerrarHistorial(){
   document.getElementById('histOverlay').classList.remove('open');
@@ -1625,7 +1701,9 @@ function cerrarHistorial(){
 function filtrarHistorial(q){
   q=(q||'').trim().toUpperCase();
   if(!q){_renderHistList(_histCache);return;}
-  _renderHistList(_histCache.filter(function(e){return(e.cliente||'').indexOf(q)>=0;}));
+  _renderHistList(_histCache.filter(function(e){
+    return(e.cliente||'').toUpperCase().indexOf(q)>=0||(e.telefono||'').indexOf(q)>=0||(e.origen||'').toUpperCase().indexOf(q)>=0||(e.destino||'').toUpperCase().indexOf(q)>=0;
+  }));
 }
 function _renderHistList(list){
   var el=document.getElementById('histLista');
@@ -1763,68 +1841,11 @@ async function sincronizarSheet(){
   var btn=document.getElementById('btn-sync-hist');
   btn.disabled=true;btn.textContent='Sincronizando...';btn.style.opacity='.5';
   try{
-    var url=COT_SHEET_URL+'?action=cotizaciones&apikey='+BACKUP_APIKEY;
-    var r=await fetch(url,{redirect:'follow'});
-    var data=await r.json();
-    if((data.success||data.ok)&&data.cotizaciones){
-      _loadHistCache();
-      var localKeys={};
-      _histCache.forEach(function(c){localKeys[(c.cliente||'').toUpperCase()+'|'+(c.fecha||'')]=1;});
-      var deletedKeys=_getDeletedKeys();
-      var added=0;
-      data.cotizaciones.forEach(function(c){
-        var cliente=String(c.CLIENTE||'').trim();
-        var fecha=c.FECHA||'';
-        if(fecha&&typeof fecha==='object'&&fecha.toISOString)fecha=fecha.toISOString().substring(0,10);
-        else fecha=String(fecha).substring(0,10);
-        var key=cliente.toUpperCase()+'|'+fecha;
-        if(localKeys[key])return;
-        if(deletedKeys.indexOf(key)>=0)return;
-        var total=parseFloat(c['INGRESO TOTAL']||c['INGRESO']||0)||0;
-        var costo=parseFloat(c['COSTO TOTAL']||0)||0;
-        var estado=String(c.ESTADO||'COTIZADO').toUpperCase();
-        // Build items from Sheet columns
-        var items=[];
-        var ingTrans=parseFloat(c['ING TRANSPORTE']||c['ING TRANS']||0)||0;
-        var ingEmp=parseFloat(c['ING EMPAQUE']||c['ING EMP']||0)||
-          ((parseFloat(c['ING VINIPEL']||0)||0)+(parseFloat(c['ING BURBUJA']||0)||0)+(parseFloat(c['ING CAJAS']||0)||0)+(parseFloat(c['ING CRAFT']||0)||0)+(parseFloat(c['ING CARTON CORRUGADO']||0)||0));
-        var ingInst=parseFloat(c['ING INSTALACIONES TOTAL']||c['ING INST']||c['ING INSTALACIONES']||0)||0;
-        var ingBod=parseFloat(c['ING BODEGAJE']||0)||0;
-        var ingCam=parseFloat(c['ING CAMINADOS']||0)||0;
-        var ingEsc=parseFloat(c['ING ESCALERAS']||0)||0;
-        var ingPar=parseFloat(c['ING PARADAS ADICIONAL']||0)||0;
-        var ingFach=parseFloat(c['INGRESO FACHADA']||0)||0;
-        var costoTras=parseFloat(c['COSTO TRASTEO']||c['COSTO TRANS']||0)||0;
-        var costoEmp=parseFloat(c['COSTO TOTAL EMPAQUE-']||c['COSTO TOTAL EMPAQUE']||c['COSTO EMP']||0)||0;
-        var costoInst=parseFloat(c['COSTO TOTAL INSTALACIONES']||c['COSTO INST']||0)||0;
-        if(ingTrans)items.push({cat:'trasteo',l:'Transporte',v:ingTrans,c:costoTras,qty:1});
-        if(ingEmp)items.push({cat:'empaque',l:'Empaque',v:ingEmp,c:costoEmp,qty:1});
-        if(ingInst)items.push({cat:'inst',l:'Instalaciones',v:ingInst,c:costoInst,qty:1});
-        if(ingBod)items.push({cat:'adicionales',l:'Bodegaje',v:ingBod,c:parseFloat(c['COSTO BODEGAJE']||0)||0,qty:1});
-        if(ingCam)items.push({cat:'adicionales',l:'Caminados',v:ingCam,c:parseFloat(c['COSTO CAMINADO']||0)||0,qty:1});
-        if(ingEsc)items.push({cat:'adicionales',l:'Escaleras',v:ingEsc,c:parseFloat(c['COSTO ESCALERAS']||0)||0,qty:1});
-        if(ingPar)items.push({cat:'adicionales',l:'Paradas adicionales',v:ingPar,c:parseFloat(c['COSTO PARADA ADICIONAL']||0)||0,qty:1});
-        if(ingFach)items.push({cat:'adicionales',l:'Fachada',v:ingFach,c:parseFloat(c['COSTO FACHADA O VACIO']||0)||0,qty:1});
-        // If no breakdown but total exists, add single item
-        if(!items.length&&total)items.push({cat:'trasteo',l:'Servicio de mudanza',v:total,c:costo,qty:1});
-        var empaque={craft:parseFloat(c['ING CRAFT']||0)||0,vinipel:parseFloat(c['ING VINIPEL']||0)||0,burbuja:parseFloat(c['ING BURBUJA']||0)||0,cajas:parseFloat(c['ING CAJAS']||0)||0};
-        _histCache.unshift({
-          cliente:cliente,telefono:String(c.TELEFONO||''),fecha:fecha,
-          origen:c.ORIGEN||'',destino:c.DESTINO||'',tipo:c.TIPO||'',fuente:c.FUENTE||'',
-          items:items,empaque:empaque,
-          total:total,costo:costo,estado:estado,saved:new Date().toISOString()
-        });
-        localKeys[key]=1;
-        added++;
-      });
-      if(added>0){
-        localStorage.setItem('ty_cot_cache',JSON.stringify(_histCache));
-        _renderHistList(_histCache);
-        alert('Se sincronizaron '+added+' cotizaciones del sheet.');
-      }else{alert('Todo sincronizado, no hay cotizaciones nuevas.');}
-    }
+    await _fetchSheetCots();
+    _mergeHistorial();
+    _renderHistList(_histCache);
   }catch(e){console.warn('Sync sheet:',e);alert('Error al sincronizar. Verifica tu conexion.');}
-  btn.disabled=false;btn.textContent='Sincronizar sheet';btn.style.opacity='1';
+  btn.disabled=false;btn.textContent='Actualizar';btn.style.opacity='1';
 }
 function limpiarHistorial(){
   if(!confirm('¿Vaciar todo el historial de cotizaciones?\n\nEsto eliminará '+_histCache.length+' registros.\n\n⚠️ Descarga el backup primero si no lo has hecho.'))return;
@@ -1906,7 +1927,7 @@ recalc();
     </div>
     <div class="hist-list" id="histLista"></div>
     <div class="hist-btns">
-      <button class="hist-btn-export" onclick="sincronizarSheet()" id="btn-sync-hist" style="color:#1B3E8C;background:rgba(27,62,140,.08);border-color:rgba(27,62,140,.25)">Sincronizar sheet</button>
+      <button class="hist-btn-export" onclick="sincronizarSheet()" id="btn-sync-hist" style="color:#1B3E8C;background:rgba(27,62,140,.08);border-color:rgba(27,62,140,.25)">Actualizar</button>
       <button class="hist-btn-export" onclick="exportarHistorial()">Descargar backup</button>
       <button class="hist-btn-clear" onclick="limpiarHistorial()">Vaciar</button>
     </div>
