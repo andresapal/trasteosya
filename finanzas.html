@@ -151,6 +151,18 @@ body.ty-dark .cot-detail-ruta{color:#7b9cf5}
 .cot-toggle{font-size:10px;color:var(--ty-muted);margin-left:4px;transition:transform .2s;display:inline-block}
 .cot-toggle.open{transform:rotate(180deg)}
 
+/* Filter pills */
+.cot-filters{display:flex;gap:4px;margin-bottom:10px}
+.cot-filter-pill{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid transparent;background:transparent;color:var(--ty-muted);transition:all .2s;font-family:inherit}
+.cot-filter-pill:hover{background:rgba(27,62,140,.06);color:var(--ty-blue)}
+.cot-filter-pill.active{background:var(--ty-blue);color:#fff;border-color:var(--ty-blue)}
+body.ty-dark .cot-filter-pill.active{background:#7b9cf5;color:#0f0f1a}
+
+/* CdC gen button */
+.cot-gen-cdc{display:inline-block;margin-top:8px;padding:7px 16px;background:linear-gradient(135deg,#1B3E8C,#0A1845);color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;border:none;cursor:pointer;font-family:inherit;transition:all .2s}
+.cot-gen-cdc:hover{box-shadow:0 4px 14px rgba(27,62,140,.3);transform:translateY(-1px)}
+body.ty-dark .cot-gen-cdc{background:linear-gradient(135deg,#7b9cf5,#5070c0)}
+
 /* Show more button */
 .cot-show-more{display:block;width:100%;padding:10px;border:1.5px dashed var(--ty-border);border-radius:10px;background:none;color:var(--ty-blue);font-size:12px;font-weight:600;cursor:pointer;margin-top:8px;transition:all .15s}
 .cot-show-more:hover{background:rgba(27,62,140,.04);border-color:var(--ty-blue)}
@@ -552,30 +564,13 @@ async function toggleEstado(btn,cliente,fecha,nuevoEstado){
   btn.setAttribute('onclick',"toggleEstado(this,'"+cliente.replace(/'/g,"\\'")+"','"+fecha.replace(/'/g,"\\'")+"','"+nextE+"')");
 
   if(success&&nuevoEstado==='VENDIDO'){
-    var cotAll=getAllCots();
-    var cot=null;
-    for(var i=0;i<cotAll.length;i++){
-      var cliN=(cotAll[i].cliente||'').trim().toUpperCase();
-      var cliB=cliente.trim().toUpperCase();
-      if(cliN===cliB&&(cotAll[i].fecha||'').substring(0,10)===fecha.substring(0,10)){cot=cotAll[i];break;}
-    }
-    var total=cot?(cot.total||0):0;
-    var num='CTY'+cdcNextNum();
-    var entry={
-      numero:num,
-      cliente:cliente.trim().toUpperCase(),
-      nit:'',
-      concepto:'SERVICIO DE TRANSPORTE SEGUN RELACION ANEXA',
-      fecha:new Date().toISOString().slice(0,10),
-      items:[{desc:'SERVICIO DE MUDANZA - COT '+fecha,valor:total}],
-      total:total,
-      saved:new Date().toISOString()
-    };
+    var cot=_buscarCot(cliente,fecha);
+    var entry=_buildCdcFromCot(cot,cliente,fecha);
     var list=cdcLoad();
     list.unshift(entry);
     cdcSave(list);
     renderCobros();
-    alert('Cuenta de Cobro '+num+' generada para '+cliente);
+    alert('Cuenta de Cobro '+entry.numero+' generada para '+cliente);
   }
 
   fetchDriveCots().then(function(){renderCotizaciones();}).catch(function(){});
@@ -584,6 +579,9 @@ async function toggleEstado(btn,cliente,fecha,nuevoEstado){
 var _allCotsRendered=[];
 var _cotShowAll=false;
 var _COT_INITIAL=15;
+var _cotEstadoFilter='vendido';
+
+function _setCotFilter(f){_cotEstadoFilter=f;_cotShowAll=false;renderCotizaciones(document.getElementById('cotSearch')?document.getElementById('cotSearch').value:'');}
 
 function renderCotizaciones(filtro){
   var cotCacheAll=getAllCots();
@@ -592,24 +590,40 @@ function renderCotizaciones(filtro){
   var el=document.getElementById('cot-mgmt-content');
   if(!el)return;
 
+  // Apply estado filter
+  var estadoFiltered=cotCacheAll;
+  if(_cotEstadoFilter==='vendido')estadoFiltered=cotCacheAll.filter(function(c){return _isVendido(c);});
+  else if(_cotEstadoFilter==='cotizado')estadoFiltered=cotCacheAll.filter(function(c){return !_isVendido(c);});
+  var countV=cotCacheAll.filter(function(c){return _isVendido(c);}).length;
+  var countC=cotCacheAll.length-countV;
+
   // Apply search filter
   var q=(filtro||'').trim().toUpperCase();
-  var filtered=q?cotCacheAll.filter(function(c){
+  var filtered=q?estadoFiltered.filter(function(c){
     return(c.cliente||'').toUpperCase().indexOf(q)>=0||(c.telefono||'').indexOf(q)>=0||(c.origen||'').toUpperCase().indexOf(q)>=0||(c.destino||'').toUpperCase().indexOf(q)>=0;
-  }):cotCacheAll;
+  }):estadoFiltered;
 
   _allCotsRendered=filtered;
 
+  var titles={todos:'Gestion de Cotizaciones',vendido:'Negocios Vendidos',cotizado:'Cotizaciones Pendientes'};
+  var pillsH='<div class="cot-filters">'
+    +'<button class="cot-filter-pill'+(_cotEstadoFilter==='vendido'?' active':'')+'" onclick="_setCotFilter(\'vendido\')">Vendido ('+countV+')</button>'
+    +'<button class="cot-filter-pill'+(_cotEstadoFilter==='cotizado'?' active':'')+'" onclick="_setCotFilter(\'cotizado\')">Cotizado ('+countC+')</button>'
+    +'<button class="cot-filter-pill'+(_cotEstadoFilter==='todos'?' active':'')+'" onclick="_setCotFilter(\'todos\')">Todos ('+cotCacheAll.length+')</button>'
+    +'</div>';
+
   if(filtered.length===0){
-    el.innerHTML='<div class="cot-section"><div class="cot-header"><h3>Gestion de Cotizaciones</h3></div>'
+    el.innerHTML='<div class="cot-section"><div class="cot-header"><h3>'+(titles[_cotEstadoFilter]||'Cotizaciones')+'</h3></div>'
+      +pillsH
       +'<input class="cot-search" id="cotSearch" type="text" placeholder="Buscar por nombre, telefono, origen o destino..." value="'+(filtro||'')+'" oninput="renderCotizaciones(this.value)">'
-      +'<div style="text-align:center;padding:30px;color:var(--ty-muted)"><p>'+(q?'Sin resultados para "'+q+'"':'Sin cotizaciones registradas')+'</p></div></div>';
+      +'<div style="text-align:center;padding:30px;color:var(--ty-muted)"><p>'+(q?'Sin resultados para "'+q+'"':'Sin registros con estado '+(titles[_cotEstadoFilter]||'').toLowerCase())+'</p></div></div>';
     return;
   }
 
   var showCount=_cotShowAll?filtered.length:Math.min(_COT_INITIAL,filtered.length);
   var h='<div class="cot-section">';
-  h+='<div class="cot-header"><h3>Gestion de Cotizaciones</h3><span class="cot-count">'+filtered.length+' cotizaciones'+(q?' encontradas':'')+'</span></div>';
+  h+='<div class="cot-header"><h3>'+(titles[_cotEstadoFilter]||'Cotizaciones')+'</h3><span class="cot-count">'+filtered.length+(q?' encontradas':'')+'</span></div>';
+  h+=pillsH;
   h+='<input class="cot-search" id="cotSearch" type="text" placeholder="Buscar por nombre, telefono, origen o destino..." value="'+(filtro||'').replace(/"/g,'&quot;')+'" oninput="renderCotizaciones(this.value)">';
   h+='<div class="cot-list">';
   for(var ci=0;ci<showCount;ci++){
@@ -666,11 +680,15 @@ function renderCotizaciones(filtro){
         h+='<a href="https://wa.me/'+tel+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:inline-block;margin-top:8px;padding:6px 14px;background:rgba(37,211,102,.12);color:#15803d;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none">WhatsApp '+cc.telefono+'</a>';
       }
     }
+    // Boton generar CdC para vendidos
+    if(isV){
+      h+=' <button class="cot-gen-cdc" onclick="event.stopPropagation();generarCdcDesdeCot(\''+cli+'\',\''+fch+'\')">Generar cuenta de cobro</button>';
+    }
     h+='</div></div>';
   }
   h+='</div>';
   if(!_cotShowAll&&filtered.length>_COT_INITIAL){
-    h+='<button class="cot-show-more" onclick="_cotShowAll=true;renderCotizaciones(document.getElementById(\'cotSearch\').value)">Ver todas ('+filtered.length+' cotizaciones)</button>';
+    h+='<button class="cot-show-more" onclick="_cotShowAll=true;renderCotizaciones(document.getElementById(\'cotSearch\').value)">Ver todas ('+filtered.length+')</button>';
   }else if(_cotShowAll&&filtered.length>_COT_INITIAL){
     h+='<button class="cot-show-more" onclick="_cotShowAll=false;renderCotizaciones(document.getElementById(\'cotSearch\').value)">Ver menos</button>';
   }
@@ -678,6 +696,51 @@ function renderCotizaciones(filtro){
   el.innerHTML=h;
 }
 
+function _buscarCot(cliente,fecha){
+  var cotAll=getAllCots();
+  for(var i=0;i<cotAll.length;i++){
+    if((cotAll[i].cliente||'').trim().toUpperCase()===cliente.trim().toUpperCase()&&(cotAll[i].fecha||'').substring(0,10)===fecha.substring(0,10))return cotAll[i];
+  }
+  return null;
+}
+function _buildCdcFromCot(cot,cliente,fecha){
+  var num='CTY'+cdcNextNum();
+  var cdcItems=[];
+  if(cot){
+    if(cot.ingTrans)cdcItems.push({desc:'TRANSPORTE',valor:cot.ingTrans});
+    if(cot.ingEmp)cdcItems.push({desc:'EMPAQUE',valor:cot.ingEmp});
+    if(cot.ingInst)cdcItems.push({desc:'INSTALACIONES',valor:cot.ingInst});
+    if(cot.ingBod)cdcItems.push({desc:'BODEGAJE',valor:cot.ingBod});
+    if(cot.ingCam)cdcItems.push({desc:'CAMINADOS',valor:cot.ingCam});
+    if(cot.ingEsc)cdcItems.push({desc:'ESCALERAS',valor:cot.ingEsc});
+    if(cot.ingPar)cdcItems.push({desc:'PARADAS ADICIONAL',valor:cot.ingPar});
+    if(cot.ingFach)cdcItems.push({desc:'FACHADA / VACIO',valor:cot.ingFach});
+  }
+  if(!cdcItems.length){
+    var total=cot?(cot.total||0):0;
+    cdcItems.push({desc:'SERVICIO DE MUDANZA - COT '+fecha,valor:total});
+  }
+  var totalCdc=cdcItems.reduce(function(a,it){return a+(it.valor||0);},0);
+  var concepto='SERVICIO DE TRANSPORTE';
+  if(cot&&cot.origen&&cot.destino)concepto+=' '+cot.origen.toUpperCase()+' - '+cot.destino.toUpperCase();
+  else concepto+=' SEGUN RELACION ANEXA';
+  return{numero:num,cliente:cliente.trim().toUpperCase(),nit:'',concepto:concepto,
+    fecha:new Date().toISOString().slice(0,10),items:cdcItems,total:totalCdc,saved:new Date().toISOString()};
+}
+function generarCdcDesdeCot(cliente,fecha){
+  var cot=_buscarCot(cliente,fecha);
+  if(!cot){alert('No se encontro la cotizacion');return;}
+  // Check if CdC already exists for this client/date
+  var existing=cdcLoad().filter(function(c){return c.cliente===cliente.trim().toUpperCase()&&c.concepto&&c.concepto.indexOf(fecha)>=0;});
+  if(existing.length&&!confirm('Ya existe cuenta de cobro para '+cliente+'.\nGenerar otra?'))return;
+  var entry=_buildCdcFromCot(cot,cliente,fecha);
+  // Pre-fill the CdC form instead of auto-saving
+  _cdcItems=entry.items.map(function(it){return{desc:it.desc,valor:it.valor};});
+  var list=cdcLoad();list.unshift(entry);cdcSave(list);renderCobros();
+  // Load into form for review
+  cdcCargar(0);
+  alert('Cuenta de Cobro '+entry.numero+' generada. Revisa los datos arriba.');
+}
 function toggleCotDetail(i){
   var det=document.getElementById('cot-det-'+i);
   var tog=document.getElementById('cot-tog-'+i);

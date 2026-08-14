@@ -169,6 +169,18 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
 .hc-del{width:26px;height:26px;border:none;border-radius:50%;background:#fee2e2;color:#dc2626;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center;margin-left:6px;transition:.15s;flex-shrink:0}
 .hc-del:hover{background:#dc2626;color:#fff}
 .hc-actions{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.hc-edit-header{display:grid;grid-template-columns:1fr 90px 90px 28px;gap:6px;margin-bottom:6px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase}
+.hc-edit-item{display:grid;grid-template-columns:1fr 90px 90px 28px;gap:6px;margin-bottom:6px;align-items:center}
+.hc-edit-item input{font-size:12px;padding:5px 6px;border:1px solid var(--border);border-radius:6px;font-family:inherit;width:100%}
+.hc-edit-item input:focus{outline:none;border-color:var(--brand)}
+.hc-edit-add{font-size:11px;color:var(--brand);cursor:pointer;font-weight:600;border:none;background:none;padding:4px 0;margin-top:4px}
+.hc-edit-actions{display:flex;gap:8px;margin-top:10px}
+.hc-edit-btn{padding:6px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:inherit}
+.hc-edit-btn.primary{background:var(--brand);color:#fff}
+.hc-edit-btn.secondary{background:#f0f0f0;color:#555}
+.hc-edit-btn:disabled{opacity:.5;cursor:not-allowed}
+.hc-edit-total{display:flex;justify-content:space-between;font-weight:700;font-size:13px;color:var(--dark);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+@media(max-width:480px){.hc-edit-header,.hc-edit-item{grid-template-columns:1fr 70px 70px 28px}}
 .ac-dropdown{display:none;position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:100;max-height:180px;overflow-y:auto}
 .ac-dropdown.show{display:block}
 .ac-item{padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center}
@@ -1729,6 +1741,7 @@ function _renderHistList(list){
     else if(items)html+='<div class="hc-items">'+escH(items)+'</div>';
     // Detail toggle
     html+='<span class="hc-toggle" onclick="event.stopPropagation();toggleDetalle('+i+')">Ver detalle &#9660;</span>';
+    html+='<span class="hc-toggle" onclick="event.stopPropagation();editarCotizacion('+i+')" style="margin-left:10px;color:#d97706">Editar</span>';
     html+='<div class="hc-detail" id="hdet-'+i+'">';
     if(e.items&&e.items.length){
       html+='<table>';
@@ -1759,9 +1772,76 @@ function _renderHistList(list){
 }
 function toggleDetalle(i){
   var det=document.getElementById('hdet-'+i);
-  var tog=det.previousElementSibling;
-  if(det.classList.contains('open')){det.classList.remove('open');tog.innerHTML='Ver detalle &#9660;';}
-  else{det.classList.add('open');tog.innerHTML='Ocultar &#9650;';}
+  var tog=det.previousElementSibling.previousElementSibling;
+  if(det.classList.contains('open')){det.classList.remove('open');if(tog)tog.innerHTML='Ver detalle &#9660;';}
+  else{det.classList.add('open');if(tog)tog.innerHTML='Ocultar &#9650;';}
+}
+/* ============ EDICION DE COTIZACIONES ============ */
+var _editItems=[];
+function editarCotizacion(i){
+  _loadHistCache();
+  var e=_histCache[i];if(!e)return;
+  _editItems=(e.items&&e.items.length)?JSON.parse(JSON.stringify(e.items)):[{cat:'trasteo',l:'Servicio',v:e.total||0,c:e.costo||0,qty:1}];
+  var det=document.getElementById('hdet-'+i);
+  if(det&&!det.classList.contains('open'))det.classList.add('open');
+  _renderEditForm(i);
+}
+function _renderEditForm(i){
+  var det=document.getElementById('hdet-'+i);if(!det)return;
+  var h='<div class="hc-edit-header"><span>Concepto</span><span>Venta</span><span>Costo</span><span></span></div>';
+  _editItems.forEach(function(it,idx){
+    h+='<div class="hc-edit-item">'
+      +'<input value="'+(it.l||'').replace(/"/g,'&quot;')+'" oninput="_editItems['+idx+'].l=this.value" placeholder="Concepto" style="text-transform:uppercase" onblur="this.value=this.value.toUpperCase();_editItems['+idx+'].l=this.value">'
+      +'<input type="number" value="'+(it.v||0)+'" oninput="_editItems['+idx+'].v=parseInt(this.value)||0;_recalcEditTotals('+i+')">'
+      +'<input type="number" value="'+(it.c||0)+'" oninput="_editItems['+idx+'].c=parseInt(this.value)||0;_recalcEditTotals('+i+')">'
+      +'<button class="hc-del" onclick="_editItems.splice('+idx+',1);_renderEditForm('+i+')" title="Eliminar">&#x2715;</button>'
+      +'</div>';
+  });
+  h+='<button class="hc-edit-add" onclick="_editItems.push({cat:\'adicionales\',l:\'\',v:0,c:0,qty:1});_renderEditForm('+i+')">+ Agregar item</button>';
+  var tv=_editItems.reduce(function(a,it){return a+(it.v||0);},0);
+  var tc=_editItems.reduce(function(a,it){return a+(it.c||0);},0);
+  var ut=tv-tc;var pct=tv?Math.round(ut/tv*100):0;
+  h+='<div class="hc-edit-total" id="edit-totals-'+i+'"><span>Venta: '+COP(tv)+'</span><span>Costo: '+COP(tc)+'</span><span style="color:'+(ut>=0?'#15803d':'#dc2626')+'">Util: '+COP(ut)+' ('+pct+'%)</span></div>';
+  h+='<div class="hc-edit-actions">'
+    +'<button class="hc-edit-btn primary" id="hc-save-'+i+'" onclick="guardarEdicionCot('+i+')">Guardar cambios</button>'
+    +'<button class="hc-edit-btn secondary" onclick="_editItems=[];_renderHistList(_histCache)">Cancelar</button>'
+    +'</div>';
+  det.innerHTML=h;
+}
+function _recalcEditTotals(i){
+  var tv=_editItems.reduce(function(a,it){return a+(it.v||0);},0);
+  var tc=_editItems.reduce(function(a,it){return a+(it.c||0);},0);
+  var ut=tv-tc;var pct=tv?Math.round(ut/tv*100):0;
+  var el=document.getElementById('edit-totals-'+i);
+  if(el)el.innerHTML='<span>Venta: '+COP(tv)+'</span><span>Costo: '+COP(tc)+'</span><span style="color:'+(ut>=0?'#15803d':'#dc2626')+'">Util: '+COP(ut)+' ('+pct+'%)</span>';
+}
+async function guardarEdicionCot(i){
+  _loadHistCache();
+  var e=_histCache[i];if(!e)return;
+  var btn=document.getElementById('hc-save-'+i);
+  if(btn){btn.disabled=true;btn.textContent='Guardando...';}
+  var items=_editItems.filter(function(it){return it.l&&it.l.trim();});
+  if(!items.length){alert('Agrega al menos un item');if(btn){btn.disabled=false;btn.textContent='Guardar cambios';}return;}
+  var totalV=items.reduce(function(a,it){return a+(it.v||0);},0);
+  var totalC=items.reduce(function(a,it){return a+(it.c||0);},0);
+  // Actualizar cache local
+  e.items=items;e.total=totalV;e.costo=totalC;
+  localStorage.setItem('ty_cot_cache',JSON.stringify(_histCache));
+  // Sincronizar Sheet: borrar fila antigua e insertar con datos nuevos
+  var sheetOk=false;
+  try{
+    await fetch(COT_SHEET_URL,{method:'POST',body:JSON.stringify({type:'delete_cotizacion',apikey:BACKUP_APIKEY,meta:{cliente:e.cliente,fecha:e.fecha}}),redirect:'follow'});
+    var meta={cliente:e.cliente,telefono:e.telefono||'',fecha:e.fecha,hora:'',
+      tipo:e.tipo||'',estado:e.estado||'COTIZADO',fuente:e.fuente||'Cotizador Admin',
+      total:totalV,subtotal:totalV,descuento:0,costo:totalC,utilidad:totalV-totalC,
+      origen:e.origen||'',destino:e.destino||'',
+      items:items.map(function(it){return{cat:it.cat||'adicionales',l:it.l,v:it.v,c:it.c||0,qty:it.qty||1};})};
+    await fetch(COT_SHEET_URL,{method:'POST',body:JSON.stringify({type:'cotizacion',apikey:BACKUP_APIKEY,meta:meta}),redirect:'follow'});
+    sheetOk=true;
+  }catch(ex){console.warn('Edit sync:',ex);}
+  _editItems=[];
+  _renderHistList(_histCache);
+  alert(sheetOk?'Cotizacion actualizada y sincronizada con Sheet':'Guardada localmente. No se pudo sincronizar con Sheet.');
 }
 async function toggleEstado(i){
   _loadHistCache();
