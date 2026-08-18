@@ -176,7 +176,7 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
     </div>
     <div id="s-cli" class="card-body">
       <div class="grid2">
-        <div class="fgroup" style="position:relative"><label>Cliente / Contacto *</label><input id="cliente" placeholder="NOMBRE DEL CLIENTE" autocomplete="name" autocapitalize="words" style="text-transform:uppercase" oninput="st('cliente',this.value);syncContacto();acBuscar('cliente')" onblur="this.value=this.value.toUpperCase();st('cliente',this.value)" onchange="st('cliente',this.value.toUpperCase());syncContacto()"/><div id="ac-cliente" class="ac-dropdown"></div></div>
+        <div class="fgroup" style="position:relative"><label>Cliente / Contacto *</label><input id="cliente" placeholder="NOMBRE DEL CLIENTE" autocomplete="name" autocapitalize="words" style="text-transform:uppercase" oninput="st('cliente',this.value);syncContacto();acBuscarDebounced('cliente')" onblur="this.value=this.value.toUpperCase();st('cliente',this.value)" onchange="st('cliente',this.value.toUpperCase());syncContacto()"/><div id="ac-cliente" class="ac-dropdown"></div></div>
         <div class="fgroup"><label>Teléfono cliente</label><input id="telefono" type="tel" placeholder="3XX XXX XXXX" autocomplete="tel" oninput="st('telefono',this.value);syncContacto()" onchange="st('telefono',this.value);syncContacto()"/></div>
       </div>
       <hr class="sep"/>
@@ -201,7 +201,7 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
     </div>
     <div id="s-veh" class="card-body">
       <div class="grid3">
-        <div class="fgroup" style="position:relative"><label>Conductor</label><input id="conductor" placeholder="NOMBRE CONDUCTOR" autocomplete="name" autocapitalize="words" style="text-transform:uppercase" oninput="st('conductor',this.value);acBuscar('conductor')" onblur="this.value=this.value.toUpperCase();st('conductor',this.value)" onchange="st('conductor',this.value.toUpperCase())"/><div id="ac-conductor" class="ac-dropdown"></div></div>
+        <div class="fgroup" style="position:relative"><label>Conductor</label><input id="conductor" placeholder="NOMBRE CONDUCTOR" autocomplete="name" autocapitalize="words" style="text-transform:uppercase" oninput="st('conductor',this.value);acBuscarDebounced('conductor')" onblur="this.value=this.value.toUpperCase();st('conductor',this.value)" onchange="st('conductor',this.value.toUpperCase())"/><div id="ac-conductor" class="ac-dropdown"></div></div>
         <div class="fgroup"><label>Cédula conductor</label><input id="conductorCedula" inputmode="numeric" placeholder="0.000.000.000" oninput="st('conductorCedula',fmtCed(this.value));this.value=state.conductorCedula"/></div>
         <div class="fgroup"><label>Celular conductor</label><input id="conductorCelular" type="tel" placeholder="300 XXX XXX" autocomplete="tel" oninput="st('conductorCelular',this.value)" onchange="st('conductorCelular',this.value)"/></div>
         <div class="fgroup"><label>Placa</label><input id="placa" placeholder="ABC-123" style="text-transform:uppercase" oninput="st('placa',this.value)" onblur="this.value=this.value.toUpperCase();st('placa',this.value)"/></div>
@@ -432,6 +432,8 @@ const updateOSDisplay=()=>{
   if(cl) cl.textContent=state.cliente?state.cliente:"";
 };
 let _cotSearchTimer=null;
+let _acTimer=null;
+function acBuscarDebounced(tipo,opIdx){clearTimeout(_acTimer);_acTimer=setTimeout(function(){acBuscar(tipo,opIdx);},300);}
 const syncContacto=()=>{
   state.recogidas.forEach(p=>{p.contacto1=state.cliente;p.telefono1=state.telefono;});
   state.entregas.forEach(p=>{p.contacto1=state.cliente;p.telefono1=state.telefono;});
@@ -487,7 +489,7 @@ function renderOps(){
     <div style="display:grid;grid-template-columns:34px 1fr 1.8fr 60px 32px;gap:8px;align-items:center;margin-bottom:7px">
       <div style="background:${o.esEmp?'#4b5563':'#f0f2f5'};color:${o.esEmp?'#fff':'#6b7280'};border-radius:6px;font-size:${o.esEmp?'11':'12'}px;font-weight:700;text-align:center;padding:5px 0">${o.esEmp?"E":i+1}</div>
       <input value="${o.cedula}" placeholder="Cédula" oninput="state.personas[${i}].cedula=fmtCed(this.value);this.value=state.personas[${i}].cedula"/>
-      <div style="position:relative"><input value="${o.nombre}" placeholder="NOMBRE" autocapitalize="words" style="text-transform:uppercase" oninput="state.personas[${i}].nombre=this.value;acBuscar('op',${i})" onblur="this.value=this.value.toUpperCase();state.personas[${i}].nombre=this.value" autocomplete="name"/><div id="ac-op-${i}" class="ac-dropdown"></div></div>
+      <div style="position:relative"><input value="${o.nombre}" placeholder="NOMBRE" autocapitalize="words" style="text-transform:uppercase" oninput="state.personas[${i}].nombre=this.value;acBuscarDebounced('op',${i})" onblur="this.value=this.value.toUpperCase();state.personas[${i}].nombre=this.value" autocomplete="name"/><div id="ac-op-${i}" class="ac-dropdown"></div></div>
       <label style="display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;font-size:11px;text-transform:none;color:#374151">
         <input type="checkbox" ${o.esEmp?"checked":""} onchange="state.personas[${i}].esEmp=this.checked;renderOps()" style="width:auto;accent-color:#4b5563"/> Emp.
       </label>
@@ -1410,7 +1412,50 @@ function cargarOSModal(){
   document.body.appendChild(modal);
 }
 
-const handleNueva=()=>{if(!confirm("¿Nueva OS? Se perderá lo no guardado."))return;try{sessionStorage.removeItem('ty_load_os');}catch(_){}location.reload();};
+const handleNueva=()=>{
+  if(!confirm("¿Nueva OS? Se perderá lo no guardado."))return;
+  try{sessionStorage.removeItem('ty_load_os');}catch(_){}
+  const t=new Date().toISOString().slice(0,10);
+  state.numeroOS=genOS(t);state.fecha=t;
+  state.cliente="";state.telefono="";
+  state.conductor="";state.conductorCedula="";state.placa="";state.conductorCelular="300 XXX XXX";
+  state.numOperarios=0;state.tipoVehiculo="";state.fotoVehiculo="";
+  state.personas=[
+    {nombre:"DAVID ESTEBAN AMAYA",cedula:"1.023.867.874",esEmp:true},
+    {nombre:"MÓNICA CANO",cedula:"1.073.674.422",esEmp:true},
+    {nombre:"ESTIVEN AMAYA",cedula:"1.021.671.996",esEmp:true},
+    {nombre:"MAURICIO QUEVEDO",cedula:"79.914.695",esEmp:false},
+    {nombre:"JONATHAN QUINTERO CANO",cedula:"1.074.810.174",esEmp:false},
+  ];
+  state.cargueFecha=t;state.cargueHora="08:00";
+  state.recogidas=[{...paradaVacia(),fecha:t,hora:"08:00"}];
+  state.entregas=[{...paradaVacia(),fecha:t,hora:"12:00",fechaEnt:t}];
+  state.articulos="";
+  state.empaque={craft:0,vinipel:0,burbuja:0,cajas:0};
+  state.firmaCliente1="";state.firmaCliente2="";state.firmaConductor="";state.firmaBodega="";
+  autoNum=true;
+  document.getElementById("cliente").value="";
+  document.getElementById("telefono").value="";
+  document.getElementById("fecha").value=t;
+  document.getElementById("cargueFecha").value=t;
+  document.getElementById("cargueHora").value="08:00";
+  document.getElementById("conductor").value="";
+  document.getElementById("conductorCedula").value="";
+  document.getElementById("conductorCelular").value="300 XXX XXX";
+  document.getElementById("placa").value="";
+  document.getElementById("numOperarios").value=0;
+  document.getElementById("tipoVehiculo").value="";
+  document.getElementById("articulos").value="";
+  document.getElementById("craft").value=0;
+  document.getElementById("vinipel").value=0;
+  document.getElementById("burbuja").value=0;
+  document.getElementById("cajas").value=0;
+  var fp=document.getElementById("fotoPreview");fp.style.display="none";fp.src="";
+  document.getElementById("btnQF").style.display="none";
+  [0,1,2,3].forEach(clearSig);
+  updateOSDisplay();renderOps();renderParadas();initSigs();
+  showToast("Nueva orden de servicio lista.");
+};
 const handleDuplicar=()=>{
   state.cliente="";state.telefono="";
   ["firmaCliente1","firmaCliente2","firmaConductor","firmaBodega"].forEach(k=>state[k]="");
