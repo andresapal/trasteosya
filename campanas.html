@@ -498,6 +498,12 @@ var ICONS={
 };
 
 var TEMPLATES={
+  bienvenida_lead:{icon:ICONS.phone,name:'Bienvenida Lead',desc:'Primer contacto con lead nuevo',category:'permanente',
+    msg:'👋 Hola {nombre}, soy Andrés de *Trasteos Ya* 🚚\n\nVi que nos contactaste recientemente y quería atenderte personalmente.\n\n✅ Tenemos disponibilidad inmediata\n💰 Podemos ajustar la cotización a tu presupuesto\n📦 Servicio completo: empaque, transporte y operarios\n\n🔗 Cotiza gratis: trasteosya.online\n\nTe envío a continuación toda la información de nuestros servicios para que puedas iniciar tu cotización 👇\n\nCordialmente,\nAndrés Aparicio\n*Trasteos Ya*'},
+  info_servicios:{icon:ICONS.truck,name:'Info General Servicios',desc:'Detalle completo de servicios y como cotizar',category:'permanente',
+    msg:'📋 *Gracias por contactar a Trasteosya*\n\n✨ Estamos comprometidos en brindar un servicio de calidad y hacer que su mudanza con nosotros sea la mejor experiencia.\n\nSegún la información que nos pueda indicar, podremos calcular el costo.\n\n🚚 Nuestros servicios de trasteos o mudanza incluyen manipulación y transporte. Prestamos otros servicios como bodegaje, empaque o, instalaciones.\n\n💰 El valor total del servicio es por el tamaño del furgón del camión, el número de operarios, sumado al tiempo que tome el desarrollo del servicio y a la distancia entre los lugares de origen y destino, si incluye paradas adicionales, y sobre la cantidad de artículos que nos haya informado.\n\n📍 Nuestro servicio es en Bogotá. Otros destinos por favor indicarnos.\n⚠️ Las tarifas están sujetas a cambios.\n\n✅ El servicio de trasteo incluye cargue, manipulación por ascensor, transporte, descargue, entregamos con armado de camas, y donde nos indiquen deben quedar las cosas. Recuerde que la cotización es estimada y puede variar dependiendo de las circunstancias específicas de su mudanza (uso de ascensor o escalera, caminados o recorridos largos)\n\n📝 Si está interesado en nuestros servicios, por favor indíquenos vía whatsapp la información solicitada:\n\n1️⃣ Fotos, videos, o la lista de las cosas que tiene según considere. Recuerde que entre más completa la información mucho mejor.\n2️⃣ Indíquenos fecha estimada para su servicio.\n3️⃣ Confírmenos detalles como: ¿si hay ascensor o sólo escalera?, si se presentan caminados largos mayores a cincuenta metros?, es decir caminado largo, ¿si tiene nevecón o nevera?, ¿y si tiene secadora?, o, si requiere instalación de televisores a pared.\n\n🏘️ Si su trasteo es para Chía, Cajicá, Cota o zonas cercanas a Bogotá, deberá confirmar previamente accesos posibles de camiones grandes y pesados con sus administraciones.\n\n📞 Si tiene alguna pregunta o inquietud, estaremos encantados de comunicarnos en breve y ayudarle en todo lo que podamos.\n\nCordialmente *Trasteosya.com* 🚚\ntrasteosya.online'},
+  seguimiento_lead:{icon:ICONS.target,name:'Seguimiento Lead',desc:'Recordatorio para leads que no respondieron',category:'permanente',
+    msg:'👋 Hola {nombre}, soy Andrés de *Trasteos Ya* 🚚\n\nTe escribí hace unos días sobre tu mudanza. ¿Pudiste revisar la información?\n\n📅 Aún tenemos disponibilidad para las próximas fechas.\n💡 Si tienes dudas sobre el proceso o el precio, con gusto te ayudo.\n\nSolo responde este mensaje y coordinamos. 🤝\n\n🔗 trasteosya.online\n\nQuedo atento,\nAndrés'},
   regreso_clases:{icon:ICONS.school,name:'Regreso a clases',desc:'Mudanzas universitarias y escolares',category:'estacional',season:'Enero',
     msg:'Hola {nombre}, soy Andres de *Trasteos Ya*.\n\nSe acerca el regreso a clases y sabemos que muchas familias necesitan mudarse cerca de universidades y colegios.\n\nTenemos *tarifas especiales* para mudanzas estudiantiles y traslados de apartaestudios.\n\nCotiza gratis: trasteosya.online\n\nQuedo atento.',
     bg1:'#1B3E8C',bg2:'#2563eb',pieceTitle:'Regreso a Clases',pieceSub:'Mudanzas estudiantiles con tarifa especial'},
@@ -988,8 +994,8 @@ function makePieceSVG(cfg){
 
 function renderBiblioteca(){
   var cats=[
+    {key:'permanente',title:'Campanas Permanentes',desc:'Bienvenida, seguimiento y campanas de todo el año'},
     {key:'estacional',title:'Campanas Estacionales',desc:'Asociadas al calendario colombiano'},
-    {key:'permanente',title:'Campanas Permanentes',desc:'Se ejecutan durante todo el año'},
     {key:'negocio',title:'Lineas de Negocio',desc:'Por empresa o proyecto'}
   ];
   var html='';
@@ -1354,9 +1360,35 @@ function dismissAlert(key){var d=getDismissedAlerts();d[key]=new Date().toISOStr
 function escH(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 function formatPhone(p){if(p.length===12&&p.startsWith('57'))return'+57 '+p.substring(2,5)+' '+p.substring(5,8)+' '+p.substring(8);return p;}
 
+// ============ AUTO-REFRESH CONTACTOS ============
+var _autoRefreshInterval=null;
+var _lastContactCount=0;
+function autoRefreshContacts(){
+  var oldCount=CLIENTS.length;
+  loadClients();
+  setTimeout(function(){
+    var diff=CLIENTS.length-oldCount;
+    if(diff>0){
+      var toast=document.createElement('div');
+      toast.textContent=diff+' contacto'+(diff>1?'s':'')+' nuevo'+(diff>1?'s':'')+' agregado'+(diff>1?'s':'');
+      toast.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#16a34a;color:#fff;padding:8px 16px;border-radius:20px;font-size:13px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,.2)';
+      document.body.appendChild(toast);
+      setTimeout(function(){toast.remove();},3000);
+    }
+  },2000);
+}
+function startAutoRefresh(){
+  if(_autoRefreshInterval)clearInterval(_autoRefreshInterval);
+  _autoRefreshInterval=setInterval(autoRefreshContacts,300000);
+}
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible')setTimeout(autoRefreshContacts,500);
+});
+
 // ============ INIT ============
-selectTemplate('referidos');
+selectTemplate('bienvenida_lead');
 loadClients();
+startAutoRefresh();
 setTimeout(checkAlertsOnLoad,1500);
 </script>
 <script src="js/swipe-nav.js"></script>
