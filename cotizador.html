@@ -2084,12 +2084,12 @@ function cargarDesdHistorial(idx){
   if(hasBod&&!state.mods.bodegaje)toggleMod('bodegaje');
   if(hasDesempaque&&!state.mods.desempaque)toggleMod('desempaque');
   if(hasAdicionales&&!state.mods.adicionales)toggleMod('adicionales');
-  // Cobertura
+  // Cobertura — poner valores ANTES de setCobertura (que llama recalc)
   if(hasTrasteo){
     if(isNacional){
-      setCobertura('nacional');
       var nv=document.getElementById('nac-venta');if(nv)nv.value=nacVenta;
       var nc=document.getElementById('nac-costo');if(nc)nc.value=nacCosto;
+      setCobertura('nacional');
     } else {
       setCobertura('urbano');
     }
