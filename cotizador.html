@@ -1742,6 +1742,7 @@ function _renderHistList(list){
     // Detail toggle
     html+='<span class="hc-toggle" onclick="event.stopPropagation();toggleDetalle('+i+')">Ver detalle &#9660;</span>';
     html+='<span class="hc-toggle" onclick="event.stopPropagation();editarCotizacion('+i+')" style="margin-left:10px;color:#d97706">Editar</span>';
+    html+='<span class="hc-toggle" onclick="event.stopPropagation();cargarDesdHistorial('+i+')" style="margin-left:10px;color:#15803d">Cargar</span>';
     html+='<div class="hc-detail" id="hdet-'+i+'">';
     if(e.items&&e.items.length){
       html+='<table>';
@@ -1772,7 +1773,7 @@ function _renderHistList(list){
 }
 function toggleDetalle(i){
   var det=document.getElementById('hdet-'+i);
-  var tog=det.previousElementSibling.previousElementSibling;
+  var tog=det.previousElementSibling.previousElementSibling.previousElementSibling;
   if(det.classList.contains('open')){det.classList.remove('open');if(tog)tog.innerHTML='Ver detalle &#9660;';}
   else{det.classList.add('open');if(tog)tog.innerHTML='Ocultar &#9650;';}
 }
@@ -1898,12 +1899,101 @@ function cargarDesdHistorial(idx){
   _loadHistCache();
   var e=_histCache[idx];
   if(!e)return;
-  if(!confirm('¿Cargar datos del cliente "'+e.cliente+'" en la cotización actual?\n\nFecha: '+e.fecha+'\nTotal: '+COP(e.total||0)))return;
+  if(!confirm('¿Cargar cotización completa de "'+e.cliente+'" al formulario?\n\nFecha: '+e.fecha+'\nTotal: '+COP(e.total||0)+'\n\nSe reemplazarán los datos actuales.'))return;
+  // Datos básicos
   if(e.cliente)document.getElementById('cliente').value=e.cliente;
   if(e.telefono)document.getElementById('telefono').value=e.telefono;
   if(e.fecha)document.getElementById('fecha').value=e.fecha;
+  // Desactivar todos los módulos primero
+  ['trasteo','empaque','inst','desempaque','bodegaje','adicionales'].forEach(function(k){
+    if(state.mods[k]){state.mods[k]=false;var mod=document.getElementById('mod-'+k);if(mod)mod.className='card';var sw=document.getElementById('sw-'+k);if(sw)sw.className='sw';}
+  });
+  // Analizar items para activar módulos y setear valores
+  var items=e.items||[];
+  var hasTrasteo=false,hasEmpaque=false,hasInst=false,hasBod=false,hasAdicionales=false,hasDesempaque=false;
+  var trasteoQtys={pequeno:0,mediano:0,grande:0};
+  var matQtys={vinipel:0,burbuja:0,cajas:0,craft:0,carton:0};
+  var instQtys={nevecon:0,secadora:0,tv:0,repisaP:0,repisaG:0,cuadroP:0,cuadroG:0};
+  var expressRollos=0;
+  var isFullEmpaque=false;
+  items.forEach(function(it){
+    var cat=it.cat||'';
+    var label=(it.l||'').toLowerCase();
+    var qty=it.qty||1;
+    if(cat==='trasteo'){
+      hasTrasteo=true;
+      if(label.indexOf('pequeño')>=0||label.indexOf('pequeno')>=0)trasteoQtys.pequeno+=qty;
+      else if(label.indexOf('grande')>=0)trasteoQtys.grande+=qty;
+      else if(label.indexOf('mediano')>=0)trasteoQtys.mediano+=qty;
+    } else if(cat==='empaque'){
+      hasEmpaque=true;
+      if(label.indexOf('express')>=0){expressRollos+=qty;}
+      else if(label.indexOf('vinipel')>=0){matQtys.vinipel+=qty;isFullEmpaque=true;}
+      else if(label.indexOf('burbuja')>=0){matQtys.burbuja+=qty;isFullEmpaque=true;}
+      else if(label.indexOf('caja')>=0){matQtys.cajas+=qty;isFullEmpaque=true;}
+      else if(label.indexOf('craft')>=0){matQtys.craft+=qty;isFullEmpaque=true;}
+      else if(label.indexOf('cartón')>=0||label.indexOf('carton')>=0){matQtys.carton+=qty;isFullEmpaque=true;}
+    } else if(cat==='inst'){
+      hasInst=true;
+      if(label.indexOf('nevec')>=0)instQtys.nevecon+=qty;
+      else if(label.indexOf('secadora')>=0)instQtys.secadora+=qty;
+      else if(label.indexOf('tv')>=0)instQtys.tv+=qty;
+      else if(label.indexOf('repisa')>=0&&label.indexOf('pequeñ')>=0)instQtys.repisaP+=qty;
+      else if(label.indexOf('repisa')>=0&&label.indexOf('grand')>=0)instQtys.repisaG+=qty;
+      else if(label.indexOf('cuadro')>=0&&label.indexOf('pequeñ')>=0)instQtys.cuadroP+=qty;
+      else if(label.indexOf('cuadro')>=0&&label.indexOf('grand')>=0)instQtys.cuadroG+=qty;
+    } else if(cat==='bodegaje'){hasBod=true;}
+    else if(cat==='desempaque'){hasDesempaque=true;}
+    else if(cat==='adicionales'){hasAdicionales=true;}
+  });
+  // Activar módulos detectados
+  if(hasTrasteo&&!state.mods.trasteo)toggleMod('trasteo');
+  if(hasEmpaque&&!state.mods.empaque)toggleMod('empaque');
+  if(hasInst&&!state.mods.inst)toggleMod('inst');
+  if(hasBod&&!state.mods.bodegaje)toggleMod('bodegaje');
+  if(hasDesempaque&&!state.mods.desempaque)toggleMod('desempaque');
+  if(hasAdicionales&&!state.mods.adicionales)toggleMod('adicionales');
+  // Setear valores de trasteo
+  if(hasTrasteo){
+    Object.keys(trasteoQtys).forEach(function(k){
+      state.trasteoQty[k]=trasteoQtys[k];
+      var inp=document.getElementById('trasteo-qty-'+k);
+      if(inp)inp.value=trasteoQtys[k]||'';
+    });
+  }
+  // Setear empaque
+  if(hasEmpaque){
+    if(isFullEmpaque&&state.empTab!=='full'){
+      setEmpTab('full');
+    }
+    if(isFullEmpaque){
+      setTimeout(function(){
+        Object.keys(matQtys).forEach(function(k){
+          var inp=document.getElementById('mat-'+k);
+          if(inp&&matQtys[k]>0)inp.value=matQtys[k];
+        });
+        recalc();
+      },100);
+    } else if(expressRollos>0){
+      state.empTab='express';
+      var inp=document.getElementById('rollos');
+      if(inp)inp.value=expressRollos;
+    }
+  }
+  // Setear instalaciones
+  if(hasInst){
+    setTimeout(function(){
+      Object.keys(instQtys).forEach(function(k){
+        var inp=document.getElementById('inst-'+k);
+        if(inp&&instQtys[k]>0)inp.value=instQtys[k];
+      });
+      recalc();
+    },150);
+  }
+  // Descuento
+  if(e.descuento>0){var dInp=document.getElementById('descuento');if(dInp)dInp.value=e.descuento;}
   cerrarHistorial();
-  alert('Datos cargados: '+e.cliente);
+  setTimeout(function(){recalc();},200);
 }
 function exportarHistorial(){
   _loadHistCache();
