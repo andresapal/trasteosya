@@ -1646,10 +1646,32 @@ async function _fetchSheetCots(){
         // Build items from Sheet columns
         var items=[];
         var pf=function(k){return parseFloat(c[k]||0)||0;};
-        // Trasteo
+        // Trasteo: detectar urbano vs nacional por precios
         var ingTrans=pf('ING TRANSPORTE')||pf('ING TRANS');
         var costoTras=pf('COSTO TRASTEO')||pf('COSTO TRANS');
-        if(ingTrans)items.push({cat:'trasteo',l:'Transporte',v:ingTrans,c:costoTras,qty:1});
+        if(ingTrans){
+          // Intentar match con combinaciones de tarifas urbanas
+          var urbMatch=null;
+          for(var ap=0;ap<=5&&!urbMatch;ap++){
+            for(var bm=0;bm<=5&&!urbMatch;bm++){
+              for(var cg=0;cg<=5&&!urbMatch;cg++){
+                if(ap+bm+cg===0)continue;
+                var vCalc=ap*TRASTEO.pequeno.v+bm*TRASTEO.mediano.v+cg*TRASTEO.grande.v;
+                var cCalc=ap*TRASTEO.pequeno.c+bm*TRASTEO.mediano.c+cg*TRASTEO.grande.c;
+                if(vCalc===ingTrans&&cCalc===costoTras)urbMatch={p:ap,m:bm,g:cg};
+              }
+            }
+          }
+          if(urbMatch){
+            // Urbano: crear items por tamaño
+            if(urbMatch.p>0)items.push({cat:'trasteo',l:'Trasteo Urbano Pequeño'+(urbMatch.p>1?' × '+urbMatch.p:''),v:TRASTEO.pequeno.v*urbMatch.p,c:TRASTEO.pequeno.c*urbMatch.p,qty:urbMatch.p,cu:TRASTEO.pequeno.c,vu:TRASTEO.pequeno.v});
+            if(urbMatch.m>0)items.push({cat:'trasteo',l:'Trasteo Urbano Mediano'+(urbMatch.m>1?' × '+urbMatch.m:''),v:TRASTEO.mediano.v*urbMatch.m,c:TRASTEO.mediano.c*urbMatch.m,qty:urbMatch.m,cu:TRASTEO.mediano.c,vu:TRASTEO.mediano.v});
+            if(urbMatch.g>0)items.push({cat:'trasteo',l:'Trasteo Urbano Grande'+(urbMatch.g>1?' × '+urbMatch.g:''),v:TRASTEO.grande.v*urbMatch.g,c:TRASTEO.grande.c*urbMatch.g,qty:urbMatch.g,cu:TRASTEO.grande.c,vu:TRASTEO.grande.v});
+          } else {
+            // Nacional: valores manuales
+            items.push({cat:'trasteo',l:'Servicio Nacional',v:ingTrans,c:costoTras,qty:1,cu:costoTras,vu:ingTrans});
+          }
+        }
         // Empaque materiales (items individuales con qty derivado de ING/precio)
         var ingVin=pf('ING VINIPEL'),ingBur=pf('ING BURBUJA'),ingCaj=pf('ING CAJAS'),ingCra=pf('ING CRAFT'),ingCar=pf('ING CARTON CORRUGADO');
         var ingEmpTotal=pf('ING EMPAQUE')||pf('ING EMP')||(ingVin+ingBur+ingCaj+ingCra+ingCar);
