@@ -1940,9 +1940,21 @@ function cargarDesdHistorial(idx){
     else if(cat==='desempaque'){hasDesempaque=true;}
     else if(cat==='adicionales'){hasAdicionales=true;}
   });
-  // Usar e.empaque directo (siempre se guarda con cantidades reales)
+  // Empaque: Sheet guarda ING (ingresos), local guarda qty real
   var emp=e.empaque||{};
-  var hasEmpData=(emp.craft||0)+(emp.vinipel||0)+(emp.burbuja||0)+(emp.cajas||0)>0;
+  var isSheet=!!(e.origen||e.destino||e.estado||e.fuente);
+  var empQty={craft:0,vinipel:0,burbuja:0,cajas:0};
+  if(isSheet){
+    // Dividir ingreso / precio venta = cantidad
+    if(emp.vinipel&&MATS.vinipel)empQty.vinipel=Math.round(emp.vinipel/MATS.vinipel.v);
+    if(emp.burbuja&&MATS.burbuja)empQty.burbuja=Math.round(emp.burbuja/MATS.burbuja.v);
+    if(emp.cajas&&MATS.cajas)empQty.cajas=Math.round(emp.cajas/MATS.cajas.v);
+    if(emp.craft&&MATS.craft)empQty.craft=Math.round(emp.craft/MATS.craft.v);
+  } else {
+    empQty.craft=emp.craft||0;empQty.vinipel=emp.vinipel||0;
+    empQty.burbuja=emp.burbuja||0;empQty.cajas=emp.cajas||0;
+  }
+  var hasEmpData=(empQty.craft+empQty.vinipel+empQty.burbuja+empQty.cajas)>0;
   if(hasEmpData)hasEmpaque=true;
   // Activar módulos
   if(hasTrasteo&&!state.mods.trasteo)toggleMod('trasteo');
@@ -1971,10 +1983,9 @@ function cargarDesdHistorial(idx){
       if(matList)matList.innerHTML='';
       buildMaterials();
       setTimeout(function(){
-        var map={vinipel:emp.vinipel||0,burbuja:emp.burbuja||0,cajas:emp.cajas||0,craft:emp.craft||0};
-        Object.keys(map).forEach(function(k){
+        Object.keys(empQty).forEach(function(k){
           var inp=document.getElementById('mat-'+k);
-          if(inp&&map[k]>0)inp.value=map[k];
+          if(inp&&empQty[k]>0)inp.value=empQty[k];
         });
         // Cartón desde items (no está en e.empaque)
         items.forEach(function(it){
