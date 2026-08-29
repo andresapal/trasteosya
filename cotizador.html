@@ -1910,19 +1910,14 @@ function cargarDesdHistorial(idx){
   });
   // Reset cantidades trasteo
   state.trasteoQty={pequeno:0,mediano:0,grande:0};
-  // Analizar items para activar módulos y setear valores
+  // Detectar módulos desde items
   var items=e.items||[];
   var hasTrasteo=false,hasEmpaque=false,hasInst=false,hasBod=false,hasAdicionales=false,hasDesempaque=false;
-  var isNacional=false;
-  var nacVenta=0,nacCosto=0;
-  var matQtys={vinipel:0,burbuja:0,cajas:0,craft:0,carton:0};
-  var instQtys={nevecon:0,secadora:0,tv:0,repisaP:0,repisaG:0,cuadroP:0,cuadroG:0};
+  var isNacional=false,nacVenta=0,nacCosto=0;
   var expressRollos=0;
-  var isFullEmpaque=false;
+  var instQtys={nevecon:0,secadora:0,tv:0,repisaP:0,repisaG:0,cuadroP:0,cuadroG:0};
   items.forEach(function(it){
-    var cat=it.cat||'';
-    var label=(it.l||'').toLowerCase();
-    var qty=it.qty||1;
+    var cat=it.cat||'';var label=(it.l||'').toLowerCase();var qty=it.qty||1;
     if(cat==='trasteo'){
       hasTrasteo=true;
       if(label.indexOf('nacional')>=0){isNacional=true;nacVenta=it.v||0;nacCosto=it.c||0;}
@@ -1931,12 +1926,7 @@ function cargarDesdHistorial(idx){
       else state.trasteoQty.mediano+=qty;
     } else if(cat==='empaque'){
       hasEmpaque=true;
-      if(label.indexOf('express')>=0){expressRollos+=qty;}
-      else if(label.indexOf('vinipel')>=0){matQtys.vinipel+=qty;isFullEmpaque=true;}
-      else if(label.indexOf('burbuja')>=0){matQtys.burbuja+=qty;isFullEmpaque=true;}
-      else if(label.indexOf('caja')>=0){matQtys.cajas+=qty;isFullEmpaque=true;}
-      else if(label.indexOf('craft')>=0){matQtys.craft+=qty;isFullEmpaque=true;}
-      else if(label.indexOf('cartón')>=0||label.indexOf('carton')>=0){matQtys.carton+=qty;isFullEmpaque=true;}
+      if(label.indexOf('express')>=0)expressRollos+=qty;
     } else if(cat==='inst'){
       hasInst=true;
       if(label.indexOf('nevec')>=0)instQtys.nevecon+=qty;
@@ -1950,14 +1940,18 @@ function cargarDesdHistorial(idx){
     else if(cat==='desempaque'){hasDesempaque=true;}
     else if(cat==='adicionales'){hasAdicionales=true;}
   });
-  // Activar módulos detectados
+  // Usar e.empaque directo (siempre se guarda con cantidades reales)
+  var emp=e.empaque||{};
+  var hasEmpData=(emp.craft||0)+(emp.vinipel||0)+(emp.burbuja||0)+(emp.cajas||0)>0;
+  if(hasEmpData)hasEmpaque=true;
+  // Activar módulos
   if(hasTrasteo&&!state.mods.trasteo)toggleMod('trasteo');
   if(hasEmpaque&&!state.mods.empaque)toggleMod('empaque');
   if(hasInst&&!state.mods.inst)toggleMod('inst');
   if(hasBod&&!state.mods.bodegaje)toggleMod('bodegaje');
   if(hasDesempaque&&!state.mods.desempaque)toggleMod('desempaque');
   if(hasAdicionales&&!state.mods.adicionales)toggleMod('adicionales');
-  // Cobertura: urbano o nacional
+  // Cobertura
   if(hasTrasteo){
     if(isNacional){
       setCobertura('nacional');
@@ -1966,20 +1960,28 @@ function cargarDesdHistorial(idx){
     } else {
       setCobertura('urbano');
     }
-    // Rebuild trasteo UI con cantidades actualizadas
     buildStaticUI();
   }
-  // Empaque
+  // Empaque — usar e.empaque directo
   if(hasEmpaque){
-    if(isFullEmpaque){
+    if(hasEmpData){
       setEmpTab('full');
-      // Forzar rebuild de materiales limpiando los existentes
-      document.getElementById('mat-list').innerHTML='';
+      // Forzar rebuild inputs
+      var matList=document.getElementById('mat-list');
+      if(matList)matList.innerHTML='';
       buildMaterials();
       setTimeout(function(){
-        Object.keys(matQtys).forEach(function(k){
+        var map={vinipel:emp.vinipel||0,burbuja:emp.burbuja||0,cajas:emp.cajas||0,craft:emp.craft||0};
+        Object.keys(map).forEach(function(k){
           var inp=document.getElementById('mat-'+k);
-          if(inp&&matQtys[k]>0)inp.value=matQtys[k];
+          if(inp&&map[k]>0)inp.value=map[k];
+        });
+        // Cartón desde items (no está en e.empaque)
+        items.forEach(function(it){
+          if(it.cat==='empaque'&&(it.l||'').toLowerCase().indexOf('cart')>=0){
+            var inp=document.getElementById('mat-carton');
+            if(inp)inp.value=(it.qty||0);
+          }
         });
         recalc();
       },50);
@@ -1991,8 +1993,8 @@ function cargarDesdHistorial(idx){
   }
   // Instalaciones
   if(hasInst){
-    // Forzar rebuild
-    document.getElementById('inst-list').innerHTML='';
+    var instList=document.getElementById('inst-list');
+    if(instList)instList.innerHTML='';
     buildInst();
     setTimeout(function(){
       Object.keys(instQtys).forEach(function(k){
