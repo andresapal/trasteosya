@@ -1118,7 +1118,7 @@ function _guardarCotParaOS(lines,cliente,tel,fecha,subV,dcto,total){
       else if(n.indexOf('burbuja')>=0) empaque.burbuja+=(l.qty||0);
       else if(n.indexOf('caja')>=0) empaque.cajas+=(l.qty||0);
     });
-    var mappedItems=lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,c:l.c||0,qty:l.qty};});
+    var mappedItems=lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,c:l.c||0,qty:l.qty,cu:l.cu||0,vu:l.vu||0};});
     var costoTotal=lines.reduce(function(a,l){return a+(l.c||0);},0);
     var entry={
       cliente:cliente.trim().toUpperCase(),
@@ -1910,12 +1910,23 @@ function cargarDesdHistorial(idx){
   });
   // Reset cantidades trasteo
   state.trasteoQty={pequeno:0,mediano:0,grande:0};
-  // Detectar módulos desde items
+  // Detectar módulos y extraer datos de items
   var items=e.items||[];
   var hasTrasteo=false,hasEmpaque=false,hasInst=false,hasBod=false,hasAdicionales=false,hasDesempaque=false;
   var isNacional=false,nacVenta=0,nacCosto=0;
   var expressRollos=0;
   var instQtys={nevecon:0,secadora:0,tv:0,repisaP:0,repisaG:0,cuadroP:0,cuadroG:0};
+  // Empaque: empacadores, transporte, cintas
+  var empCant=0,empDias=0,empCU=0,empVU=0;
+  var transCant=0,transCU=0;
+  var cintasCant=0,cintasCU=0;
+  var cartonQty=0;
+  // Desempaque
+  var desOp=0,desDias=0,desCU=0,desVU=0;
+  // Bodegaje
+  var bodKey='';
+  // Adicionales
+  var adicData={};
   items.forEach(function(it){
     var cat=it.cat||'';var label=(it.l||'').toLowerCase();var qty=it.qty||1;
     if(cat==='trasteo'){
@@ -1926,8 +1937,25 @@ function cargarDesdHistorial(idx){
       else state.trasteoQty.mediano+=qty;
     } else if(cat==='empaque'){
       hasEmpaque=true;
-      if(label.indexOf('express')>=0)expressRollos+=qty;
-    } else if(cat==='inst'){
+      if(label.indexOf('express')>=0){expressRollos+=qty;}
+      else if(label.indexOf('empacador')>=0){
+        // Label: "Empacadores (2×1d)" — parsear emp y dias
+        var m=label.match(/(\d+)\s*[×x]\s*(\d+)/);
+        if(m){empCant=parseInt(m[1]);empDias=parseInt(m[2]);}
+        else{empCant=qty;empDias=1;}
+        // cu/vu: si están guardados usar esos, sino derivar
+        if(it.cu>0){empCU=it.cu;}else if(empCant>0&&empDias>0&&it.c>0){empCU=Math.round(it.c/(empCant*empDias));}
+        if(it.vu>0){empVU=it.vu;}else{empVU=130000;}
+      } else if(label.indexOf('transporte')>=0){
+        transCant=qty;
+        if(it.cu>0){transCU=it.cu;}else if(qty>0&&it.c>0){transCU=Math.round(it.c/qty);}
+      } else if(label.indexOf('cinta')>=0){
+        cintasCant=qty;
+        if(it.cu>0){cintasCU=it.cu;}else if(qty>0&&it.c>0){cintasCU=Math.round(it.c/qty);}
+      } else if(label.indexOf('cart')>=0){
+        cartonQty=qty;
+      }
+    } else if(cat==='inst'||cat==='instalaciones'){
       hasInst=true;
       if(label.indexOf('nevec')>=0)instQtys.nevecon+=qty;
       else if(label.indexOf('secadora')>=0)instQtys.secadora+=qty;
@@ -1936,23 +1964,48 @@ function cargarDesdHistorial(idx){
       else if(label.indexOf('repisa')>=0&&label.indexOf('grand')>=0)instQtys.repisaG+=qty;
       else if(label.indexOf('cuadro')>=0&&label.indexOf('pequeñ')>=0)instQtys.cuadroP+=qty;
       else if(label.indexOf('cuadro')>=0&&label.indexOf('grand')>=0)instQtys.cuadroG+=qty;
-    } else if(cat==='bodegaje'){hasBod=true;}
-    else if(cat==='desempaque'){hasDesempaque=true;}
-    else if(cat==='adicionales'){hasAdicionales=true;}
+    } else if(cat==='bodegaje'){
+      hasBod=true;
+      if(label.indexOf('40')>=0)bodKey='m40';
+      else if(label.indexOf('30')>=0)bodKey='m30';
+      else if(label.indexOf('20')>=0)bodKey='m20';
+      else bodKey='m10';
+    } else if(cat==='desempaque'){
+      hasDesempaque=true;
+      // Label: "Desempaque 2 op × 1 día(s)"
+      var dm=label.match(/(\d+)\s*op\s*[×x]\s*(\d+)/);
+      if(dm){desOp=parseInt(dm[1]);desDias=parseInt(dm[2]);}
+      else{desOp=qty;desDias=1;}
+      if(it.cu>0){desCU=it.cu;}else if(desOp>0&&desDias>0&&it.c>0){desCU=Math.round(it.c/(desOp*desDias));}
+      if(it.vu>0){desVU=it.vu;}else if(desOp>0&&desDias>0&&it.v>0){desVU=Math.round(it.v/(desOp*desDias));}
+    } else if(cat==='adicionales'){
+      hasAdicionales=true;
+      // Label: "Caminado × 2", "Escaleras × 1", etc.
+      var ak='';
+      if(label.indexOf('caminad')>=0)ak='caminado';
+      else if(label.indexOf('escalera')>=0)ak='escaleras';
+      else if(label.indexOf('fachada')>=0)ak='fachada';
+      else if(label.indexOf('parada')>=0)ak='parada';
+      if(ak){
+        var av=0,ac=0;
+        if(it.cu>0){ac=it.cu;}else if(qty>0&&it.c>0){ac=Math.round(it.c/qty);}
+        if(it.vu>0){av=it.vu;}else if(qty>0&&it.v>0){av=Math.round(it.v/qty);}
+        adicData[ak]={qty:qty,venta:av,costo:ac};
+      }
+    }
   });
-  // Empaque: Sheet guarda ING (ingresos), local guarda qty real
-  var emp=e.empaque||{};
+  // Empaque materiales: Sheet guarda ING, local guarda qty
+  var empObj=e.empaque||{};
   var isSheet=!!(e.origen||e.destino||e.estado||e.fuente);
   var empQty={craft:0,vinipel:0,burbuja:0,cajas:0};
   if(isSheet){
-    // Dividir ingreso / precio venta = cantidad
-    if(emp.vinipel&&MATS.vinipel)empQty.vinipel=Math.round(emp.vinipel/MATS.vinipel.v);
-    if(emp.burbuja&&MATS.burbuja)empQty.burbuja=Math.round(emp.burbuja/MATS.burbuja.v);
-    if(emp.cajas&&MATS.cajas)empQty.cajas=Math.round(emp.cajas/MATS.cajas.v);
-    if(emp.craft&&MATS.craft)empQty.craft=Math.round(emp.craft/MATS.craft.v);
+    if(empObj.vinipel&&MATS.vinipel)empQty.vinipel=Math.round(empObj.vinipel/MATS.vinipel.v);
+    if(empObj.burbuja&&MATS.burbuja)empQty.burbuja=Math.round(empObj.burbuja/MATS.burbuja.v);
+    if(empObj.cajas&&MATS.cajas)empQty.cajas=Math.round(empObj.cajas/MATS.cajas.v);
+    if(empObj.craft&&MATS.craft)empQty.craft=Math.round(empObj.craft/MATS.craft.v);
   } else {
-    empQty.craft=emp.craft||0;empQty.vinipel=emp.vinipel||0;
-    empQty.burbuja=emp.burbuja||0;empQty.cajas=emp.cajas||0;
+    empQty.craft=empObj.craft||0;empQty.vinipel=empObj.vinipel||0;
+    empQty.burbuja=empObj.burbuja||0;empQty.cajas=empObj.cajas||0;
   }
   var hasEmpData=(empQty.craft+empQty.vinipel+empQty.burbuja+empQty.cajas)>0;
   if(hasEmpData)hasEmpaque=true;
@@ -1974,26 +2027,37 @@ function cargarDesdHistorial(idx){
     }
     buildStaticUI();
   }
-  // Empaque — usar e.empaque directo
+  // Empaque Full
   if(hasEmpaque){
-    if(hasEmpData){
+    if(hasEmpData||empCant>0||transCant>0||cintasCant>0){
       setEmpTab('full');
-      // Forzar rebuild inputs
       var matList=document.getElementById('mat-list');
       if(matList)matList.innerHTML='';
       buildMaterials();
       setTimeout(function(){
+        // Materiales
         Object.keys(empQty).forEach(function(k){
           var inp=document.getElementById('mat-'+k);
           if(inp&&empQty[k]>0)inp.value=empQty[k];
         });
-        // Cartón desde items (no está en e.empaque)
-        items.forEach(function(it){
-          if(it.cat==='empaque'&&(it.l||'').toLowerCase().indexOf('cart')>=0){
-            var inp=document.getElementById('mat-carton');
-            if(inp)inp.value=(it.qty||0);
-          }
-        });
+        if(cartonQty>0){var ci=document.getElementById('mat-carton');if(ci)ci.value=cartonQty;}
+        // Empacadores
+        if(empCant>0){
+          var ec=document.getElementById('emp-cant');if(ec)ec.value=empCant;
+          var ed=document.getElementById('emp-dias');if(ed)ed.value=empDias||1;
+          if(empCU>0){var ecu=document.getElementById('emp-cu');if(ecu)ecu.value=empCU;}
+          if(empVU>0){var evu=document.getElementById('emp-vu');if(evu)evu.value=empVU;}
+        }
+        // Transporte empaque
+        if(transCant>0){
+          var tc=document.getElementById('trans-cant');if(tc)tc.value=transCant;
+          if(transCU>0){var tcu=document.getElementById('trans-cu');if(tcu)tcu.value=transCU;}
+        }
+        // Cintas
+        if(cintasCant>0){
+          var cc=document.getElementById('cintas-cant');if(cc)cc.value=cintasCant;
+          if(cintasCU>0){var ccu=document.getElementById('cintas-cu');if(ccu)ccu.value=cintasCU;}
+        }
         recalc();
       },50);
     } else if(expressRollos>0){
@@ -2011,6 +2075,37 @@ function cargarDesdHistorial(idx){
       Object.keys(instQtys).forEach(function(k){
         var inp=document.getElementById('inst-'+k);
         if(inp&&instQtys[k]>0)inp.value=instQtys[k];
+      });
+      recalc();
+    },50);
+  }
+  // Desempaque
+  if(hasDesempaque&&desOp>0){
+    setTimeout(function(){
+      var dop=document.getElementById('des-op');if(dop)dop.value=desOp;
+      var dd=document.getElementById('des-dias');if(dd)dd.value=desDias||1;
+      if(desCU>0){var dcu=document.getElementById('des-cu');if(dcu)dcu.value=desCU;}
+      if(desVU>0){var dvu=document.getElementById('des-vu');if(dvu)dvu.value=desVU;}
+      recalc();
+    },50);
+  }
+  // Bodegaje
+  if(hasBod&&bodKey){
+    state.bodSize=bodKey;
+    setTimeout(function(){
+      var opts=document.querySelectorAll('#bodegaje-opts .radio-opt');
+      opts.forEach(function(o){o.classList.remove('active');if(o.getAttribute('data-val')===bodKey)o.classList.add('active');});
+      recalc();
+    },50);
+  }
+  // Adicionales
+  if(hasAdicionales&&Object.keys(adicData).length>0){
+    setTimeout(function(){
+      Object.keys(adicData).forEach(function(ak){
+        var d=adicData[ak];
+        var qInp=document.getElementById('adic-'+ak+'-cant');if(qInp&&d.qty>0)qInp.value=d.qty;
+        var vInp=document.getElementById('adic-'+ak+'-venta');if(vInp&&d.venta>0)vInp.value=d.venta;
+        var cInp=document.getElementById('adic-'+ak+'-costo');if(cInp&&d.costo>0)cInp.value=d.costo;
       });
       recalc();
     },50);
