@@ -1645,27 +1645,65 @@ async function _fetchSheetCots(){
         var estado=String(c.ESTADO||'COTIZADO').toUpperCase();
         // Build items from Sheet columns
         var items=[];
-        var ingTrans=parseFloat(c['ING TRANSPORTE']||c['ING TRANS']||0)||0;
-        var ingEmp=parseFloat(c['ING EMPAQUE']||c['ING EMP']||0)||
-          ((parseFloat(c['ING VINIPEL']||0)||0)+(parseFloat(c['ING BURBUJA']||0)||0)+(parseFloat(c['ING CAJAS']||0)||0)+(parseFloat(c['ING CRAFT']||0)||0)+(parseFloat(c['ING CARTON CORRUGADO']||0)||0));
-        var ingInst=parseFloat(c['ING INSTALACIONES TOTAL']||c['ING INST']||c['ING INSTALACIONES']||0)||0;
-        var ingBod=parseFloat(c['ING BODEGAJE']||0)||0;
-        var ingCam=parseFloat(c['ING CAMINADOS']||0)||0;
-        var ingEsc=parseFloat(c['ING ESCALERAS']||0)||0;
-        var costoTras=parseFloat(c['COSTO TRASTEO']||c['COSTO TRANS']||0)||0;
-        var costoEmp=parseFloat(c['COSTO TOTAL EMPAQUE-']||c['COSTO TOTAL EMPAQUE']||c['COSTO EMP']||0)||0;
-        var costoInst=parseFloat(c['COSTO TOTAL INSTALACIONES']||c['COSTO INST']||0)||0;
+        var pf=function(k){return parseFloat(c[k]||0)||0;};
+        // Trasteo
+        var ingTrans=pf('ING TRANSPORTE')||pf('ING TRANS');
+        var costoTras=pf('COSTO TRASTEO')||pf('COSTO TRANS');
         if(ingTrans)items.push({cat:'trasteo',l:'Transporte',v:ingTrans,c:costoTras,qty:1});
-        if(ingEmp)items.push({cat:'empaque',l:'Empaque',v:ingEmp,c:costoEmp,qty:1});
-        if(ingInst)items.push({cat:'inst',l:'Instalaciones',v:ingInst,c:costoInst,qty:1});
-        if(ingBod)items.push({cat:'adicionales',l:'Bodegaje',v:ingBod,c:parseFloat(c['COSTO BODEGAJE']||0)||0,qty:1});
-        if(ingCam)items.push({cat:'adicionales',l:'Caminados',v:ingCam,c:parseFloat(c['COSTO CAMINADO']||0)||0,qty:1});
-        if(ingEsc)items.push({cat:'adicionales',l:'Escaleras',v:ingEsc,c:parseFloat(c['COSTO ESCALERAS']||0)||0,qty:1});
+        // Empaque materiales (items individuales con qty derivado de ING/precio)
+        var ingVin=pf('ING VINIPEL'),ingBur=pf('ING BURBUJA'),ingCaj=pf('ING CAJAS'),ingCra=pf('ING CRAFT'),ingCar=pf('ING CARTON CORRUGADO');
+        var ingEmpTotal=pf('ING EMPAQUE')||pf('ING EMP')||(ingVin+ingBur+ingCaj+ingCra+ingCar);
+        var costoEmpTotal=pf('COSTO TOTAL EMPAQUE-')||pf('COSTO TOTAL EMPAQUE')||pf('COSTO EMP');
+        if(ingEmpTotal)items.push({cat:'empaque',l:'Empaque',v:ingEmpTotal,c:costoEmpTotal,qty:1});
+        // Empaque: operarios (solo costo)
+        var cosOpsEmp=pf('COSTO OPERARIOS EMPAQUE');
+        if(cosOpsEmp)items.push({cat:'empaque',l:'Empacadores (1×1d)',v:0,c:cosOpsEmp,qty:1,cu:cosOpsEmp,vu:0});
+        // Empaque: transporte envio (solo costo)
+        var cosTransEmp=pf('COSTO TRANSPORTE ENVIO EMPAQUE');
+        if(cosTransEmp)items.push({cat:'empaque',l:'Transporte × 1',v:0,c:cosTransEmp,qty:1,cu:cosTransEmp,vu:0});
+        // Empaque: cintas (solo costo)
+        var cosCintas=pf('COSTO CINTAS');
+        if(cosCintas)items.push({cat:'empaque',l:'Cintas × 1',v:0,c:cosCintas,qty:1,cu:cosCintas,vu:0});
+        // Instalaciones individuales (qty = ING / precio venta unitario)
+        var ingNev=pf('ING INSTALACION NEVECON'),cosNev=pf('COSTO INST NEVECON');
+        var ingSec=pf('ING INSTALACION SECADORA'),cosSec=pf('COSTO INST SECADORA');
+        var ingTV=pf('ING INSTALACION TVS'),cosTV=pf('COSTO INST TV');
+        var ingRep=pf('ING INSTALACION REPISAS'),cosRep=pf('COSTO INSTALACION REPISAS');
+        var ingCua=pf('ING INSTALACION CUADROS'),cosCua=pf('COSTO INSTALACION CUADROS');
+        var hasIndivInst=ingNev||ingSec||ingTV||ingRep||ingCua;
+        if(hasIndivInst){
+          if(ingNev){var qn=Math.round(ingNev/INST.nevecon.v)||1;items.push({cat:'inst',l:'Nevecón × '+qn,v:ingNev,c:cosNev,qty:qn});}
+          if(ingSec){var qs=Math.round(ingSec/INST.secadora.v)||1;items.push({cat:'inst',l:'Secadora × '+qs,v:ingSec,c:cosSec,qty:qs});}
+          if(ingTV){var qt=Math.round(ingTV/INST.tv.v)||1;items.push({cat:'inst',l:'TV × '+qt,v:ingTV,c:cosTV,qty:qt});}
+          if(ingRep){var qr=Math.round(ingRep/INST.repisaP.v)||1;items.push({cat:'inst',l:'Repisas pequeñas × '+qr,v:ingRep,c:cosRep,qty:qr});}
+          if(ingCua){var qc=Math.round(ingCua/INST.cuadroP.v)||1;items.push({cat:'inst',l:'Cuadros pequeños × '+qc,v:ingCua,c:cosCua,qty:qc});}
+        } else {
+          var ingInst=pf('ING INSTALACIONES TOTAL')||pf('ING INST')||pf('ING INSTALACIONES');
+          var costoInst=pf('COSTO TOTAL INSTALACIONES')||pf('COSTO INST');
+          if(ingInst)items.push({cat:'inst',l:'Instalaciones',v:ingInst,c:costoInst,qty:1});
+        }
+        // Bodegaje
+        var ingBod=pf('ING BODEGAJE'),cosBod=pf('COSTO BODEGAJE');
+        if(ingBod)items.push({cat:'bodegaje',l:'Bodegaje',v:ingBod,c:cosBod,qty:1});
+        // Desempaque (solo costo en Sheet)
+        var cosDes=pf('COSTO DESEMPAQUE');
+        if(cosDes)items.push({cat:'desempaque',l:'Desempaque 1 op × 1 día(s)',v:0,c:cosDes,qty:1,cu:cosDes,vu:0});
+        // Adicionales
+        var ingCam=pf('ING CAMINADOS'),cosCam=pf('COSTO CAMINADO');
+        var ingEsc=pf('ING ESCALERAS'),cosEsc=pf('COSTO ESCALERAS');
+        var ingPar=pf('ING PARADAS ADICIONAL'),cosPar=pf('COSTO PARADA ADICIONAL');
+        var ingFac=pf('INGRESO FACHADA'),cosFac=pf('COSTO FACHADA O VACIO');
+        if(ingCam||cosCam)items.push({cat:'adicionales',l:'Caminado × 1',v:ingCam,c:cosCam,qty:1,cu:cosCam,vu:ingCam});
+        if(ingEsc||cosEsc)items.push({cat:'adicionales',l:'Escaleras × 1',v:ingEsc,c:cosEsc,qty:1,cu:cosEsc,vu:ingEsc});
+        if(ingPar||cosPar)items.push({cat:'adicionales',l:'Parada × 1',v:ingPar,c:cosPar,qty:1,cu:cosPar,vu:ingPar});
+        if(ingFac||cosFac)items.push({cat:'adicionales',l:'Fachada × 1',v:ingFac,c:cosFac,qty:1,cu:cosFac,vu:ingFac});
         if(!items.length&&total)items.push({cat:'trasteo',l:'Servicio de mudanza',v:total,c:costo,qty:1});
-        var empaque={craft:parseFloat(c['ING CRAFT']||0)||0,vinipel:parseFloat(c['ING VINIPEL']||0)||0,burbuja:parseFloat(c['ING BURBUJA']||0)||0,cajas:parseFloat(c['ING CAJAS']||0)||0};
+        // Descuento
+        var vlrDcto=pf('VLR DCTO');
+        var empaque={craft:ingCra,vinipel:ingVin,burbuja:ingBur,cajas:ingCaj};
         return{cliente:cliente,telefono:String(c.TELEFONO||''),fecha:fecha,
           origen:c.ORIGEN||'',destino:c.DESTINO||'',tipo:c.TIPO||'',fuente:c.FUENTE||'',
-          items:items,empaque:empaque,
+          items:items,empaque:empaque,descuento:vlrDcto||0,
           total:total,costo:costo,estado:estado,saved:c.TIMESTAMP||''};
       });
     }
@@ -1979,18 +2017,26 @@ function cargarDesdHistorial(idx){
       if(it.cu>0){desCU=it.cu;}else if(desOp>0&&desDias>0&&it.c>0){desCU=Math.round(it.c/(desOp*desDias));}
       if(it.vu>0){desVU=it.vu;}else if(desOp>0&&desDias>0&&it.v>0){desVU=Math.round(it.v/(desOp*desDias));}
     } else if(cat==='adicionales'){
-      hasAdicionales=true;
-      // Label: "Caminado × 2", "Escaleras × 1", etc.
-      var ak='';
-      if(label.indexOf('caminad')>=0)ak='caminado';
-      else if(label.indexOf('escalera')>=0)ak='escaleras';
-      else if(label.indexOf('fachada')>=0)ak='fachada';
-      else if(label.indexOf('parada')>=0)ak='parada';
-      if(ak){
-        var av=0,ac=0;
-        if(it.cu>0){ac=it.cu;}else if(qty>0&&it.c>0){ac=Math.round(it.c/qty);}
-        if(it.vu>0){av=it.vu;}else if(qty>0&&it.v>0){av=Math.round(it.v/qty);}
-        adicData[ak]={qty:qty,venta:av,costo:ac};
+      // Bodegaje puede venir como cat adicionales en datos viejos
+      if(label.indexOf('bodeg')>=0){
+        hasBod=true;
+        if(label.indexOf('40')>=0)bodKey='m40';
+        else if(label.indexOf('30')>=0)bodKey='m30';
+        else if(label.indexOf('20')>=0)bodKey='m20';
+        else bodKey='m10';
+      } else {
+        hasAdicionales=true;
+        var ak='';
+        if(label.indexOf('caminad')>=0)ak='caminado';
+        else if(label.indexOf('escalera')>=0)ak='escaleras';
+        else if(label.indexOf('fachada')>=0)ak='fachada';
+        else if(label.indexOf('parada')>=0)ak='parada';
+        if(ak){
+          var av=0,ac=0;
+          if(it.cu>0){ac=it.cu;}else if(qty>0&&it.c>0){ac=Math.round(it.c/qty);}
+          if(it.vu>0){av=it.vu;}else if(qty>0&&it.v>0){av=Math.round(it.v/qty);}
+          adicData[ak]={qty:qty,venta:av,costo:ac};
+        }
       }
     }
   });
