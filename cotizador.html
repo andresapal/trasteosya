@@ -1908,10 +1908,13 @@ function cargarDesdHistorial(idx){
   ['trasteo','empaque','inst','desempaque','bodegaje','adicionales'].forEach(function(k){
     if(state.mods[k]){state.mods[k]=false;var mod=document.getElementById('mod-'+k);if(mod)mod.className='card';var sw=document.getElementById('sw-'+k);if(sw)sw.className='sw';}
   });
+  // Reset cantidades trasteo
+  state.trasteoQty={pequeno:0,mediano:0,grande:0};
   // Analizar items para activar módulos y setear valores
   var items=e.items||[];
   var hasTrasteo=false,hasEmpaque=false,hasInst=false,hasBod=false,hasAdicionales=false,hasDesempaque=false;
-  var trasteoQtys={pequeno:0,mediano:0,grande:0};
+  var isNacional=false;
+  var nacVenta=0,nacCosto=0;
   var matQtys={vinipel:0,burbuja:0,cajas:0,craft:0,carton:0};
   var instQtys={nevecon:0,secadora:0,tv:0,repisaP:0,repisaG:0,cuadroP:0,cuadroG:0};
   var expressRollos=0;
@@ -1922,9 +1925,10 @@ function cargarDesdHistorial(idx){
     var qty=it.qty||1;
     if(cat==='trasteo'){
       hasTrasteo=true;
-      if(label.indexOf('pequeño')>=0||label.indexOf('pequeno')>=0)trasteoQtys.pequeno+=qty;
-      else if(label.indexOf('grande')>=0)trasteoQtys.grande+=qty;
-      else if(label.indexOf('mediano')>=0)trasteoQtys.mediano+=qty;
+      if(label.indexOf('nacional')>=0){isNacional=true;nacVenta=it.v||0;nacCosto=it.c||0;}
+      else if(label.indexOf('pequeño')>=0||label.indexOf('pequeno')>=0)state.trasteoQty.pequeno+=qty;
+      else if(label.indexOf('grande')>=0)state.trasteoQty.grande+=qty;
+      else state.trasteoQty.mediano+=qty;
     } else if(cat==='empaque'){
       hasEmpaque=true;
       if(label.indexOf('express')>=0){expressRollos+=qty;}
@@ -1953,47 +1957,55 @@ function cargarDesdHistorial(idx){
   if(hasBod&&!state.mods.bodegaje)toggleMod('bodegaje');
   if(hasDesempaque&&!state.mods.desempaque)toggleMod('desempaque');
   if(hasAdicionales&&!state.mods.adicionales)toggleMod('adicionales');
-  // Setear valores de trasteo
+  // Cobertura: urbano o nacional
   if(hasTrasteo){
-    Object.keys(trasteoQtys).forEach(function(k){
-      state.trasteoQty[k]=trasteoQtys[k];
-      var inp=document.getElementById('trasteo-qty-'+k);
-      if(inp)inp.value=trasteoQtys[k]||'';
-    });
-  }
-  // Setear empaque
-  if(hasEmpaque){
-    if(isFullEmpaque&&state.empTab!=='full'){
-      setEmpTab('full');
+    if(isNacional){
+      setCobertura('nacional');
+      var nv=document.getElementById('nac-venta');if(nv)nv.value=nacVenta;
+      var nc=document.getElementById('nac-costo');if(nc)nc.value=nacCosto;
+    } else {
+      setCobertura('urbano');
     }
+    // Rebuild trasteo UI con cantidades actualizadas
+    buildStaticUI();
+  }
+  // Empaque
+  if(hasEmpaque){
     if(isFullEmpaque){
+      setEmpTab('full');
+      // Forzar rebuild de materiales limpiando los existentes
+      document.getElementById('mat-list').innerHTML='';
+      buildMaterials();
       setTimeout(function(){
         Object.keys(matQtys).forEach(function(k){
           var inp=document.getElementById('mat-'+k);
           if(inp&&matQtys[k]>0)inp.value=matQtys[k];
         });
         recalc();
-      },100);
+      },50);
     } else if(expressRollos>0){
-      state.empTab='express';
+      setEmpTab('express');
       var inp=document.getElementById('rollos');
       if(inp)inp.value=expressRollos;
     }
   }
-  // Setear instalaciones
+  // Instalaciones
   if(hasInst){
+    // Forzar rebuild
+    document.getElementById('inst-list').innerHTML='';
+    buildInst();
     setTimeout(function(){
       Object.keys(instQtys).forEach(function(k){
         var inp=document.getElementById('inst-'+k);
         if(inp&&instQtys[k]>0)inp.value=instQtys[k];
       });
       recalc();
-    },150);
+    },50);
   }
   // Descuento
   if(e.descuento>0){var dInp=document.getElementById('descuento');if(dInp)dInp.value=e.descuento;}
   cerrarHistorial();
-  setTimeout(function(){recalc();},200);
+  setTimeout(function(){recalc();},100);
 }
 function exportarHistorial(){
   _loadHistCache();
