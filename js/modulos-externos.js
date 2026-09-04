@@ -1,27 +1,18 @@
 /**
  * Enlace del ERP hacia modulos que viven fuera de este sitio.
  *
- * Hoy solo GeoProspector. Se inyecta en la barra .header-nav de las paginas
- * de administracion, para no repetir el mismo <a> en seis archivos.
+ * Hoy solo GeoProspector (prospeccion comercial por zonas). Se inyecta en la
+ * barra del encabezado de las paginas de administracion, para no repetir el
+ * mismo <a> en seis archivos.
  *
  * ─────────────────────────────────────────────────────────────
- *  PARA CAMBIAR LA DIRECCION DEL MODULO, EDITA SOLO ESTA LINEA:
+ *  SI ALGUN DIA CAMBIA LA DIRECCION DEL MODULO, EDITA SOLO ESTA LINEA:
  * ─────────────────────────────────────────────────────────────
  */
 var GEOPROSPECTOR_URL = 'https://geoprospector.vercel.app/prospeccion/nueva';
 
 (function () {
   'use strict';
-
-  // Mientras se trabaja en el computador, el modulo corre local.
-  var URL_LOCAL = 'http://localhost:3000/prospeccion/nueva';
-
-  var esLocal =
-    location.hostname === 'localhost' ||
-    location.hostname === '127.0.0.1' ||
-    location.protocol === 'file:';
-
-  var destino = esLocal ? URL_LOCAL : GEOPROSPECTOR_URL;
 
   /**
    * Las seis paginas del ERP no comparten el mismo encabezado:
@@ -42,18 +33,21 @@ var GEOPROSPECTOR_URL = 'https://geoprospector.vercel.app/prospeccion/nueva';
   function crearEnlace() {
     if (document.querySelector('[data-modulo="geoprospector"]')) return;
 
-    var destinoDom = buscarContenedor();
-    if (!destinoDom) return;
+    var destino = buscarContenedor();
+    if (!destino) return;
 
-    var nav = destinoDom.el;
     var a = document.createElement('a');
     a.setAttribute('data-modulo', 'geoprospector');
     a.textContent = 'Prospeccion';
+    a.href = GEOPROSPECTOR_URL;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.title = 'GeoProspector - buscar negocios por zona';
 
     // En .header-nav hereda los estilos de la pagina. En los demas
     // contenedores hay que darle el aspecto a mano para que no salga como
     // un enlace azul suelto.
-    if (!destinoDom.esNav) {
+    if (!destino.esNav) {
       a.style.cssText =
         'display:inline-flex;align-items:center;font-size:13px;' +
         'color:var(--text-muted,#475569);text-decoration:none;padding:6px 10px;' +
@@ -69,29 +63,7 @@ var GEOPROSPECTOR_URL = 'https://geoprospector.vercel.app/prospeccion/nueva';
       });
     }
 
-    if (destino) {
-      a.href = destino;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.title = esLocal
-        ? 'GeoProspector (corriendo en este computador)'
-        : 'GeoProspector - prospeccion por zonas';
-    } else {
-      // Aun no publicado: se muestra apagado en vez de dar un enlace roto.
-      a.href = '#';
-      a.style.opacity = '.45';
-      a.style.cursor = 'not-allowed';
-      a.title = 'GeoProspector aun no esta publicado';
-      a.addEventListener('click', function (e) {
-        e.preventDefault();
-        alert(
-          'GeoProspector todavia no esta publicado.\n\n' +
-          'Por ahora se abre desde el computador donde se esta construyendo.'
-        );
-      });
-    }
-
-    nav.appendChild(a);
+    destino.el.appendChild(a);
   }
 
   if (document.readyState === 'loading') {
