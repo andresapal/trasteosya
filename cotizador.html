@@ -181,13 +181,14 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
 .hc-edit-btn:disabled{opacity:.5;cursor:not-allowed}
 .hc-edit-total{display:flex;justify-content:space-between;font-weight:700;font-size:13px;color:var(--dark);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
 @media(max-width:480px){.hc-edit-header,.hc-edit-item{grid-template-columns:1fr 70px 70px 28px}}
-.ac-dropdown{display:none;position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:100;max-height:180px;overflow-y:auto}
+.ac-dropdown{display:none;position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:100;max-height:300px;overflow-y:auto}
 .ac-dropdown.show{display:block}
 .ac-item{padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center}
 .ac-item:last-child{border-bottom:none}
 .ac-item:hover,.ac-item.active{background:#f0f4ff}
 .ac-item .ac-name{font-weight:700;color:var(--dark)}
 .ac-item .ac-tel{font-size:12px;color:var(--muted)}
+.ac-item .ac-src{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--brand);background:var(--brand-light);padding:2px 6px;border-radius:4px;margin-left:6px}
 </style>
 <link rel="stylesheet" href="css/access-gate.css?v=18"></head>
 <body data-gate="enabled">
@@ -1063,7 +1064,8 @@ async function generarImagenYWA(){
     const total=subV-dcto;
     const msg=E.casa+` *Cotización Trasteos Ya*\n${cliente?"Hola "+cliente+", aquí va tu cotización:\n":""}\n`+E.money+` *Total: ${COP(total)}*\n\n`+E.clip+` _Te adjunto la imagen con el detalle completo._\n\n${OBSERVACIONES}`;
     setTimeout(()=>{
-      window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`,"_blank","noopener,noreferrer");
+      var waUrl=tel?`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`:`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl,"_blank","noopener,noreferrer");
     },500);
 
     // Sync al sheet
@@ -1109,7 +1111,8 @@ function sendWA(){
     msg+=`\n`+E.check+` *Total: ${COP(subV)}*`;
   }
   msg+=`\n\n${OBSERVACIONES}`;
-  window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`,"_blank","noopener,noreferrer");
+  var waUrl=tel?`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`:`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+  window.open(waUrl,"_blank","noopener,noreferrer");
   // Notificar al operador
   _notificarCotizacion(lines,subV,dcto,total);
   // Guardar cotización para uso en OS
@@ -1218,6 +1221,20 @@ function _notificarCotizacion(lines,subV,dcto,total){
     fetch('https://api.web3forms.com/submit',{method:'POST',body:fd}).catch(function(){});
   }catch(e){}
 }
+
+// ============ CONTACTOS SHEET (autocompletar nombre → teléfono) ============
+const CONTACTS_URL='https://script.google.com/macros/s/AKfycbz4gG8fs_mAq9z9dcIhhqB9GUOFehc4_jW0Wd77RxPMIEmmshcXHlAVb39cML6hdGKM/exec';
+var _contactsDB=[];
+(function(){
+  try{
+    fetch(CONTACTS_URL,{redirect:'follow'}).then(function(r){return r.json();}).then(function(d){
+      if(d.ok&&d.contacts){
+        _contactsDB=d.contacts.map(function(c){return{nombre:(c.n||'').trim(),tel:(c.p||'').replace(/[^\d]/g,'')};});
+        console.log('[Contactos] '+_contactsDB.length+' cargados del Sheet');
+      }
+    }).catch(function(){});
+  }catch(e){}
+})();
 
 // ============ BACKUP A GOOGLE DRIVE ============
 const BACKUP_URL='https://script.google.com/macros/s/AKfycbytFjQC4osp6QNdCyALI5DGLCMtomQ_DYGqa56MQkGJoykyZcJIPiA1JVyrJ2Smj3ST-w/exec';
@@ -1600,20 +1617,31 @@ function buscarCliente(q){
   var dd=document.getElementById('cliente-sugerencias');
   q=(q||'').trim().toUpperCase();
   if(q.length<2){dd.classList.remove('show');dd.innerHTML='';return;}
-  try{var cache=JSON.parse(localStorage.getItem('ty_cot_cache')||'[]');}catch(_){return;}
   var vistos={};
   var matches=[];
+  // 1. Buscar en cache local (cotizaciones anteriores)
+  try{var cache=JSON.parse(localStorage.getItem('ty_cot_cache')||'[]');}catch(_){var cache=[];}
   cache.forEach(function(e){
     var nombre=(e.cliente||'').toUpperCase();
     if(!nombre||vistos[nombre])return;
     if(nombre.indexOf(q)>=0){
       vistos[nombre]=1;
-      matches.push({nombre:e.cliente,tel:e.telefono||''});
+      matches.push({nombre:e.cliente,tel:e.telefono||'',src:'cache'});
+    }
+  });
+  // 2. Buscar en contactos del Sheet (679+ contactos con teléfono)
+  _contactsDB.forEach(function(c){
+    var nombre=(c.nombre||'').toUpperCase();
+    if(!nombre||vistos[nombre])return;
+    if(nombre.indexOf(q)>=0){
+      vistos[nombre]=1;
+      matches.push({nombre:c.nombre,tel:c.tel||'',src:'sheet'});
     }
   });
   if(!matches.length){dd.classList.remove('show');dd.innerHTML='';return;}
-  dd.innerHTML=matches.slice(0,5).map(function(m,i){
-    return '<div class="ac-item" onmousedown="seleccionarCliente('+i+')" data-nombre="'+escH(m.nombre)+'" data-tel="'+escH(m.tel)+'"><span class="ac-name">'+escH(m.nombre)+'</span><span class="ac-tel">'+escH(m.tel)+'</span></div>';
+  dd.innerHTML=matches.slice(0,8).map(function(m,i){
+    var srcTag=m.src==='sheet'?'<span class="ac-src">contacto</span>':'';
+    return '<div class="ac-item" onmousedown="seleccionarCliente('+i+')" data-nombre="'+escH(m.nombre)+'" data-tel="'+escH(m.tel)+'"><span class="ac-name">'+escH(m.nombre)+'</span><span class="ac-tel">'+(m.tel?escH(m.tel):'sin tel')+'</span>'+srcTag+'</div>';
   }).join('');
   dd.classList.add('show');
 }
