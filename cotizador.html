@@ -247,6 +247,10 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         <span class="hide-mobile">Historial</span>
       </div>
+      <div style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);font-size:13px;font-weight:600;color:#15803d;background:rgba(21,128,61,.06)" onclick="abrirMotor()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-2V6a4 4 0 0 0-4-4z"/><circle cx="12" cy="15" r="2"/></svg>
+        <span class="hide-mobile">Motor IA</span>
+      </div>
     </div>
   </div>
 </header>
@@ -2341,5 +2345,24 @@ recalc();
     </div>
   </div>
 </div>
+<!-- ═══ Motor Inteligente Overlay ═══ -->
+<div class="hist-overlay" id="motorOverlay" onclick="if(event.target===this)cerrarMotor()" style="display:none">
+  <div class="hist-box" style="max-width:520px;max-height:90vh;overflow-y:auto">
+    <div class="hist-top">
+      <h3 style="color:#15803d">Motor Inteligente</h3>
+      <button class="hist-close" onclick="cerrarMotor()">✕</button>
+    </div>
+    <div style="padding:16px">
+      <label style="font-size:13px;font-weight:600;color:var(--text);display:block;margin-bottom:6px">Texto del cliente (WhatsApp)</label>
+      <textarea id="motorTexto" rows="8" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;background:var(--surface);color:var(--text)" placeholder="Pega aquí el mensaje del cliente...&#10;&#10;Ejemplo:&#10;Hola, me llamo María López&#10;Necesito mudarme el 20 de octubre&#10;De Chapinero a Suba&#10;Tengo: 1 cama doble, 1 sofá, 1 nevera, 15 cajas&#10;Piso 4 sin ascensor"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button onclick="analizarMotor()" style="flex:1;padding:10px;background:#15803d;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Analizar</button>
+        <button onclick="verHistorialMotor()" style="padding:10px 16px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer">Aprendizaje</button>
+      </div>
+      <div id="motorResultado"></div>
+    </div>
+  </div>
+</div>
+<script src="js/motor-inteligente.js?v=1"></script>
 <script src="js/access-gate.js?v=18"></script></body>
 </html>
