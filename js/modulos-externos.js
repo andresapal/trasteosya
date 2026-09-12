@@ -22,11 +22,9 @@ var GEOPROSPECTOR_URL = 'https://geoprospector.vercel.app/prospeccion/nueva';
    * Se busca en ese orden y se toma el primero que exista.
    */
   function buscarContenedor() {
-    var selectores = ['.header-nav', '.header-actions', '.header-inner'];
-    for (var i = 0; i < selectores.length; i++) {
-      var el = document.querySelector(selectores[i]);
-      if (el) return { el: el, esNav: selectores[i] === '.header-nav' };
-    }
+    // Solo se carga en campanas.html
+    var el = document.querySelector('.header-inner');
+    if (el) return { el: el, esNav: false };
     return null;
   }
 
