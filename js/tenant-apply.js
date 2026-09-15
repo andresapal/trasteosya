@@ -42,7 +42,48 @@
       '.tenant-demo-badge{position:fixed;top:8px;right:8px;z-index:9999;' +
       'background:' + T.colors.brand2 + ';color:#fff;font-size:10px;font-weight:700;' +
       'padding:3px 10px;border-radius:20px;letter-spacing:1px;opacity:.85;' +
-      'pointer-events:none;text-transform:uppercase}' : '');
+      'pointer-events:none;text-transform:uppercase}' +
+      /* ── Access-gate modal en colores del tenant ── */
+      '.ty-gate-modal__overlay{background:rgba(4,46,48,0.80)!important}' +
+      '.ty-gate-modal__box{' +
+        'background:' +
+          'linear-gradient(45deg,rgba(13,115,119,0.15) 25%,transparent 25%),' +
+          'linear-gradient(-45deg,rgba(13,115,119,0.15) 25%,transparent 25%),' +
+          'linear-gradient(45deg,transparent 75%,rgba(13,115,119,0.15) 75%),' +
+          'linear-gradient(-45deg,transparent 75%,rgba(13,115,119,0.15) 75%),' +
+          'linear-gradient(180deg,rgba(255,255,255,0.10) 0%,transparent 30%),' +
+          'linear-gradient(135deg,#063B3D 0%,#0A5355 50%,#063B3D 100%)!important;' +
+        'border-color:rgba(13,200,200,0.40)!important;' +
+        'box-shadow:0 24px 80px rgba(4,46,48,0.60),inset 0 1px 0 rgba(255,255,255,0.18)!important}' +
+      '.ty-gate-modal__icon{background:rgba(13,115,119,0.22)!important;border-color:rgba(13,200,200,0.40)!important}' +
+      '.ty-gate-modal__input:focus{border-color:rgba(13,200,200,0.80)!important;' +
+        'box-shadow:0 0 0 4px rgba(13,115,119,0.20)!important;background:rgba(255,255,255,0.12)!important}' +
+      '.ty-gate-modal__ok{' +
+        'background:linear-gradient(180deg,#0D9488 0%,#0D7377 50%,#095C5F 100%)!important;' +
+        'box-shadow:0 4px 14px rgba(13,115,119,0.50)!important}' +
+      '.ty-gate-modal__ok:hover{box-shadow:0 6px 20px rgba(13,115,119,0.65)!important}' +
+      '.ty-gate-modal__cancel{border-color:rgba(13,200,200,0.25)!important}' +
+      '.ty-gate-modal__cancel:hover{background:rgba(13,115,119,0.18)!important}' +
+      /* ── Toolbar operador en colores del tenant ── */
+      '.ty-op-toolbar{' +
+        'background:' +
+          'linear-gradient(45deg,rgba(13,115,119,0.15) 25%,transparent 25%),' +
+          'linear-gradient(-45deg,rgba(13,115,119,0.15) 25%,transparent 25%),' +
+          'linear-gradient(45deg,transparent 75%,rgba(13,115,119,0.15) 75%),' +
+          'linear-gradient(-45deg,transparent 75%,rgba(13,115,119,0.15) 75%),' +
+          'linear-gradient(135deg,#063B3D 0%,#0A5355 50%,#063B3D 100%)!important;' +
+        'border-color:rgba(13,200,200,0.40)!important;' +
+        'box-shadow:inset 0 1px 0 rgba(255,255,255,0.18),0 8px 24px rgba(4,46,48,0.45)!important}' +
+      '.ty-lock-btn--on{' +
+        'background:' +
+          'linear-gradient(45deg,rgba(13,115,119,0.22) 25%,transparent 25%),' +
+          'linear-gradient(-45deg,rgba(13,115,119,0.22) 25%,transparent 25%),' +
+          'linear-gradient(45deg,transparent 75%,rgba(13,115,119,0.22) 75%),' +
+          'linear-gradient(-45deg,transparent 75%,rgba(13,115,119,0.22) 75%),' +
+          'linear-gradient(135deg,#063B3D 0%,#0A5355 50%,#0D7377 100%)!important;' +
+        'border-color:rgba(13,200,200,0.45)!important;' +
+        'box-shadow:inset 0 1px 0 rgba(255,255,255,0.22),0 4px 14px rgba(4,46,48,0.45)!important}'
+      : '');
   document.head.appendChild(style);
 
   // ─── Interceptar notificaciones en demo ───

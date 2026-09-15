@@ -80,7 +80,7 @@
         brandLight: '#E0F2F1',
         headerBorder: '#0D7377'
       },
-      pin: 'ZGVtbzEyMw==',              // "demo123"
+      pin: 'MDAwMA==',                    // "0000"
       notify: null,                       // desactivado en demo
       apis: null,                         // desactivado en demo
       footerMsg: 'Gracias por confiar en nosotros',
