@@ -11,7 +11,8 @@
 
   // PIN visible en el codigo (gating ligero - acordado con el cliente)
   // Para hacerlo un poco menos obvio, esta en base64.
-  const PIN_HASH = 'QEFuZHJlczI0MDUq';  // = '@Andres2405*'
+  // Si hay tenant activo, usa el PIN del tenant.
+  const PIN_HASH = (window.TENANT && window.TENANT.pin) ? window.TENANT.pin : 'QEFuZHJlczI0MDUq';
   const STORAGE_KEY = 'ty_operator';
 
   function checkPin(input) {
@@ -48,7 +49,7 @@
       '<div class="ty-gate-modal__box" role="dialog" aria-modal="true">' +
         '<div class="ty-gate-modal__icon">🔒</div>' +
         '<h3 class="ty-gate-modal__title">Acceso operador</h3>' +
-        '<p class="ty-gate-modal__lead">' + (opts.message || 'Ingresa el PIN para activar las funciones internas (costos, márgenes, descuento, orden de servicio).') + '</p>' +
+        '<p class="ty-gate-modal__lead">' + (opts.message || 'Ingresa el PIN para activar las funciones internas de ' + ((window.TENANT && window.TENANT.nombre) || 'Trasteos Ya') + '.') + '</p>' +
         '<input type="password" class="ty-gate-modal__input" placeholder="PIN" autocomplete="off">' +
         '<div class="ty-gate-modal__err" role="alert"></div>' +
         '<div class="ty-gate-modal__actions">' +
@@ -128,12 +129,13 @@
     bar.className = 'ty-op-toolbar' + (window.innerWidth > 640 ? ' ty-op-toolbar--hidden' : '');
     var darkIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
     var lightIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+    var _m = (window.TENANT && window.TENANT.id !== 'ty') ? '?marca=' + window.TENANT.id : '';
     bar.innerHTML =
-      '<a href="cotizador.html" class="ty-op-toolbar__link">Cotizador</a>' +
-      '<a href="orden-servicio.html" class="ty-op-toolbar__link">Orden de servicio</a>' +
-      '<a href="kpi-empresa.html" class="ty-op-toolbar__link">KPI\'s</a>' +
-      '<a href="campanas.html" class="ty-op-toolbar__link">Campañas</a>' +
-      '<a href="finanzas.html" class="ty-op-toolbar__link">Finanzas</a>' +
+      '<a href="cotizador.html' + _m + '" class="ty-op-toolbar__link">Cotizador</a>' +
+      '<a href="orden-servicio.html' + _m + '" class="ty-op-toolbar__link">Orden de servicio</a>' +
+      '<a href="kpi-empresa.html' + _m + '" class="ty-op-toolbar__link">KPI\'s</a>' +
+      '<a href="campanas.html' + _m + '" class="ty-op-toolbar__link">Campañas</a>' +
+      '<a href="finanzas.html' + _m + '" class="ty-op-toolbar__link">Finanzas</a>' +
       '<button type="button" class="ty-op-toolbar__dark" title="Modo oscuro">' + (localStorage.getItem('ty_dark_mode')==='1' ? lightIcon : darkIcon) + '</button>' +
       '<button type="button" class="ty-op-toolbar__logout">Salir</button>';
     document.body.appendChild(bar);
@@ -182,7 +184,7 @@
       document.body.style.visibility = 'hidden';
       showPinModal({
         adminOnly: true,
-        message: 'Esta es una herramienta privada del equipo Trasteos Ya. Ingresa tu PIN para continuar.',
+        message: 'Esta es una herramienta privada del equipo ' + ((window.TENANT && window.TENANT.nombre) || 'Trasteos Ya') + '. Ingresa tu PIN para continuar.',
         onSuccess: function () {
           applyBodyClass();
           if (localStorage.getItem('ty_dark_mode') === '1') {
