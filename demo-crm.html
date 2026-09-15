@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>CRM Mudanzas — Demo</title>
+<script src="js/tenant.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f0f4f3;--card:#fff;--border:#e0e7e5;--text:#1a2e2a;--muted:#6b7f7a;--brand:#0D7377;--brand2:#EA580C;--brandLight:#E0F2F1}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+.hero{background:linear-gradient(135deg,#0D7377 0%,#0a5c5f 40%,#074244 100%);color:#fff;padding:48px 24px 40px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60%;right:-20%;width:500px;height:500px;background:radial-gradient(circle,rgba(234,88,12,.15) 0%,transparent 70%);pointer-events:none}
+.hero-logo{height:56px;margin-bottom:16px;border-radius:10px}
+.hero h1{font-size:28px;font-weight:800;letter-spacing:-.5px;margin-bottom:8px}
+.hero p{font-size:15px;opacity:.8;max-width:500px;margin:0 auto}
+.hero-badge{display:inline-block;background:var(--brand2);color:#fff;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px}
+
+.grid{max-width:900px;margin:-32px auto 0;padding:0 16px 60px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;position:relative;z-index:1}
+
+.mod{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px 22px;text-decoration:none;color:var(--text);transition:all .2s;cursor:pointer;display:flex;flex-direction:column;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.mod:hover{border-color:var(--brand);box-shadow:0 4px 20px rgba(13,115,119,.12);transform:translateY(-2px)}
+.mod-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mod-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mod-icon.blue{background:rgba(13,115,119,.1);color:#0D7377}
+.mod-icon.orange{background:rgba(234,88,12,.1);color:#EA580C}
+.mod-icon.green{background:rgba(21,128,61,.1);color:#15803d}
+.mod-icon.purple{background:rgba(109,40,217,.1);color:#6d28d9}
+.mod-icon.red{background:rgba(220,38,38,.1);color:#dc2626}
+.mod-icon.teal{background:rgba(13,148,136,.1);color:#0d9488}
+.mod h3{font-size:15px;font-weight:700}
+.mod p{font-size:12px;color:var(--muted);line-height:1.5}
+.mod-tag{font-size:10px;font-weight:600;color:var(--brand);background:var(--brandLight);padding:2px 8px;border-radius:4px;display:inline-block;width:fit-content}
+
+.footer{text-align:center;padding:24px;font-size:12px;color:var(--muted)}
+.footer a{color:var(--brand);text-decoration:none;font-weight:600}
+
+@media(max-width:600px){
+  .hero{padding:32px 16px 28px}
+  .hero h1{font-size:22px}
+  .grid{grid-template-columns:1fr;padding:0 12px 40px;margin-top:-24px}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Demo interactiva</div>
+  <img class="hero-logo" id="demo-logo" alt="CRM Mudanzas">
+  <h1 id="demo-title">CRM Mudanzas</h1>
+  <p id="demo-sub">Sistema inteligente para empresas de mudanzas — cotizador, ordenes, finanzas, KPIs, campañas y agente de voz.</p>
+</div>
+
+<div class="grid">
+
+  <a class="mod" href="cotizador.html?marca=demo">
+    <div class="mod-icon blue">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    </div>
+    <h3>Cotizador Inteligente</h3>
+    <p>Genera cotizaciones en segundos con calculo automatico de vehiculo, materiales, costos y margenes.</p>
+    <span class="mod-tag">Motor IA incluido</span>
+  </a>
+
+  <a class="mod" href="orden-servicio.html?marca=demo">
+    <div class="mod-icon orange">
+      <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5a1 1 0 0 1-1 1h-6"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+    </div>
+    <h3>Orden de Servicio</h3>
+    <p>Gestiona la operacion: equipo, vehiculos, rutas, paradas, firmas digitales y PDF profesional.</p>
+    <span class="mod-tag">Multi-parada</span>
+  </a>
+
+  <a class="mod" href="finanzas.html?marca=demo">
+    <div class="mod-icon green">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    </div>
+    <h3>Finanzas</h3>
+    <p>Control financiero completo: ingresos, gastos, utilidad, cuentas de cobro y flujo de caja.</p>
+  </a>
+
+  <a class="mod" href="kpi-empresa.html?marca=demo">
+    <div class="mod-icon purple">
+      <svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+    </div>
+    <h3>KPI Empresa</h3>
+    <p>Dashboard CEO con metricas de ingresos, empaque, operacion y geointeligencia en tiempo real.</p>
+    <span class="mod-tag">Charts interactivos</span>
+  </a>
+
+  <a class="mod" href="kpis.html?marca=demo">
+    <div class="mod-icon teal">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    <h3>KPIs Operativos</h3>
+    <p>Monitoreo detallado por periodo: conversiones, ticket promedio, tiempos, margenes por servicio.</p>
+  </a>
+
+  <a class="mod" href="campanas.html?marca=demo">
+    <div class="mod-icon red">
+      <svg viewBox="0 0 24 24"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
+    </div>
+    <h3>Campañas WhatsApp</h3>
+    <p>Envio masivo segmentado por ciudad, tipo de servicio y estado. Plantillas personalizables.</p>
+    <span class="mod-tag">Prospeccion incluida</span>
+  </a>
+
+  <a class="mod" href="voice-agent.html?marca=demo">
+    <div class="mod-icon blue">
+      <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </div>
+    <h3>Agente de Voz IA</h3>
+    <p>Asistente virtual que atiende llamadas, cotiza por voz y envia la cotizacion por WhatsApp.</p>
+    <span class="mod-tag">Llamada real</span>
+  </a>
+
+  <a class="mod" href="cotizadorparati.html?marca=demo">
+    <div class="mod-icon orange">
+      <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+    </div>
+    <h3>Cotizador para Clientes</h3>
+    <p>Link publico para que el cliente cotice solo — estilo iOS, con tu marca y logo.</p>
+  </a>
+
+</div>
+
+<div class="footer">
+  Powered by <a href="#">7Group</a> · Sistema listo para tu empresa de mudanzas
+</div>
+
+<script>
+// Aplicar logo del tenant
+(function(){
+  var T = window.TENANT;
+  if (!T) return;
+  var logo = document.getElementById('demo-logo');
+  if (logo && T.logo) logo.src = T.logo;
+  var title = document.getElementById('demo-title');
+  if (title) title.textContent = T.nombre || 'CRM Mudanzas';
+  var sub = document.getElementById('demo-sub');
+  if (sub && T.tagline) sub.textContent = T.tagline + ' — cotizador, ordenes, finanzas, KPIs, campañas y agente de voz.';
+})();
+</script>
+
+</body>
+</html>
