@@ -17,15 +17,15 @@
   var marca = params.get('marca');
   var isDemoPortal = window.location.pathname.indexOf('demo-crm') !== -1;
 
-  // Si viene en URL, guardar para que la navegacion interna lo mantenga
+  // Si viene en URL, guardar en sessionStorage (dura solo la pestaña)
   if (marca) {
-    try { localStorage.setItem('ty_marca', marca); } catch (e) {}
+    try { sessionStorage.setItem('ty_marca', marca); } catch (e) {}
+    try { localStorage.removeItem('ty_marca'); } catch (e) {}
   } else if (isDemoPortal) {
-    // El portal demo fuerza demo
     marca = 'demo';
-    try { localStorage.setItem('ty_marca', 'demo'); } catch (e) {}
+    try { sessionStorage.setItem('ty_marca', 'demo'); } catch (e) {}
   } else {
-    try { marca = localStorage.getItem('ty_marca'); } catch (e) {}
+    try { marca = sessionStorage.getItem('ty_marca'); } catch (e) {}
   }
 
   if (!marca) marca = 'ty';
