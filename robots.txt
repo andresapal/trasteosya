@@ -11,6 +11,9 @@ Disallow: /kpi-empresa
 Disallow: /campanas
 Disallow: /finanzas
 Disallow: /servicios
+Disallow: /voice-agent
+Disallow: /video-comercial
+Disallow: /demo-crm
 
 # Permitir que Google indexe imagenes
 User-agent: Googlebot-Image

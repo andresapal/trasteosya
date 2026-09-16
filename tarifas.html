@@ -52,16 +52,26 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
 .nac-add button{padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
 .nac-add button:hover{filter:brightness(.9)}
 .nac-empty{padding:20px 15px;text-align:center;font-size:12px;color:var(--muted)}
-.nac-route{display:grid;grid-template-columns:1fr 128px 128px 60px;gap:10px;align-items:center;padding:9px 15px;border-bottom:1px solid #f1f5f9}
-.nac-route .lbl{font-size:13px;font-weight:600}
-.nac-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;text-align:center;padding:4px}
+.nac-ruta{border-bottom:1px solid var(--border);padding:0}
+.nac-ruta:last-child{border-bottom:0}
+.nac-ruta-h{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;background:#f8fafc}
+.nac-ruta-h .lbl{font-size:13px;font-weight:700}
+.nac-ruta-h .hint{font-size:11px;color:var(--muted);margin:0}
+.nac-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px 8px}
 .nac-del:hover{color:var(--red)}
+.nac-grid{display:grid;grid-template-columns:90px 1fr 1fr;gap:8px;padding:8px 15px;align-items:center}
+.nac-grid .tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.nac-grid .tag-exp{color:var(--brand)}
+.nac-grid .tag-comp{color:#7c3aed}
+.nac-dias{padding:6px 15px 10px;display:flex;align-items:center;gap:8px}
+.nac-dias label{font-size:11.5px;color:var(--muted);font-weight:600}
+.nac-dias input{width:60px;padding:6px 8px;text-align:center;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;font-weight:600}
 @media(max-width:640px){
-  .nac-route{grid-template-columns:1fr 1fr;gap:8px 10px}
-  .nac-route .lbl{grid-column:1/-1}
-  .nac-del{grid-column:1/-1;text-align:right}
+  .nac-grid{grid-template-columns:1fr 1fr;gap:6px 8px;padding:8px 13px}
+  .nac-grid .tag{grid-column:1/-1}
   .nac-add{flex-direction:column}
   .nac-add select{width:100%}
+  .nac-dias{flex-wrap:wrap}
 }
 .row{display:grid;grid-template-columns:1fr 128px 128px 92px;gap:10px;align-items:center;padding:9px 15px;border-bottom:1px solid #f1f5f9}
 .row:last-child{border-bottom:0}
@@ -196,15 +206,43 @@ function toggleCard(el){
   if(card)card.classList.toggle('collapsed');
 }
 
+function initNacParada(){
+  if(!T.TARIFAS.nacParada)T.TARIFAS.nacParada={c:0,v:0};
+}
+function initUrbParada(){
+  if(!T.TARIFAS.urbParada)T.TARIFAS.urbParada={c:100000,v:130000};
+}
+
 function render(){
   var h='';
-  SECCIONES.forEach(function(s){
+
+  // Trasteo urbano (primera seccion, luego parada adicional urbana)
+  var su=SECCIONES[0];
+  h+='<div class="card"><div class="card-h" onclick="toggleCard(this)"><div><div class="card-t">'+su.t+'</div><div class="card-d">'+su.d+'</div></div>'+CHEVRON+'</div>'
+    +'<div class="card-body">'
+    +'<div class="row row-h"><div>Concepto</div><div style="text-align:right">Costo</div><div style="text-align:right">Venta</div><div style="text-align:right">Margen</div></div>';
+  su.items().forEach(function(it){h+=filaHTML(it);});
+  initUrbParada();
+  var up=T.TARIFAS.urbParada;
+  h+='<div class="row row-h"><div>Parada adicional</div><div style="text-align:right">Costo</div><div style="text-align:right">Venta</div><div style="text-align:right">Margen</div></div>'
+    +'<div class="row"><div><div class="lbl">Parada adicional urbana</div><div class="hint">Recogida o entrega en otra dirección</div></div>'
+    +'<input type="text" inputmode="numeric" class="c" id="f_urbParada_c" value="'+fmt(up.c)+'" oninput="cambio(this)">'
+    +'<input type="text" inputmode="numeric" class="v" id="f_urbParada_v" value="'+fmt(up.v)+'" oninput="cambio(this)">'
+    +'<div class="mg" id="m_urbParada"></div></div>';
+  h+='</div></div>';
+
+  // Trasteo nacional (justo debajo de urbano)
+  h+=renderNacional();
+
+  // Resto de secciones (materiales en adelante)
+  for(var si=1;si<SECCIONES.length;si++){
+    var s=SECCIONES[si];
     h+='<div class="card"><div class="card-h" onclick="toggleCard(this)"><div><div class="card-t">'+s.t+'</div><div class="card-d">'+s.d+'</div></div>'+CHEVRON+'</div>'
       +'<div class="card-body">'
       +'<div class="row row-h"><div>Concepto</div><div style="text-align:right">Costo</div><div style="text-align:right">Venta</div><div style="text-align:right">Margen</div></div>';
     s.items().forEach(function(it){h+=filaHTML(it);});
     h+='</div></div>';
-  });
+  }
 
   // Adicionales: base completa o por operario
   h+='<div class="card"><div class="card-h" onclick="toggleCard(this)"><div><div class="card-t">Adicionales</div><div class="card-d">Valor completo o por operario</div></div>'+CHEVRON+'</div><div class="card-body">';
@@ -244,23 +282,22 @@ function render(){
     +'<div class="card-body"><div class="row"><div><div class="lbl">Utilidad mínima por servicio</div></div>'
     +'<div></div><input type="text" inputmode="numeric" class="v" id="f_utilidadMinima" value="'+fmt(T.TARIFAS.utilidadMinima)+'" oninput="cambio(this)"><div></div></div></div></div>';
 
-  // Nacional
-  h+=renderNacional();
-
   document.getElementById('secciones').innerHTML=h;
   margenes();
   renderNacRutas();
 }
 
-// === Nacional ===
+// === Trasteo nacional ===
 function getNacional(){
   if(!T.TARIFAS.nacional)T.TARIFAS.nacional={};
   return T.TARIFAS.nacional;
 }
 function renderNacional(){
+  initNacParada();
+  var np=T.TARIFAS.nacParada;
   var opts='<option value="">Ciudad</option>';
   CIUDADES.forEach(function(c){opts+='<option value="'+c+'">'+c+'</option>';});
-  return '<div class="card"><div class="card-h" onclick="toggleCard(this)"><div><div class="card-t">Nacional</div><div class="card-d">Rutas intermunicipales. MarIAna sigue pasando al asesor.</div></div>'+CHEVRON+'</div>'
+  return '<div class="card"><div class="card-h" onclick="toggleCard(this)"><div><div class="card-t">Trasteo nacional</div><div class="card-d">Rutas intermunicipales · Expreso y compartido · MarIAna sigue pasando al asesor</div></div>'+CHEVRON+'</div>'
     +'<div class="card-body">'
     +'<div class="nac-add">'
     +'<select id="nacOrigen">'+opts+'</select>'
@@ -268,6 +305,13 @@ function renderNacional(){
     +'<button onclick="agregarRuta()">Agregar ruta</button>'
     +'</div>'
     +'<div id="nacRutas"></div>'
+    +'<div style="border-top:1px solid var(--border);margin-top:4px">'
+    +'<div class="row row-h"><div>Parada adicional nacional</div><div style="text-align:right">Costo</div><div style="text-align:right">Venta</div><div style="text-align:right">Margen</div></div>'
+    +'<div class="row"><div><div class="lbl">Parada adicional</div><div class="hint">Recogida o entrega en otra ciudad</div></div>'
+    +'<input type="text" inputmode="numeric" class="c" id="f_nacParada_c" value="'+fmt(np.c)+'" oninput="cambio(this)">'
+    +'<input type="text" inputmode="numeric" class="v" id="f_nacParada_v" value="'+fmt(np.v)+'" oninput="cambio(this)">'
+    +'<div class="mg" id="m_nacParada"></div></div>'
+    +'</div>'
     +'</div></div>';
 }
 function renderNacRutas(){
@@ -275,14 +319,26 @@ function renderNacRutas(){
   var box=document.getElementById('nacRutas');
   if(!box)return;
   if(!keys.length){box.innerHTML='<div class="nac-empty">Sin rutas. Agrega origen y destino arriba.</div>';return;}
-  var h='<div class="row row-h" style="display:grid;grid-template-columns:1fr 128px 128px 60px;gap:10px;padding:9px 15px"><div>Ruta</div><div style="text-align:right">Costo</div><div style="text-align:right">Venta</div><div></div></div>';
+  var h='';
   keys.forEach(function(k){
-    var r=nac[k],partes=k.split('-'),safeId=k.replace(/-/g,'_');
-    h+='<div class="nac-route">'
-      +'<div class="lbl">'+partes[0]+' &rarr; '+partes[1]+'</div>'
-      +'<input type="text" inputmode="numeric" class="c" id="nac_'+safeId+'_c" value="'+fmt(r.c)+'" oninput="cambioNac(this)">'
-      +'<input type="text" inputmode="numeric" class="v" id="nac_'+safeId+'_v" value="'+fmt(r.v)+'" oninput="cambioNac(this)">'
-      +'<button class="nac-del" onclick="eliminarRuta(\''+k+'\')" title="Eliminar">&times;</button>'
+    var r=nac[k],partes=k.split('-'),sid=k.replace(/-/g,'_');
+    h+='<div class="nac-ruta">'
+      +'<div class="nac-ruta-h"><div><div class="lbl">'+partes[0]+' &rarr; '+partes[1]+'</div></div>'
+      +'<button class="nac-del" onclick="eliminarRuta(\''+k+'\')" title="Eliminar">&times;</button></div>'
+      +'<div class="nac-grid">'
+      +'<div class="tag tag-exp">Expreso</div>'
+      +'<input type="text" inputmode="numeric" class="c" id="nac_'+sid+'_ec" value="'+fmt(r.ec||0)+'" oninput="cambioNac(this)" placeholder="Costo">'
+      +'<input type="text" inputmode="numeric" class="v" id="nac_'+sid+'_ev" value="'+fmt(r.ev||0)+'" oninput="cambioNac(this)" placeholder="Venta">'
+      +'</div>'
+      +'<div class="nac-grid">'
+      +'<div class="tag tag-comp">Compartido</div>'
+      +'<input type="text" inputmode="numeric" class="c" id="nac_'+sid+'_cc" value="'+fmt(r.cc||0)+'" oninput="cambioNac(this)" placeholder="Costo">'
+      +'<input type="text" inputmode="numeric" class="v" id="nac_'+sid+'_cv" value="'+fmt(r.cv||0)+'" oninput="cambioNac(this)" placeholder="Venta">'
+      +'</div>'
+      +'<div class="nac-dias">'
+      +'<label>Días de tránsito (compartido):</label>'
+      +'<input type="text" id="nac_'+sid+'_dias" value="'+(r.dias||'')+'" oninput="cambioNacDias(this)" placeholder="ej: 2-3">'
+      +'</div>'
       +'</div>';
   });
   box.innerHTML=h;
@@ -293,7 +349,7 @@ function agregarRuta(){
   if(o===d){alert('Origen y destino deben ser diferentes.');return;}
   var key=o+'-'+d,nac=getNacional();
   if(nac[key]){alert('Esa ruta ya existe.');return;}
-  nac[key]={c:0,v:0};
+  nac[key]={ec:0,ev:0,cc:0,cv:0,dias:''};
   renderNacRutas();
   marcar('Sin guardar');
   document.getElementById('nacOrigen').value='';
@@ -307,10 +363,18 @@ function eliminarRuta(k){
 }
 function cambioNac(el){
   var v=parse(el.value);el.value=fmt(v);
-  var m=el.id.match(/^nac_(.+)_(c|v)$/);
+  var m=el.id.match(/^nac_(.+)_(ec|ev|cc|cv)$/);
   if(m){
     var rKey=m[1].replace(/_/g,'-'),nac=getNacional();
     if(nac[rKey])nac[rKey][m[2]]=v;
+  }
+  marcar('Sin guardar');
+}
+function cambioNacDias(el){
+  var m=el.id.match(/^nac_(.+)_dias$/);
+  if(m){
+    var rKey=m[1].replace(/_/g,'-'),nac=getNacional();
+    if(nac[rKey])nac[rKey].dias=el.value.trim();
   }
   marcar('Sin guardar');
 }
@@ -379,12 +443,26 @@ function recolectar(){
   });
   var um=document.getElementById('f_utilidadMinima');
   if(um)out.utilidadMinima=parse(um.value);
-  // Nacional
+  // Parada adicional urbana
+  var upc=document.getElementById('f_urbParada_c'),upv=document.getElementById('f_urbParada_v');
+  out.urbParada={c:upc?parse(upc.value):0,v:upv?parse(upv.value):0};
+  // Parada adicional nacional
+  var npc=document.getElementById('f_nacParada_c'),npv=document.getElementById('f_nacParada_v');
+  out.nacParada={c:npc?parse(npc.value):0,v:npv?parse(npv.value):0};
+  // Nacional rutas
   var nac=getNacional(),nacOut={};
   Object.keys(nac).forEach(function(k){
-    var ec=document.getElementById('nac_'+k.replace(/-/g,'_')+'_c');
-    var ev=document.getElementById('nac_'+k.replace(/-/g,'_')+'_v');
-    nacOut[k]={c:ec?parse(ec.value):(nac[k].c||0),v:ev?parse(ev.value):(nac[k].v||0)};
+    var sid=k.replace(/-/g,'_');
+    var eec=document.getElementById('nac_'+sid+'_ec'),eev=document.getElementById('nac_'+sid+'_ev');
+    var ecc=document.getElementById('nac_'+sid+'_cc'),ecv=document.getElementById('nac_'+sid+'_cv');
+    var ed=document.getElementById('nac_'+sid+'_dias');
+    nacOut[k]={
+      ec:eec?parse(eec.value):(nac[k].ec||0),
+      ev:eev?parse(eev.value):(nac[k].ev||0),
+      cc:ecc?parse(ecc.value):(nac[k].cc||0),
+      cv:ecv?parse(ecv.value):(nac[k].cv||0),
+      dias:ed?ed.value.trim():(nac[k].dias||'')
+    };
   });
   out.nacional=nacOut;
   return out;
