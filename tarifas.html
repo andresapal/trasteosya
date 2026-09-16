@@ -36,9 +36,33 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);c
 .wrap{max-width:900px;margin:0 auto;padding:18px 16px}
 .aviso{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;padding:11px 13px;font-size:12.5px;line-height:1.5;margin-bottom:16px}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden}
-.card-h{padding:13px 15px;border-bottom:1px solid var(--border);display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.card-h{padding:13px 15px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;user-select:none;transition:background .15s}
+.card-h:hover{background:#f8fafc}
 .card-t{font-size:14px;font-weight:700;color:var(--navy)}
 .card-d{font-size:11.5px;color:var(--muted)}
+.card-chevron{width:18px;height:18px;color:var(--muted);transition:transform .25s;flex-shrink:0}
+.card.collapsed .card-chevron{transform:rotate(-90deg)}
+.card-body{transition:max-height .3s ease,opacity .2s ease;overflow:hidden}
+.card.collapsed .card-body{max-height:0!important;opacity:0;overflow:hidden}
+.card.collapsed .card-h{border-bottom-color:transparent}
+/* Nacional */
+.nac-add{display:flex;gap:8px;padding:12px 15px;align-items:flex-end;flex-wrap:wrap}
+.nac-add select{flex:1;min-width:120px;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:var(--text)}
+.nac-add select:focus{outline:none;border-color:var(--brand)}
+.nac-add button{padding:8px 16px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.nac-add button:hover{filter:brightness(.9)}
+.nac-empty{padding:20px 15px;text-align:center;font-size:12px;color:var(--muted)}
+.nac-route{display:grid;grid-template-columns:1fr 128px 128px 60px;gap:10px;align-items:center;padding:9px 15px;border-bottom:1px solid #f1f5f9}
+.nac-route .lbl{font-size:13px;font-weight:600}
+.nac-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;text-align:center;padding:4px}
+.nac-del:hover{color:var(--red)}
+@media(max-width:640px){
+  .nac-route{grid-template-columns:1fr 1fr;gap:8px 10px}
+  .nac-route .lbl{grid-column:1/-1}
+  .nac-del{grid-column:1/-1;text-align:right}
+  .nac-add{flex-direction:column}
+  .nac-add select{width:100%}
+}
 .row{display:grid;grid-template-columns:1fr 128px 128px 92px;gap:10px;align-items:center;padding:9px 15px;border-bottom:1px solid #f1f5f9}
 .row:last-child{border-bottom:0}
 .row-h{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;background:#f8fafc}
@@ -161,17 +185,29 @@ function filaHTML(it){
     +'<div class="mg" id="m_'+it.ruta.join('_')+'"></div></div>';
 }
 
+var CHEVRON='<svg class="card-chevron" viewBox="0 0 20 20" fill="currentColor"><path d="M6.3 3.3a1 1 0 011.4 0l5 5a1 1 0 010 1.4l-5 5a1 1 0 01-1.4-1.4L10.6 9 6.3 4.7a1 1 0 010-1.4z"/></svg>';
+
+var CIUDADES_PRIO=["Bogotá","Medellín","Barranquilla","Cali","Chía","Cajicá","Zipaquirá","Madrid"];
+var CIUDADES_RESTO=["Armenia","Barrancabermeja","Bello","Bucaramanga","Buenaventura","Cartagena","Ciénaga","Cúcuta","Duitama","Envigado","Facatativá","Florencia","Floridablanca","Fusagasugá","Girardot","Girón","Ibagué","Ipiales","Itagüí","La Dorada","Maicao","Manizales","Melgar","Montería","Mosquera","Neiva","Palmira","Pasto","Pereira","Piedecuesta","Popayán","Quibdó","Riohacha","Rionegro","Sahagún","Santa Marta","Sincelejo","Soacha","Sogamoso","Soledad","Tuluá","Tunja","Turbo","Ubaté","Valledupar","Villavicencio","Yopal"];
+var CIUDADES=CIUDADES_PRIO.concat(CIUDADES_RESTO);
+
+function toggleCard(el){
+  var card=el.closest('.card');
+  if(card)card.classList.toggle('collapsed');
+}
+
 function render(){
   var h='';
   SECCIONES.forEach(function(s){
-    h+='<div class="card"><div class="card-h"><div class="card-t">'+s.t+'</div><div class="card-d">'+s.d+'</div></div>'
+    h+='<div class="card"><div class="card-h" onclick="toggleCard(this)"><div><div class="card-t">'+s.t+'</div><div class="card-d">'+s.d+'</div></div>'+CHEVRON+'</div>'
+      +'<div class="card-body">'
       +'<div class="row row-h"><div>Concepto</div><div style="text-align:right">Costo</div><div style="text-align:right">Venta</div><div style="text-align:right">Margen</div></div>';
     s.items().forEach(function(it){h+=filaHTML(it);});
-    h+='</div>';
+    h+='</div></div>';
   });
 
   // Adicionales: base completa o por operario
-  h+='<div class="card"><div class="card-h"><div class="card-t">Adicionales</div><div class="card-d">Valor completo o por operario</div></div>';
+  h+='<div class="card"><div class="card-h" onclick="toggleCard(this)"><div><div class="card-t">Adicionales</div><div class="card-d">Valor completo o por operario</div></div>'+CHEVRON+'</div><div class="card-body">';
   ADICIONALES.forEach(function(a){
     var cfg=T.TARIFAS.adicionales[a.k];
     h+='<div class="row"><div><div class="lbl">'+a.l+'</div><div class="hint">'+a.d+'</div></div>'
@@ -201,15 +237,82 @@ function render(){
         +filaHTML({ruta:['adicionales',a.k,'operario'],l:a.l+' por operario',hint:'Se multiplica por los operarios del camión'});
     }
   });
-  h+='<div class="nota">Manipulación por fachada no tiene tarifa: siempre requiere visita, y MarIAna lo pasa a un asesor.</div></div>';
+  h+='<div class="nota">Manipulación por fachada no tiene tarifa: siempre requiere visita, y MarIAna lo pasa a un asesor.</div></div></div>';
 
   // Utilidad mínima
-  h+='<div class="card"><div class="card-h"><div class="card-t">Utilidad mínima</div><div class="card-d">Aviso cuando una cotización queda por debajo</div></div>'
-    +'<div class="row"><div><div class="lbl">Utilidad mínima por servicio</div></div>'
-    +'<div></div><input type="text" inputmode="numeric" class="v" id="f_utilidadMinima" value="'+fmt(T.TARIFAS.utilidadMinima)+'" oninput="cambio(this)"><div></div></div></div>';
+  h+='<div class="card"><div class="card-h" onclick="toggleCard(this)"><div><div class="card-t">Utilidad mínima</div><div class="card-d">Aviso cuando una cotización queda por debajo</div></div>'+CHEVRON+'</div>'
+    +'<div class="card-body"><div class="row"><div><div class="lbl">Utilidad mínima por servicio</div></div>'
+    +'<div></div><input type="text" inputmode="numeric" class="v" id="f_utilidadMinima" value="'+fmt(T.TARIFAS.utilidadMinima)+'" oninput="cambio(this)"><div></div></div></div></div>';
+
+  // Nacional
+  h+=renderNacional();
 
   document.getElementById('secciones').innerHTML=h;
   margenes();
+  renderNacRutas();
+}
+
+// === Nacional ===
+function getNacional(){
+  if(!T.TARIFAS.nacional)T.TARIFAS.nacional={};
+  return T.TARIFAS.nacional;
+}
+function renderNacional(){
+  var opts='<option value="">Ciudad</option>';
+  CIUDADES.forEach(function(c){opts+='<option value="'+c+'">'+c+'</option>';});
+  return '<div class="card"><div class="card-h" onclick="toggleCard(this)"><div><div class="card-t">Nacional</div><div class="card-d">Rutas intermunicipales. MarIAna sigue pasando al asesor.</div></div>'+CHEVRON+'</div>'
+    +'<div class="card-body">'
+    +'<div class="nac-add">'
+    +'<select id="nacOrigen">'+opts+'</select>'
+    +'<select id="nacDestino">'+opts+'</select>'
+    +'<button onclick="agregarRuta()">Agregar ruta</button>'
+    +'</div>'
+    +'<div id="nacRutas"></div>'
+    +'</div></div>';
+}
+function renderNacRutas(){
+  var nac=getNacional(),keys=Object.keys(nac).sort();
+  var box=document.getElementById('nacRutas');
+  if(!box)return;
+  if(!keys.length){box.innerHTML='<div class="nac-empty">Sin rutas. Agrega origen y destino arriba.</div>';return;}
+  var h='<div class="row row-h" style="display:grid;grid-template-columns:1fr 128px 128px 60px;gap:10px;padding:9px 15px"><div>Ruta</div><div style="text-align:right">Costo</div><div style="text-align:right">Venta</div><div></div></div>';
+  keys.forEach(function(k){
+    var r=nac[k],partes=k.split('-'),safeId=k.replace(/-/g,'_');
+    h+='<div class="nac-route">'
+      +'<div class="lbl">'+partes[0]+' &rarr; '+partes[1]+'</div>'
+      +'<input type="text" inputmode="numeric" class="c" id="nac_'+safeId+'_c" value="'+fmt(r.c)+'" oninput="cambioNac(this)">'
+      +'<input type="text" inputmode="numeric" class="v" id="nac_'+safeId+'_v" value="'+fmt(r.v)+'" oninput="cambioNac(this)">'
+      +'<button class="nac-del" onclick="eliminarRuta(\''+k+'\')" title="Eliminar">&times;</button>'
+      +'</div>';
+  });
+  box.innerHTML=h;
+}
+function agregarRuta(){
+  var o=document.getElementById('nacOrigen').value,d=document.getElementById('nacDestino').value;
+  if(!o||!d){alert('Selecciona origen y destino.');return;}
+  if(o===d){alert('Origen y destino deben ser diferentes.');return;}
+  var key=o+'-'+d,nac=getNacional();
+  if(nac[key]){alert('Esa ruta ya existe.');return;}
+  nac[key]={c:0,v:0};
+  renderNacRutas();
+  marcar('Sin guardar');
+  document.getElementById('nacOrigen').value='';
+  document.getElementById('nacDestino').value='';
+}
+function eliminarRuta(k){
+  if(!confirm('¿Eliminar la ruta '+k.replace('-',' → ')+'?'))return;
+  delete getNacional()[k];
+  renderNacRutas();
+  marcar('Sin guardar');
+}
+function cambioNac(el){
+  var v=parse(el.value);el.value=fmt(v);
+  var m=el.id.match(/^nac_(.+)_(c|v)$/);
+  if(m){
+    var rKey=m[1].replace(/_/g,'-'),nac=getNacional();
+    if(nac[rKey])nac[rKey][m[2]]=v;
+  }
+  marcar('Sin guardar');
 }
 
 function cambio(el){
@@ -276,6 +379,14 @@ function recolectar(){
   });
   var um=document.getElementById('f_utilidadMinima');
   if(um)out.utilidadMinima=parse(um.value);
+  // Nacional
+  var nac=getNacional(),nacOut={};
+  Object.keys(nac).forEach(function(k){
+    var ec=document.getElementById('nac_'+k.replace(/-/g,'_')+'_c');
+    var ev=document.getElementById('nac_'+k.replace(/-/g,'_')+'_v');
+    nacOut[k]={c:ec?parse(ec.value):(nac[k].c||0),v:ev?parse(ev.value):(nac[k].v||0)};
+  });
+  out.nacional=nacOut;
   return out;
 }
 
