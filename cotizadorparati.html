@@ -1174,7 +1174,7 @@ function buildCotMsg(prefix){
   var cats={trasteo:{label:'Trasteo',items:[],t:0},empaque:{label:'Empaque',items:[],t:0},inst:{label:'Instalaciones',items:[],t:0},adicionales:{label:'Otros servicios',items:[],t:0},bodegaje:{label:'Bodegaje',items:[],t:0}};
   lines.forEach(function(l){var c=cats[l.cat]||cats.adicionales;c.items.push(l);c.t+=l.v;});
   Object.keys(cats).forEach(function(k){var c=cats[k];if(!c.items.length)return;msg+='*'+c.label+': '+COP(c.t)+'*\n';c.items.forEach(function(l){msg+='  • '+l.l+': '+COP(l.v)+(l.est?' (estimado)':'')+'\n';});msg+='\n';});
-  msg+=E.check+' *Total estimado: '+COP(S._total)+'*\n\n'+E.dart+' Este valor es un estimado que puede ajustarse al validar en sitio. Sin compromiso.\n\n'+String.fromCodePoint(0xA1)+'Quedo atento a tus dudas! '+E.hands+'\n*Equipo Trasteos Ya*\ntrasteosya.online';
+  msg+=E.check+' *Total estimado: '+COP(S._total)+'*\n\n'+E.dart+' Este valor es un estimado que puede ajustarse al validar en sitio. Sin compromiso.\n\n'+String.fromCodePoint(0xA1)+'Quedo atent@ a tus dudas! '+E.hands+'\n*Equipo Trasteos Ya*\ntrasteosya.online';
   return msg;
 }
 $('#btn-wa').addEventListener('click',()=>{

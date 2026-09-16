@@ -522,6 +522,10 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
           <svg class="icon" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           Lista materiales empaque
         </button>
+        <button class="btn-pdf" id="btn-copiar-ref" onclick="copiarReferidos(this)" style="border-color:#16a34a;color:#16a34a">
+          <svg class="icon" viewBox="0 0 24 24" style="stroke:#16a34a"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copiar mensaje de referidos
+        </button>
       </div>
     </div>
   </aside>
@@ -573,6 +577,10 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
     <button class="btn-pdf" id="drawer-btn-mats" onclick="closeDrawer();pdfMateriales()" disabled>
       <svg class="icon" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       Lista materiales
+    </button>
+    <button class="btn-pdf" onclick="copiarReferidos(this)" style="border-color:#16a34a;color:#16a34a">
+      <svg class="icon" viewBox="0 0 24 24" style="stroke:#16a34a"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Copiar mensaje de referidos
     </button>
   </div>
 </div>
@@ -973,7 +981,7 @@ Queremos que tu mudanza sea una experiencia tranquila y sin sorpresas. Para dart
 
 `+E.dart+` Nuestro compromiso es darte un servicio planeado, sin contratiempos y al mejor precio.
 
-¡Quedo atento a cualquier duda! `+E.hands+`
+Quedo atent@ a cualquier duda! `+E.hands+`
 
 *Equipo Trasteos Ya*
 ${LINK_TY}`;
@@ -1105,6 +1113,32 @@ function sendWA(){
   // Sync al sheet
   const subC=lines.reduce((a,l)=>a+l.c,0);
   _saveCotSheet({tipo:'Mudanza',total,subtotal:subV,descuento:dcto,costo:subC,utilidad:total-subC,items:lines.map(l=>({cat:l.cat,l:l.l,v:l.v,c:l.c,qty:l.qty}))});
+}
+
+// ============ COPIAR MENSAJE DE REFERIDOS ============
+function copiarReferidos(btn){
+  var nombre=(document.getElementById("cliente").value||'').trim();
+  var primer=nombre?nombre.split(/\s+/)[0]:'';
+  var msg='Hola'+(primer?' '+primer:'')+', soy Andres de *Trasteos Ya*.\n\n'+
+    'Gracias por haber confiado en nosotros para tu mudanza. Esperamos que todo haya quedado perfecto.\n\n'+
+    'Queremos invitarte a nuestro *programa de referidos*:\n\n'+
+    'Por cada persona que nos recomiendes y contrate con nosotros, recibes una *comision de $20.000* a partir de servicio cerrado y/o vendido.\n\n'+
+    'Solo dile que te mencione al cotizar.\n\n'+
+    'trasteosya.online\n\n'+
+    'Gracias por ser parte de la familia Trasteos Ya.';
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(msg).then(function(){
+      var txt=btn.textContent;
+      btn.textContent='Copiado';btn.style.background='#16a34a';btn.style.color='#fff';
+      setTimeout(function(){btn.textContent=txt;btn.style.background='';btn.style.color='#16a34a';},2000);
+    });
+  }else{
+    var ta=document.createElement('textarea');ta.value=msg;ta.style.cssText='position:fixed;left:-9999px';
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    var txt=btn.textContent;
+    btn.textContent='Copiado';btn.style.background='#16a34a';btn.style.color='#fff';
+    setTimeout(function(){btn.textContent=txt;btn.style.background='';btn.style.color='#16a34a';},2000);
+  }
 }
 
 // ============ CACHE COTIZACIONES PARA OS ============
