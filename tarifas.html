@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Tarifas - Trasteos Ya</title>
+<link rel="icon" href="assets/img/logo.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0A1845;--brand:#003DA5;--red:#E30613;
+  --bg:#f4f6fb;--surface:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;
+  --cost:#b45309;--sale:#15803d;
+}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);padding-bottom:96px}
+.top{background:var(--navy);color:#fff;padding:16px 20px;position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;justify-content:space-between;gap:12px}
+.top img{height:30px}
+.top-t{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.top-s{font-size:11px;color:#9db2dd;margin-top:2px}
+.wrap{max-width:900px;margin:0 auto;padding:18px 16px}
+.aviso{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;padding:11px 13px;font-size:12.5px;line-height:1.5;margin-bottom:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden}
+.card-h{padding:13px 15px;border-bottom:1px solid var(--border);display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.card-t{font-size:14px;font-weight:700;color:var(--navy)}
+.card-d{font-size:11.5px;color:var(--muted)}
+.row{display:grid;grid-template-columns:1fr 128px 128px 92px;gap:10px;align-items:center;padding:9px 15px;border-bottom:1px solid #f1f5f9}
+.row:last-child{border-bottom:0}
+.row-h{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;background:#f8fafc}
+.lbl{font-size:13px;font-weight:600}
+.hint{font-size:11px;color:var(--muted);margin-top:2px}
+.hint b{color:var(--cost)}
+input[type=text]{width:100%;padding:8px 10px;text-align:right;border:1.5px solid var(--border);border-radius:8px;
+  font-family:inherit;font-size:14px;font-weight:600;background:#fff;color:var(--text)}
+input[type=text]:focus{outline:none;border-color:var(--brand);background:#f8faff}
+input.c{color:var(--cost)}
+input.v{color:var(--sale)}
+.mg{font-size:12px;font-weight:700;text-align:right;color:var(--sale)}
+.mg.neg{color:var(--red)}
+.modo{display:flex;gap:6px;padding:0 15px 11px}
+.modo button{flex:1;padding:8px;border:1.5px solid var(--border);background:#fff;border-radius:8px;
+  font-family:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
+.modo button.on{border-color:var(--brand);background:#eff5ff;color:var(--brand)}
+.nota{padding:0 15px 12px;font-size:11.5px;color:var(--muted);line-height:1.5}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--border);
+  padding:12px 16px;display:flex;gap:10px;align-items:center;justify-content:center;
+  box-shadow:0 -4px 20px rgba(15,23,42,.06);z-index:30}
+.bar-in{width:100%;max-width:900px;display:flex;gap:10px;align-items:center}
+.estado{flex:1;font-size:12px;color:var(--muted);min-height:16px}
+button.act{padding:11px 20px;border:0;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
+.guardar{background:var(--brand);color:#fff}
+.guardar:disabled{opacity:.55;cursor:default}
+.restaurar{background:#fff;border:1.5px solid var(--border);color:var(--muted)}
+@media(max-width:640px){
+  .row{grid-template-columns:1fr 1fr;gap:8px 10px;padding:11px 13px}
+  .row .lbl{grid-column:1/-1}
+  .row-h{display:none}
+  .mg{grid-column:1/-1;text-align:left}
+  .bar-in{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div style="display:flex;align-items:center;gap:11px">
+    <img src="assets/img/logo.png" alt="Trasteos Ya">
+    <div>
+      <div class="top-t">Tarifas</div>
+      <div class="top-s" id="origen">Cargando...</div>
+    </div>
+  </div>
+  <a href="cotizador.html" style="color:#9db2dd;font-size:12px;text-decoration:none;font-weight:600">Cotizador</a>
+</header>
+
+<div class="wrap">
+  <div class="aviso">
+    Estos son los valores que usan el cotizador interno, el cotizador del cliente y MarIAna.
+    Lo que guardes aquí lo toman los tres. El costo es lo que te vale a ti; la venta es lo que paga el cliente.
+  </div>
+  <div id="secciones"></div>
+</div>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="estado" id="estado"></div>
+    <button class="act restaurar" onclick="restaurar()">Valores base</button>
+    <button class="act guardar" id="btnGuardar" onclick="guardar()">Guardar</button>
+  </div>
+</div>
+
+<script src="js/cotizador-core.js"></script>
+<script>
+'use strict';
+var MARIANA_URL='https://script.google.com/macros/s/AKfycbwE0hcz8ZsI1nv3OlM0bwXymof_E0FjmvWO02ruOLR6C291alguj1vBlknPZNvzXQ-v/exec';
+var APIKEY='TrasteosYa-2026-Backup';
+var T=TYCotizador;
+
+var SECCIONES=[
+  {k:'trasteo',t:'Trasteo urbano',d:'Por tamaño de vivienda',items:function(){
+    return Object.keys(T.TRASTEO_INFO).map(function(k){
+      var i=T.TRASTEO_INFO[k];
+      return {ruta:['trasteo',k],l:i.l,hint:i.vehiculo+' · '+i.operarios+' operarios · '+i.vivienda};});}},
+  {k:'materiales',t:'Materiales de empaque',d:'Valor por unidad o rollo suelto (empaque full)',items:function(){
+    return Object.keys(T.MAT_INFO).map(function(k){
+      return {ruta:['materiales',k],l:T.MAT_INFO[k].l,hint:'Por '+T.MAT_INFO[k].unit};});}},
+  {k:'empaque',t:'Servicio de empaque',d:'Labor. Es distinto del material',items:function(){return [
+    {ruta:['empaque','expressDia'],l:'Empaque del mismo día',hint:'Rollo de vinipel con la labor incluida. No se suma al material.'},
+    {ruta:['empaque','empacadorDia'],l:'Empacador por día',hint:'Cuando se empaca uno o dos días antes del trasteo'},
+    {ruta:['empaque','cinta'],l:'Cinta de empaque',hint:'Por unidad, solo costo'},
+    {ruta:['empaque','transporte'],l:'Transporte de materiales',hint:'Solo costo'}];}},
+  {k:'instalaciones',t:'Instalaciones',d:'Valor por unidad instalada',items:function(){
+    return Object.keys(T.INST_INFO).map(function(k){return {ruta:['instalaciones',k],l:T.INST_INFO[k].l};});}},
+  {k:'desempaque',t:'Desempaque',d:'Por operario y por día',items:function(){
+    return [{ruta:['desempaque'],l:'Desempaque',hint:'Se multiplica por operarios y días'}];}},
+  {k:'bodegaje',t:'Bodegaje',d:'Mensual. El cliente solo ve 10, 20 y 30 m³',items:function(){
+    return Object.keys(T.BOD_INFO).map(function(k){return {ruta:['bodegaje',k],l:T.BOD_INFO[k].l};});}},
+  {k:'recargoMunicipio',t:'Recargo municipios',d:'Chía, Cajicá, Cota y Madrid',items:function(){
+    return [{ruta:['recargoMunicipio'],l:'Recargo',hint:'Se suma al valor del trasteo'}];}}
+];
+
+var ADICIONALES=[
+  {k:'caminado',l:'Caminado',d:'Más de 50 metros desde el camión'},
+  {k:'escaleras',l:'Escaleras',d:'Desde el tercer piso'},
+  {k:'parada',l:'Parada adicional',d:'Recogida o entrega en otra dirección'}
+];
+
+function fmt(n){return String(Math.round(Number(n)||0)).replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+function parse(s){return Math.max(0,parseInt(String(s).replace(/\D/g,''),10)||0);}
+function get(ruta){var o=T.TARIFAS;for(var i=0;i<ruta.length;i++)o=o[ruta[i]];return o;}
+function sugerido(ruta){
+  var o=T.SUGERIDO_EXCEL;
+  for(var i=0;i<ruta.length;i++){if(!o)return null;o=o[ruta[i]];}
+  return o||null;
+}
+function idDe(ruta,campo){return 'f_'+ruta.join('_')+'_'+campo;}
+
+function filaHTML(it){
+  var val=get(it.ruta),sug=sugerido(it.ruta);
+  var hint=it.hint||'';
+  if(sug&&(sug.c!==val.c||sug.v!==val.v))
+    hint+=(hint?' · ':'')+'<b>Excel 2026: costo '+fmt(sug.c)+' / venta '+fmt(sug.v)+'</b>';
+  return '<div class="row">'
+    +'<div><div class="lbl">'+it.l+'</div>'+(hint?'<div class="hint">'+hint+'</div>':'')+'</div>'
+    +'<input type="text" inputmode="numeric" class="c" id="'+idDe(it.ruta,'c')+'" value="'+fmt(val.c)+'" oninput="cambio(this)">'
+    +'<input type="text" inputmode="numeric" class="v" id="'+idDe(it.ruta,'v')+'" value="'+fmt(val.v)+'" oninput="cambio(this)">'
+    +'<div class="mg" id="m_'+it.ruta.join('_')+'"></div></div>';
+}
+
+function render(){
+  var h='';
+  SECCIONES.forEach(function(s){
+    h+='<div class="card"><div class="card-h"><div class="card-t">'+s.t+'</div><div class="card-d">'+s.d+'</div></div>'
+      +'<div class="row row-h"><div>Concepto</div><div style="text-align:right">Costo</div><div style="text-align:right">Venta</div><div style="text-align:right">Margen</div></div>';
+    s.items().forEach(function(it){h+=filaHTML(it);});
+    h+='</div>';
+  });
+
+  // Adicionales: base completa o por operario
+  h+='<div class="card"><div class="card-h"><div class="card-t">Adicionales</div><div class="card-d">Valor completo o por operario</div></div>';
+  ADICIONALES.forEach(function(a){
+    var cfg=T.TARIFAS.adicionales[a.k];
+    h+='<div class="row"><div><div class="lbl">'+a.l+'</div><div class="hint">'+a.d+'</div></div>'
+      +'<div style="grid-column:2/-1"></div></div>';
+    if(cfg.modo!==undefined&&a.k!=='parada'){
+      h+='<div class="modo">'
+        +'<button id="modo_'+a.k+'_fijo" class="'+(cfg.modo==='fijo'?'on':'')+'" onclick="setModo(\''+a.k+'\',\'fijo\')">Valor completo</button>'
+        +'<button id="modo_'+a.k+'_operario" class="'+(cfg.modo==='operario'?'on':'')+'" onclick="setModo(\''+a.k+'\',\'operario\')">Por operario</button>'
+        +'</div>';
+    }
+    if(a.k==='escaleras'){
+      h+='<div class="row row-h"><div>Valor completo por piso</div><div style="text-align:right">Costo</div><div style="text-align:right">Venta</div><div></div></div>';
+      h+='<div class="row"><div><div class="lbl">Costo de escalereado</div><div class="hint">Igual para cualquier piso</div></div>'
+        +'<input type="text" inputmode="numeric" class="c" id="f_adicionales_escaleras_fijo_c" value="'+fmt(cfg.fijo.c)+'" oninput="cambio(this)">'
+        +'<div></div><div></div></div>';
+      [3,4,5].forEach(function(p){
+        h+='<div class="row"><div><div class="lbl">Venta piso '+p+(p===5?' o más':'')+'</div></div><div></div>'
+          +'<input type="text" inputmode="numeric" class="v" id="f_adicionales_escaleras_fijo_v_'+p+'" value="'+fmt(cfg.fijo.v[p])+'" oninput="cambio(this)">'
+          +'<div></div></div>';
+      });
+    }else{
+      h+='<div class="row row-h"><div>Valor completo</div><div style="text-align:right">Costo</div><div style="text-align:right">Venta</div><div style="text-align:right">Margen</div></div>'
+        +filaHTML({ruta:['adicionales',a.k,'fijo'],l:a.l+' completo'});
+    }
+    if(cfg.operario){
+      h+='<div class="row row-h"><div>Por operario</div><div style="text-align:right">Costo</div><div style="text-align:right">Venta</div><div style="text-align:right">Margen</div></div>'
+        +filaHTML({ruta:['adicionales',a.k,'operario'],l:a.l+' por operario',hint:'Se multiplica por los operarios del camión'});
+    }
+  });
+  h+='<div class="nota">Manipulación por fachada no tiene tarifa: siempre requiere visita, y MarIAna lo pasa a un asesor.</div></div>';
+
+  // Utilidad mínima
+  h+='<div class="card"><div class="card-h"><div class="card-t">Utilidad mínima</div><div class="card-d">Aviso cuando una cotización queda por debajo</div></div>'
+    +'<div class="row"><div><div class="lbl">Utilidad mínima por servicio</div></div>'
+    +'<div></div><input type="text" inputmode="numeric" class="v" id="f_utilidadMinima" value="'+fmt(T.TARIFAS.utilidadMinima)+'" oninput="cambio(this)"><div></div></div></div>';
+
+  document.getElementById('secciones').innerHTML=h;
+  margenes();
+}
+
+function cambio(el){
+  var v=parse(el.value);
+  el.value=fmt(v);
+  margenes();
+  marcar('Sin guardar');
+}
+function setModo(k,modo){
+  T.TARIFAS.adicionales[k].modo=modo;
+  document.getElementById('modo_'+k+'_fijo').className=(modo==='fijo'?'on':'');
+  document.getElementById('modo_'+k+'_operario').className=(modo==='operario'?'on':'');
+  marcar('Sin guardar');
+}
+function margenes(){
+  document.querySelectorAll('.mg').forEach(function(el){
+    var ruta=el.id.slice(2).split('_');
+    var c=document.getElementById('f_'+ruta.join('_')+'_c'),v=document.getElementById('f_'+ruta.join('_')+'_v');
+    if(!c||!v){el.textContent='';return;}
+    var cc=parse(c.value),vv=parse(v.value),u=vv-cc;
+    el.textContent=vv?(fmt(u)+'  '+Math.round(u/vv*100)+'%'):'';
+    el.className='mg'+(u<0?' neg':'');
+  });
+}
+function marcar(txt){document.getElementById('estado').textContent=txt;}
+
+// Lee los inputs y arma el objeto de tarifas
+function recolectar(){
+  var out=JSON.parse(JSON.stringify(T.TARIFAS));
+  function set(ruta,campo,valor){
+    var o=out;for(var i=0;i<ruta.length;i++){o=o[ruta[i]];}
+    o[campo]=valor;
+  }
+  SECCIONES.forEach(function(s){
+    s.items().forEach(function(it){
+      ['c','v'].forEach(function(campo){
+        var el=document.getElementById(idDe(it.ruta,campo));
+        if(el)set(it.ruta,campo,parse(el.value));
+      });
+    });
+  });
+  ADICIONALES.forEach(function(a){
+    var cfg=out.adicionales[a.k];
+    cfg.modo=T.TARIFAS.adicionales[a.k].modo;
+    if(a.k==='escaleras'){
+      var ec=document.getElementById('f_adicionales_escaleras_fijo_c');
+      if(ec)cfg.fijo.c=parse(ec.value);
+      [3,4,5].forEach(function(p){
+        var e=document.getElementById('f_adicionales_escaleras_fijo_v_'+p);
+        if(e)cfg.fijo.v[p]=parse(e.value);
+      });
+    }else{
+      ['c','v'].forEach(function(campo){
+        var e=document.getElementById(idDe(['adicionales',a.k,'fijo'],campo));
+        if(e)cfg.fijo[campo]=parse(e.value);
+      });
+    }
+    if(cfg.operario){
+      ['c','v'].forEach(function(campo){
+        var e=document.getElementById(idDe(['adicionales',a.k,'operario'],campo));
+        if(e)cfg.operario[campo]=parse(e.value);
+      });
+    }
+  });
+  var um=document.getElementById('f_utilidadMinima');
+  if(um)out.utilidadMinima=parse(um.value);
+  return out;
+}
+
+function guardar(){
+  var btn=document.getElementById('btnGuardar');
+  btn.disabled=true;marcar('Guardando...');
+  var tarifas=recolectar();
+  fetch(MARIANA_URL,{method:'POST',body:JSON.stringify({action:'guardar_tarifas',apikey:APIKEY,tarifas:tarifas}),redirect:'follow'})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      btn.disabled=false;
+      if(d&&d.ok){
+        T.aplicar(tarifas);
+        marcar('Guardado. MarIAna y los cotizadores ya usan estos valores.');
+        document.getElementById('origen').textContent='Actualizado '+(d.actualizado||'ahora');
+      }else{
+        marcar('No se pudo guardar: '+((d&&d.error)||'revisa la conexión'));
+      }
+    })
+    .catch(function(e){btn.disabled=false;marcar('No se pudo guardar: '+e.message);});
+}
+
+function restaurar(){
+  if(!confirm('¿Volver a los valores base? Se pierden los cambios que no hayas guardado.'))return;
+  T.restaurarBase();
+  render();
+  marcar('Valores base cargados. Guarda para aplicarlos.');
+}
+
+// Arranque: pinta ya con los valores base y luego refresca con lo guardado.
+// Si el Sheet no responde, la pantalla igual queda usable.
+render();
+document.getElementById('origen').textContent='Valores base';
+marcar('Buscando tarifas guardadas...');
+var _aviso=setTimeout(function(){marcar('No se pudieron traer las tarifas guardadas. Estás viendo los valores base.');},8000);
+T.cargarTarifas(MARIANA_URL,APIKEY).then(function(){
+  clearTimeout(_aviso);
+  var m=T.meta();
+  document.getElementById('origen').textContent=m.actualizado?('Actualizado '+m.actualizado):'Valores base';
+  render();
+  marcar('');
+}).catch(function(){
+  clearTimeout(_aviso);
+  marcar('No se pudieron traer las tarifas guardadas. Estás viendo los valores base.');
+});
+</script>
+<script src="js/access-gate.js"></script>
+</body>
+</html>

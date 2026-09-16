@@ -4,6 +4,7 @@ Allow: /
 # Herramientas internas y Cotizador Corporativo (noindex + PIN-gated)
 Disallow: /cotizador
 Disallow: /orden-servicio
+Disallow: /tarifas
 Disallow: /gracias
 Disallow: /kpis
 Disallow: /kpi-empresa

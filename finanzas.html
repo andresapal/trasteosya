@@ -767,11 +767,39 @@ function toggleCotDetail(i){
 }
 
 /* ============================================
+   MARIANA IA: cuentas de cobro de servicios confirmados por llamada
+   Mismo flujo que marcar VENDIDO a mano (_buildCdcFromCot + numeración CTY)
+   y devuelve el número a la pestaña MarIAna del Sheet
+   ============================================ */
+var MARIANA_URL='https://script.google.com/macros/s/AKfycbwE0hcz8ZsI1nv3OlM0bwXymof_E0FjmvWO02ruOLR6C291alguj1vBlknPZNvzXQ-v/exec';
+async function sincronizarCdcMariana(){
+  try{
+    var r=await fetch(MARIANA_URL+'?action=pendientes_cdc&apikey='+BACKUP_APIKEY,{redirect:'follow'});
+    var d=await r.json();
+    if(!d.ok||!d.pendientes||!d.pendientes.length)return;
+    var nuevas=[];
+    d.pendientes.forEach(function(p){
+      var list=cdcLoad();
+      var cdc=list.filter(function(c){return c.mariana===p.callId;})[0];
+      if(!cdc){
+        var cot=_buscarCot(p.cliente,p.fecha)||{total:p.total,origen:p.origen,destino:p.destino};
+        cdc=_buildCdcFromCot(cot,p.cliente,p.fecha);
+        cdc.mariana=p.callId;cdc.nit=p.documento||'';
+        list.unshift(cdc);cdcSave(list);
+        nuevas.push(cdc.numero+' '+cdc.cliente+(p.numeroOS?' ('+p.numeroOS+')':''));
+      }
+      fetch(MARIANA_URL,{method:'POST',body:JSON.stringify({action:'vincular_cdc',apikey:BACKUP_APIKEY,callId:p.callId,numero:cdc.numero}),redirect:'follow'}).catch(function(){});
+    });
+    if(nuevas.length){renderCobros();alert('Cuentas de cobro generadas desde MarIAna:\n'+nuevas.join('\n'));}
+  }catch(e){console.warn('MarIAna CdC:',e);}
+}
+
+/* ============================================
    INIT
    ============================================ */
 renderCobros();
 document.getElementById('cot-mgmt-content').innerHTML='<div class="cot-loading">Cargando cotizaciones...</div>';
-fetchDriveCots().then(function(){renderCotizaciones();}).catch(function(){
+fetchDriveCots().then(function(){renderCotizaciones();sincronizarCdcMariana();}).catch(function(){
   document.getElementById('cot-mgmt-content').innerHTML='<div class="cot-section"><div class="cot-header"><h3>Gestion de Cotizaciones</h3></div>'
     +'<div style="text-align:center;padding:30px;color:var(--ty-muted)"><p>No se pudieron cargar las cotizaciones</p></div></div>';
 });

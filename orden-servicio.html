@@ -1494,7 +1494,33 @@ document.addEventListener('visibilitychange',function(){
 window.addEventListener('beforeunload',function(){
   if(state.cliente.trim()) guardarOS();
 });
+/* ============================================
+   MARIANA IA: abrir la OS creada por una llamada
+   orden-servicio.html?mariana=ID_LLAMADA → llena cliente, fecha, direcciones y empaque
+   y usa el mismo guardarOS() / cargarOSdesdeStorage() de siempre
+   ============================================ */
+const MARIANA_URL='https://script.google.com/macros/s/AKfycbwE0hcz8ZsI1nv3OlM0bwXymof_E0FjmvWO02ruOLR6C291alguj1vBlknPZNvzXQ-v/exec';
+function cargarOSMariana(id){
+  fetch(MARIANA_URL+'?action=llamada&apikey='+BACKUP_APIKEY+'&id='+encodeURIComponent(id),{redirect:'follow'})
+  .then(r=>r.json()).then(function(d){
+    if(!d.ok||!d.llamada||!d.llamada.NumeroOS){showToast('No se encontró la OS de MarIAna',true);return;}
+    const L=d.llamada,f=L.FechaServicio,h=L.HoraServicio||'08:00',tel=String(L.Telefono||''),emp=L.empaque||{};
+    const key=OS_PREFIX+L.NumeroOS;
+    if(!localStorage.getItem(key)){
+      Object.assign(state,{numeroOS:L.NumeroOS,fecha:new Date().toISOString().slice(0,10),
+        cliente:L.Cliente,telefono:tel,cargueFecha:f,cargueHora:h,
+        empaque:{craft:emp.craft||0,vinipel:emp.vinipel||0,burbuja:emp.burbuja||0,cajas:emp.cajas||0}});
+      state.recogidas=[{...paradaVacia(),ciudad:L.ciudadOrigenOS,direccion:L.DirOrigen,fecha:f,hora:h,contacto1:L.Cliente,telefono1:tel,email:L.Email||''}];
+      state.entregas=[{...paradaVacia(),ciudad:L.ciudadDestinoOS,direccion:L.DirDestino,fecha:f,hora:sumarH(h,4),fechaEnt:f,contacto1:L.Cliente,telefono1:tel}];
+      if(!guardarOS())return;
+    }
+    cargarOSdesdeStorage(key);
+  }).catch(function(){showToast('Sin conexión con MarIAna',true);});
+}
+
 window.onload=()=>{
+  const marianaId=new URLSearchParams(location.search).get('mariana');
+  if(marianaId){try{sessionStorage.removeItem('ty_load_os');}catch(_){}setTimeout(()=>cargarOSMariana(marianaId),0);}
   const loadKey=sessionStorage.getItem('ty_load_os');
   if(loadKey){sessionStorage.removeItem('ty_load_os');cargarOSdesdeStorage(loadKey);return;}
   document.getElementById("fecha").value=state.fecha;

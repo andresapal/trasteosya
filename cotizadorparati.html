@@ -607,6 +607,7 @@ body.result-shown .tyc{display:block}
   </div>
 </div>
 
+<script src="js/cotizador-core.js"></script>
 <script>
 'use strict';
 
@@ -618,15 +619,12 @@ const OPERADOR_WA='573143095194';
 const _e=function(c){return String.fromCodePoint(c);};
 const E={casa:_e(0x1F3E0),phone:_e(0x1F4F1),pin:_e(0x1F4CD),check:_e(0x2705),dart:_e(0x1F3AF),hands:_e(0x1F91D),wave:_e(0x1F44B),truck:_e(0x1F69A),money:_e(0x1F4B0),pkg:_e(0x1F4E6),cal:_e(0x1F4C5),bill:_e(0x1F4B5),office:_e(0x1F3E2),person:_e(0x1F464),clock:_e(0x23F0)};
 
-/* ========= PRECIOS (venta que el cliente ve al final; costo para admin) ========= */
-const CAMION={pequeno:{l:'Camión pequeño',v:580000,c:420000},mediano:{l:'Camión mediano',v:730000,c:570000},grande:{l:'Camión grande',v:870000,c:710000}};
-const MAT={vinipel:{l:'Vinipel',v:130000,c:30000},burbuja:{l:'Burbuja',v:160000,c:70000},cajas:{l:'Cajas',v:13000,c:6000},craft:{l:'Craft',v:40000,c:30000}};
-const INSTP={nevecon:{l:'Nevecón',v:120000,c:100000},secadora:{l:'Secadora',v:90000,c:80000},tv:{l:'TV',v:90000,c:80000}};
-const BOD={m10:{l:'Bodegaje 10 m³',v:350000,c:280000},m20:{l:'Bodegaje 20 m³',v:550000,c:410000},m30:{l:'Bodegaje 30 m³',v:700000,c:550000}};
-const CAMINADO={v:100000};
-const ESCALERA={3:120000,4:150000,5:180000};
-const VIV_LABEL={pequeno:'Apartaestudio o pequeño',mediano:'Apartamento mediano',familiar:'Apartamento familiar',casa:'Casa'};
-const VIV_CAMION={pequeno:'pequeno',mediano:'mediano',familiar:'grande',casa:'grande'};
+/* ========= PRECIOS: fuente única en js/cotizador-core.js (también la usa MarIAna) ========= */
+const {CAMION,MAT,INSTP,CAMINADO,ESCALERA,VIV_LABEL,VIV_CAMION,CERCANAS,CERCANA_SURCHARGE}=TYCotizador;
+const BOD=TYCotizador.BOD_CLIENTE; // el cliente solo ve 10, 20 y 30 m³
+/* Trae lo que esté guardado en tarifas.html (si falla, quedan los valores base) */
+const MARIANA_URL='https://script.google.com/macros/s/AKfycbwE0hcz8ZsI1nv3OlM0bwXymof_E0FjmvWO02ruOLR6C291alguj1vBlknPZNvzXQ-v/exec';
+TYCotizador.cargarTarifas(MARIANA_URL,BACKUP_APIKEY);
 
 /* ========= STATE ========= */
 const S={nombre:'',whatsapp:'',vivienda:null,origen:'Bogotá',destino:'Bogotá',
@@ -641,8 +639,6 @@ const S={nombre:'',whatsapp:'',vivienda:null,origen:'Bogotá',destino:'Bogotá',
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 const COP=n=>'$ '+Math.round(n||0).toLocaleString('es-CO');
 const CIUDADES=['Bogotá','Chía','Cajicá','Cota','Madrid','Otra ciudad'];
-const CERCANAS={'Chía':1,'Cajicá':1,'Cota':1,'Madrid':1};
-const CERCANA_SURCHARGE={v:140000,c:100000};
 function reveal(id){
   const el=$('#'+id);if(!el)return;
   if(!el.classList.contains('show'))el.classList.add('show');
@@ -887,11 +883,7 @@ function checkNacional(){
 $('#cont-ruta').addEventListener('click',()=>{cancelAutoPrompt();stepDone('ruta');stepCurrent('empaque');reveal('c-empaque');setTimeout(()=>{var p=$('#progress'),c=$('#c-empaque');if(p&&c){var gap=c.getBoundingClientRect().top-p.getBoundingClientRect().bottom;if(gap<4)window.scrollBy({top:gap-8,behavior:'smooth'});}},500);armAutoPrompt('empaque',30,'¿Deseas continuar con instalaciones?',()=>{stepDone('empaque');stepCurrent('servicio');reveal('c-inst');});persistNow();});
 
 /* ========= STEP 4: EMPAQUE ========= */
-function empDefaults(tipo){
-  const chico=(S.vivienda==='pequeno'||S.vivienda==='mediano');
-  if(tipo==='express'){return {vinipel:chico?2:3};}
-  return chico?{cajas:20,vinipel:2,burbuja:1,craft:1}:{cajas:45,vinipel:5,burbuja:2,craft:1};
-}
+function empDefaults(tipo){return TYCotizador.empDefaults(S.vivienda,tipo);}
 function buildEmpaque(){
   S.empaque.mat=empDefaults(S.empaque.tipo);
   renderEmpaque();
@@ -1015,38 +1007,7 @@ $$('#bodegaje-yn button').forEach(b=>b.addEventListener('click',()=>{
 }));
 
 /* ========= CALCULAR LINEAS ========= */
-function buildLines(){
-  const lines=[];
-  // Camion (por vivienda) — recargo municipio integrado en un solo valor
-  const ck=VIV_CAMION[S.vivienda];
-  const muni=CERCANAS[S.origen]?S.origen:(CERCANAS[S.destino]?S.destino:null);
-  if(ck){
-    const c=CAMION[ck];
-    let v=c.v,cost=c.c;
-    if(muni){v+=CERCANA_SURCHARGE.v;cost+=CERCANA_SURCHARGE.c;}
-    lines.push({cat:'trasteo',l:'Trasteo — '+c.l+' - Destino '+S.destino,detail:VIV_LABEL[S.vivienda]+' · '+S.origen+' → '+S.destino,v:v,c:cost,qty:1});
-  }
-  if(S.camionExtra){const c=CAMION.pequeno;lines.push({cat:'trasteo',l:'Camión adicional (pequeño)',detail:'Carga extra',v:c.v,c:c.c,qty:1});}
-  // Empaque
-  Object.keys(S.empaque.mat).forEach(k=>{
-    const q=S.empaque.mat[k]||0;if(q>0&&MAT[k]){lines.push({cat:'empaque',l:MAT[k].l+' × '+q,detail:S.empaque.tipo==='express'?'Empaque express':'Empaque full',v:MAT[k].v*q,c:MAT[k].c*q,qty:q});}
-  });
-  // Instalaciones
-  ['nevecon','secadora','tv'].forEach(k=>{
-    const q=S.inst[k]||0;if(q>0){lines.push({cat:'inst',l:INSTP[k].l+' × '+q,detail:'Instalación',v:INSTP[k].v*q,c:INSTP[k].c*q,qty:q});}
-  });
-  // Adicionales
-  if(S.caminado){lines.push({cat:'adicionales',l:'Caminado largo',detail:'Valor estimado',v:CAMINADO.v,c:0,qty:1,est:true});}
-  if(!S.ascensor&&S.pisos){
-    let vEsc=ESCALERA[S.pisos]||120000;
-    const cajas=S.empaque.mat.cajas||0;
-    if(cajas>45)vEsc+=60000;else if(cajas>=20)vEsc+=30000;
-    lines.push({cat:'adicionales',l:'Escaleras (piso '+S.pisos+(S.pisos>=5?'+':'')+')',detail:'Valor estimado — ajustable según lugar',v:vEsc,c:0,qty:1,est:true});
-  }
-  // Bodegaje
-  if(S.bodegaje&&S.bodSize&&BOD[S.bodSize]){const b=BOD[S.bodSize];lines.push({cat:'bodegaje',l:b.l,detail:'Almacenamiento mensual',v:b.v,c:b.c,qty:1});}
-  return lines;
-}
+function buildLines(){return TYCotizador.buildLines(S);}
 
 /* ========= PRE-COTIZACION CONFIRM ========= */
 function confirmAndFinalize(){
