@@ -9,6 +9,7 @@ Disallow: /gracias
 Disallow: /kpis
 Disallow: /kpi-empresa
 Disallow: /campanas
+Disallow: /finanzas
 Disallow: /servicios
 
 # Permitir que Google indexe imagenes
