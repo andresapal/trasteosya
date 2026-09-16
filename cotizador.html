@@ -196,6 +196,11 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
 .ac-item .ac-name{font-weight:700;color:var(--dark)}
 .ac-item .ac-tel{font-size:12px;color:var(--muted)}
 .ac-item .ac-src{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--brand);background:var(--brand-light);padding:2px 6px;border-radius:4px;margin-left:6px}
+.nac-veh{padding:10px 0;border-bottom:1px dashed rgba(0,0,0,.08)}.nac-veh:last-child{border-bottom:none}
+.nac-veh-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.nac-veh-head span{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.5px}
+.nac-del-btn{background:none;border:1px solid rgba(227,6,19,.3);color:#E30613;border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer}.nac-del-btn:hover{background:rgba(227,6,19,.08)}
+.nac-add-btn{width:100%;padding:10px;margin-top:8px;background:rgba(0,61,165,.04);border:1px dashed rgba(0,61,165,.25);border-radius:10px;color:var(--brand);font-weight:600;font-size:13px;cursor:pointer}.nac-add-btn:hover{background:rgba(0,61,165,.08)}
 </style>
 <link rel="stylesheet" href="css/access-gate.css?v=18"></head>
 <body data-gate="enabled">
@@ -312,41 +317,10 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
           <div class="radio-grid" id="trasteo-opts"></div>
         </div>
 
-        <!-- PANEL NACIONAL -->
+        <!-- PANEL NACIONAL (multi-vehiculo) -->
         <div id="panel-nacional" style="display:none">
-          <div class="field-label" style="margin-bottom:8px">Modalidad</div>
-          <div class="radio-grid" style="grid-template-columns:1fr 1fr;margin-bottom:14px">
-            <div class="ropt sel" id="mod-expreso" onclick="setModalidad('expreso')">
-              <strong>⚡ Expreso</strong>
-              <small>Directo al destino</small>
-            </div>
-            <div class="ropt" id="mod-compartido" onclick="setModalidad('compartido')">
-              <strong>🤝 Compartido</strong>
-              <small>Varios clientes</small>
-            </div>
-          </div>
-          <div class="grid2">
-            <div class="field">
-              <label>Origen</label>
-              <select id="nac-origen" onchange="handleCiudadSel(this,'nac-origen')"></select>
-              <input id="nac-origen-otro" placeholder="Escribe la ciudad" style="display:none;margin-top:4px" oninput="recalc()">
-            </div>
-            <div class="field">
-              <label>Destino</label>
-              <select id="nac-destino" onchange="handleCiudadSel(this,'nac-destino')"></select>
-              <input id="nac-destino-otro" placeholder="Escribe la ciudad" style="display:none;margin-top:4px" oninput="recalc()">
-            </div>
-          </div>
-          <div class="grid2" style="margin-top:4px">
-            <div class="field" id="field-nac-costo" style="display:none">
-              <label style="color:var(--cost)">Costo</label>
-              <input id="nac-costo" type="text" inputmode="numeric" placeholder="0" oninput="handleNumInput(this)">
-            </div>
-            <div class="field">
-              <label style="color:var(--sale)">Valor venta</label>
-              <input id="nac-venta" type="text" inputmode="numeric" placeholder="0" oninput="handleNumInput(this)">
-            </div>
-          </div>
+          <div id="nac-vehiculos"></div>
+          <button type="button" class="nac-add-btn" onclick="addNacVehiculo()">+ Agregar veh&iacute;culo</button>
         </div>
       </div>
     </div>
@@ -648,7 +622,7 @@ function handleNumInput(el){
   recalc();
 }
 
-let state={showCosts:false,mods:{trasteo:false,empaque:false,inst:false,desempaque:false,bodegaje:false,adicionales:false},trasteoSize:"mediano",trasteoQty:{pequeno:0,mediano:0,grande:0},empTab:"express",bodSize:"m10",cobertura:"urbano",modalidad:"expreso"};
+let state={showCosts:false,mods:{trasteo:false,empaque:false,inst:false,desempaque:false,bodegaje:false,adicionales:false},trasteoSize:"mediano",trasteoQty:{pequeno:0,mediano:0,grande:0},empTab:"express",bodSize:"m10",cobertura:"urbano",modalidad:"expreso",nacVehiculos:[{modalidad:'expreso'}]};
 
 // ============ BUILD UI, only rebuilds non-input elements, preserves input values ============
 function buildStaticUI(){
@@ -736,15 +710,87 @@ function setCobertura(c){
   document.getElementById("cob-nacional").className="ropt"+(c==="nacional"?" sel":"");
   document.getElementById("panel-urbano").style.display=c==="urbano"?"block":"none";
   document.getElementById("panel-nacional").style.display=c==="nacional"?"block":"none";
-  // show/hide cost field in nacional
-  const fc=document.getElementById("field-nac-costo");
-  if(fc)fc.style.display=(c==="nacional"&&state.showCosts)?"block":"none";
+  if(c==='nacional')renderNacVehiculos();
   recalc();
 }
 function setModalidad(m){
   state.modalidad=m;
-  document.getElementById("mod-expreso").className="ropt"+(m==="expreso"?" sel":"");
-  document.getElementById("mod-compartido").className="ropt"+(m==="compartido"?" sel":"");
+  if(state.nacVehiculos&&state.nacVehiculos[0])state.nacVehiculos[0].modalidad=m;
+  recalc();
+}
+function renderNacVehiculos(){
+  var cont=document.getElementById('nac-vehiculos');
+  if(!cont)return;
+  var vehs=state.nacVehiculos;
+  if(!vehs||!vehs.length)vehs=state.nacVehiculos=[{modalidad:'expreso'}];
+  var h='';
+  vehs.forEach(function(v,i){
+    var isExp=(v.modalidad||'expreso')==='expreso';
+    if(vehs.length>1){
+      h+='<div class="nac-veh"><div class="nac-veh-head"><span>Vehículo '+(i+1)+'</span>';
+      h+='<button type="button" class="nac-del-btn" onclick="removeNacVehiculo('+i+')">Eliminar</button></div>';
+    } else {
+      h+='<div class="nac-veh">';
+    }
+    h+='<div class="field-label" style="margin-bottom:8px">Modalidad</div>';
+    h+='<div class="radio-grid" style="grid-template-columns:1fr 1fr;margin-bottom:14px">';
+    h+='<div class="ropt'+(isExp?' sel':'')+'" onclick="setNacModalidad('+i+',\'expreso\')"><strong>Expreso</strong><small>Directo al destino</small></div>';
+    h+='<div class="ropt'+(!isExp?' sel':'')+'" onclick="setNacModalidad('+i+',\'compartido\')"><strong>Compartido</strong><small>Varios clientes</small></div>';
+    h+='</div>';
+    h+='<div class="grid2"><div class="field"><label>Origen</label>';
+    h+='<select id="nac-origen-'+i+'" onchange="handleCiudadSel(this,\'nac-origen-'+i+'\')">'+ciudadOpts(v.origen||'Bogotá')+'</select>';
+    h+='<input id="nac-origen-'+i+'-otro" placeholder="Escribe la ciudad" style="display:none;margin-top:4px" oninput="recalc()"></div>';
+    h+='<div class="field"><label>Destino</label>';
+    h+='<select id="nac-destino-'+i+'" onchange="handleCiudadSel(this,\'nac-destino-'+i+'\')">'+ciudadOpts(v.destino||'')+'</select>';
+    h+='<input id="nac-destino-'+i+'-otro" placeholder="Escribe la ciudad" style="display:none;margin-top:4px" oninput="recalc()"></div></div>';
+    h+='<div class="grid2" style="margin-top:4px">';
+    h+='<div class="field" style="'+(state.showCosts?'':'display:none')+'"><label style="color:var(--cost)">Costo</label>';
+    h+='<input id="nac-costo-'+i+'" type="text" inputmode="numeric" placeholder="0" oninput="handleNumInput(this)"></div>';
+    h+='<div class="field"><label style="color:var(--sale)">Valor venta</label>';
+    h+='<input id="nac-venta-'+i+'" type="text" inputmode="numeric" placeholder="0" oninput="handleNumInput(this)"></div></div>';
+    h+='</div>';
+  });
+  cont.innerHTML=h;
+  vehs.forEach(function(v,i){
+    if(v.costo){var ec=document.getElementById('nac-costo-'+i);if(ec)ec.value=fmtMiles(v.costo);}
+    if(v.venta){var ev=document.getElementById('nac-venta-'+i);if(ev)ev.value=fmtMiles(v.venta);}
+    if(v.origen==='Otro'){var eo=document.getElementById('nac-origen-'+i+'-otro');if(eo){eo.style.display='block';eo.value=v.origenTxt||'';}}
+    if(v.destino==='Otro'){var ed=document.getElementById('nac-destino-'+i+'-otro');if(ed){ed.style.display='block';ed.value=v.destinoTxt||'';}}
+  });
+}
+function saveNacValues(){
+  if(!state.nacVehiculos)return;
+  state.nacVehiculos.forEach(function(v,i){
+    var so=document.getElementById('nac-origen-'+i);
+    var sd=document.getElementById('nac-destino-'+i);
+    var to=document.getElementById('nac-origen-'+i+'-otro');
+    var td=document.getElementById('nac-destino-'+i+'-otro');
+    if(so)v.origen=so.value;
+    if(sd)v.destino=sd.value;
+    if(to&&so&&so.value==='Otro')v.origenTxt=to.value;
+    if(td&&sd&&sd.value==='Otro')v.destinoTxt=td.value;
+    v.costo=numVal('nac-costo-'+i);
+    v.venta=numVal('nac-venta-'+i);
+  });
+}
+function addNacVehiculo(){
+  saveNacValues();
+  state.nacVehiculos.push({modalidad:'expreso',origen:'Bogotá',destino:''});
+  renderNacVehiculos();
+  recalc();
+}
+function removeNacVehiculo(idx){
+  if(!state.nacVehiculos||state.nacVehiculos.length<=1)return;
+  saveNacValues();
+  state.nacVehiculos.splice(idx,1);
+  renderNacVehiculos();
+  recalc();
+}
+function setNacModalidad(idx,m){
+  if(!state.nacVehiculos[idx])return;
+  saveNacValues();
+  state.nacVehiculos[idx].modalidad=m;
+  renderNacVehiculos();
   recalc();
 }
 
@@ -761,9 +807,7 @@ function toggleCosts(){
     const priceEl=document.getElementById(`mat-price-${k}`);
     if(priceEl)priceEl.textContent=(state.showCosts?`C: ${COP(m.c)} · `:"")+`V: ${COP(m.v)}`;
   });
-  // Show/hide nacional cost field
-  const fc=document.getElementById("field-nac-costo");
-  if(fc)fc.style.display=(state.cobertura==="nacional"&&state.showCosts)?"block":"none";
+  if(state.cobertura==='nacional')renderNacVehiculos();
   recalc();
 }
 
@@ -817,15 +861,18 @@ function getLines(){
         }
       });
     } else {
-      // Nacional: valores manuales
-      const venta=numVal("nac-venta");
-      const costo=numVal("nac-costo");
-      const origen=getCiudadVal("nac-origen")||"Bogotá";
-      const destino=getCiudadVal("nac-destino")||"destino";
-      const mod=state.modalidad==="expreso"?"Expreso":"Compartido";
-      if(venta>0||costo>0){
-        lines.push({cat:"trasteo",l:`Servicio Nacional ${mod}`,detail:`${origen} → ${destino}`,c:costo,v:venta,qty:1,cu:costo,vu:venta});
-      }
+      var vehs=state.nacVehiculos||[{modalidad:'expreso'}];
+      vehs.forEach(function(vh,i){
+        const venta=numVal("nac-venta-"+i);
+        const costo=numVal("nac-costo-"+i);
+        const origen=getCiudadVal("nac-origen-"+i)||"Bogotá";
+        const destino=getCiudadVal("nac-destino-"+i)||"destino";
+        const mod=(vh.modalidad||'expreso')==="expreso"?"Expreso":"Compartido";
+        if(venta>0||costo>0){
+          const lbl=vehs.length>1?`Servicio Nacional ${mod} (Veh ${i+1})`:`Servicio Nacional ${mod}`;
+          lines.push({cat:"trasteo",l:lbl,detail:`${origen} → ${destino}`,c:costo,v:venta,qty:1,cu:costo,vu:venta});
+        }
+      });
     }
   }
   if(state.mods.empaque){
@@ -2036,7 +2083,7 @@ function cargarDesdHistorial(idx){
   // Detectar módulos y extraer datos de items
   var items=e.items||[];
   var hasTrasteo=false,hasEmpaque=false,hasInst=false,hasBod=false,hasAdicionales=false,hasDesempaque=false;
-  var isNacional=false,nacVenta=0,nacCosto=0;
+  var isNacional=false,nacVenta=0,nacCosto=0,nacItems=[];
   var expressRollos=0;
   var instQtys={nevecon:0,secadora:0,tv:0,repisaP:0,repisaG:0,cuadroP:0,cuadroG:0};
   // Empaque: empacadores, transporte, cintas
@@ -2054,7 +2101,7 @@ function cargarDesdHistorial(idx){
     var cat=it.cat||'';var label=(it.l||'').toLowerCase();var qty=it.qty||1;
     if(cat==='trasteo'){
       hasTrasteo=true;
-      if(label.indexOf('nacional')>=0){isNacional=true;nacVenta=it.v||0;nacCosto=it.c||0;}
+      if(label.indexOf('nacional')>=0){isNacional=true;nacVenta=it.v||0;nacCosto=it.c||0;nacItems.push({venta:it.v||0,costo:it.c||0,detail:it.detail||'',modalidad:label.indexOf('compartido')>=0?'compartido':'expreso'});}
       else if(label.indexOf('pequeño')>=0||label.indexOf('pequeno')>=0)state.trasteoQty.pequeno+=qty;
       else if(label.indexOf('grande')>=0)state.trasteoQty.grande+=qty;
       else state.trasteoQty.mediano+=qty;
@@ -2150,15 +2197,12 @@ function cargarDesdHistorial(idx){
   // Cobertura
   if(hasTrasteo){
     if(isNacional){
+      state.nacVehiculos=nacItems.length?nacItems.map(function(ni){
+        var parts=(ni.detail||'').split(/\s*→\s*|\s*->\s*/);
+        return{modalidad:ni.modalidad,origen:parts[0]||'Bogotá',destino:parts[1]||'',costo:ni.costo,venta:ni.venta};
+      }):[{modalidad:'expreso',costo:nacCosto,venta:nacVenta}];
       setCobertura('nacional');
-      setTimeout(function(){
-        var nv=document.getElementById('nac-venta');
-        var nc=document.getElementById('nac-costo');
-        if(nv){nv.value=fmtMiles(nacVenta);}
-        if(nc){nc.value=fmtMiles(nacCosto);}
-        console.log('[Cargar] Nacional venta='+nacVenta+' costo='+nacCosto);
-        recalc();
-      },30);
+      setTimeout(function(){recalc();},30);
     } else {
       setCobertura('urbano');
     }
@@ -2299,6 +2343,8 @@ function _saveSession(){
     inputs._cobertura=state.cobertura;
     inputs._modalidad=state.modalidad;
     inputs._showCosts=state.showCosts;
+    if(state.cobertura==='nacional')saveNacValues();
+    inputs._nacVehiculos=JSON.parse(JSON.stringify(state.nacVehiculos||[{modalidad:'expreso'}]));
     inputs._ts=Date.now();
     sessionStorage.setItem(_SS_KEY,JSON.stringify(inputs));
   }catch(e){}
@@ -2316,6 +2362,7 @@ function _restoreSession(){
     if(d._trasteoQty){state.trasteoQty=d._trasteoQty;buildStaticUI();}
     if(d._empTab)setEmpTab(d._empTab);
     if(d._bodSize)sel('bod',d._bodSize);
+    if(d._nacVehiculos)state.nacVehiculos=d._nacVehiculos;
     if(d._cobertura)setCobertura(d._cobertura);
     if(d._modalidad)setModalidad(d._modalidad);
     // Restore input values
@@ -2334,8 +2381,7 @@ window.addEventListener('pagehide',_saveSession);
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')_saveSession();});
 
 // ============ INIT ============
-document.getElementById("nac-origen").innerHTML=ciudadOpts("Bogotá");
-document.getElementById("nac-destino").innerHTML=ciudadOpts("Medellín");
+renderNacVehiculos();
 buildStaticUI();
 const _restored=_restoreSession();
 if(!_restored){document.getElementById("fecha").value=new Date().toISOString().slice(0,10);}
