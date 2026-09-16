@@ -577,7 +577,7 @@ TYCotizador.cargarTarifas('https://script.google.com/macros/s/AKfycbwE0hcz8ZsI1n
 
 const COP=n=>new Intl.NumberFormat("es-CO",{style:"currency",currency:"COP",maximumFractionDigits:0}).format(Math.max(0,Math.round(n)));
 const CIUDADES_PRIO=["Bogotá","Medellín","Barranquilla","Cali","Chía","Cajicá","Zipaquirá","Madrid"];
-const CIUDADES_RESTO=["Armenia","Barrancabermeja","Bello","Bucaramanga","Buenaventura","Cartagena","Ciénaga","Cúcuta","Duitama","Envigado","Facatativá","Florencia","Floridablanca","Fusagasugá","Girardot","Girón","Ibagué","Ipiales","Itagüí","La Dorada","Maicao","Manizales","Melgar","Montería","Mosquera","Neiva","Palmira","Pasto","Pereira","Piedecuesta","Popayán","Quibdó","Riohacha","Rionegro","Sahagún","Santa Marta","Sincelejo","Soacha","Sogamoso","Soledad","Tuluá","Tunja","Turbo","Ubaté","Valledupar","Villavicencio","Yopal"];
+const CIUDADES_RESTO=["Armenia","Barrancabermeja","Bello","Bucaramanga","Buenaventura","Cartagena","Ciénaga","Cúcuta","Duitama","Envigado","Facatativá","Florencia","Floridablanca","Fusagasugá","Girardot","Girón","Ibagué","Ipiales","Itagüí","La Calera","La Dorada","Maicao","Manizales","Melgar","Montería","Mosquera","Neiva","Palmira","Pasto","Pereira","Piedecuesta","Popayán","Quibdó","Riohacha","Rionegro","Sahagún","Santa Marta","Sincelejo","Soacha","Sogamoso","Soledad","Tuluá","Tunja","Turbo","Ubaté","Valledupar","Villavicencio","Yopal"];
 const CIUDADES_ALL=[...CIUDADES_PRIO,...CIUDADES_RESTO,"Otro"];
 function ciudadOpts(selVal){
   const v=selVal||"Bogotá";
