@@ -2,6 +2,7 @@ User-agent: *
 Allow: /
 
 # Herramientas internas y Cotizador Corporativo (noindex + PIN-gated)
+Allow: /cotizadorparati
 Disallow: /cotizador
 Disallow: /orden-servicio
 Disallow: /tarifas
