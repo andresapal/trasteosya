@@ -7,16 +7,29 @@
 <title>Tarifas - Trasteos Ya</title>
 <link rel="icon" href="assets/img/logo.png" type="image/png">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="js/tenant.js"></script>
+<script src="js/tenant-apply.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --navy:#0A1845;--brand:#003DA5;--red:#E30613;
   --bg:#f4f6fb;--surface:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;
-  --cost:#b45309;--sale:#15803d;
+  --cost:#E30613;--sale:#15803d;
 }
 body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);padding-bottom:96px}
-.top{background:var(--navy);color:#fff;padding:16px 20px;position:sticky;top:0;z-index:20;
-  display:flex;align-items:center;justify-content:space-between;gap:12px}
+.top{
+  background:
+    linear-gradient(45deg, rgba(93,168,255,0.12) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(93,168,255,0.12) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(93,168,255,0.12) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(93,168,255,0.12) 75%),
+    linear-gradient(135deg, #001236 0%, #0A1845 50%, #001236 100%);
+  background-size: 22px 22px, 22px 22px, 22px 22px, 22px 22px, 100% 100%;
+  background-position: 0 0, 0 11px, 11px -11px, -11px 0, 0 0;
+  color:#fff;padding:16px 20px;position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border-bottom:1px solid rgba(93,168,255,0.25);
+  box-shadow:0 4px 20px rgba(10,24,69,0.35)}
 .top img{height:30px}
 .top-t{font-size:15px;font-weight:700;letter-spacing:-.01em}
 .top-s{font-size:11px;color:#9db2dd;margin-top:2px}
@@ -66,13 +79,12 @@ button.act{padding:11px 20px;border:0;border-radius:9px;font-family:inherit;font
 
 <header class="top">
   <div style="display:flex;align-items:center;gap:11px">
-    <img src="assets/img/logo.png" alt="Trasteos Ya">
+    <a href="index.html"><img src="assets/img/logo.png" alt="Trasteos Ya" style="height:30px"></a>
     <div>
       <div class="top-t">Tarifas</div>
       <div class="top-s" id="origen">Cargando...</div>
     </div>
   </div>
-  <a href="cotizador.html" style="color:#9db2dd;font-size:12px;text-decoration:none;font-weight:600">Cotizador</a>
 </header>
 
 <div class="wrap">
@@ -310,6 +322,7 @@ T.cargarTarifas(MARIANA_URL,APIKEY).then(function(){
   marcar('No se pudieron traer las tarifas guardadas. Estás viendo los valores base.');
 });
 </script>
-<script src="js/access-gate.js"></script>
+<link rel="stylesheet" href="css/access-gate.css?v=18"/>
+<script src="js/access-gate.js?v=18"></script>
 </body>
 </html>
