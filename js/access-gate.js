@@ -136,6 +136,7 @@
       '<a href="kpi-empresa.html' + _m + '" class="ty-op-toolbar__link">KPI\'s</a>' +
       '<a href="campanas.html' + _m + '" class="ty-op-toolbar__link">Campañas</a>' +
       '<a href="finanzas.html' + _m + '" class="ty-op-toolbar__link">Finanzas</a>' +
+      '<a href="tarifas.html' + _m + '" class="ty-op-toolbar__link">Tarifas</a>' +
       '<button type="button" class="ty-op-toolbar__dark" title="Modo oscuro">' + (localStorage.getItem('ty_dark_mode')==='1' ? lightIcon : darkIcon) + '</button>' +
       '<button type="button" class="ty-op-toolbar__logout">Salir</button>';
     document.body.appendChild(bar);
