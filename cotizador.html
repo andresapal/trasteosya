@@ -201,6 +201,13 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
 .nac-veh-head span{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.5px}
 .nac-del-btn{background:none;border:1px solid rgba(227,6,19,.3);color:#E30613;border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer}.nac-del-btn:hover{background:rgba(227,6,19,.08)}
 .nac-add-btn{width:100%;padding:10px;margin-top:8px;background:rgba(0,61,165,.04);border:1px dashed rgba(0,61,165,.25);border-radius:10px;color:var(--brand);font-weight:600;font-size:13px;cursor:pointer}.nac-add-btn:hover{background:rgba(0,61,165,.08)}
+.tam-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px}
+.tam-opt{text-align:center;padding:8px 4px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:12px;transition:all .15s}
+.tam-opt strong{display:block;font-size:13px}.tam-opt small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+.tam-opt.sel{border-color:var(--brand);background:var(--brand-light);color:var(--brand)}
+.ops-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}.ops-row label{font-size:12px;font-weight:600;color:var(--navy);white-space:nowrap}
+.ops-row select{flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit}
+.urb-ops-row{display:flex;align-items:center;gap:6px;margin-top:4px;justify-content:center}.urb-ops-row label{font-size:10px;color:var(--muted)}.urb-ops-row select{padding:2px 4px;font-size:11px;border:1px solid var(--border);border-radius:4px;width:40px;text-align:center}
 </style>
 <link rel="stylesheet" href="css/access-gate.css?v=18"></head>
 <body data-gate="enabled">
@@ -622,15 +629,23 @@ function handleNumInput(el){
   recalc();
 }
 
-let state={showCosts:false,mods:{trasteo:false,empaque:false,inst:false,desempaque:false,bodegaje:false,adicionales:false},trasteoSize:"mediano",trasteoQty:{pequeno:0,mediano:0,grande:0},empTab:"express",bodSize:"m10",cobertura:"urbano",modalidad:"expreso",nacVehiculos:[{modalidad:'expreso'}]};
+let state={showCosts:false,mods:{trasteo:false,empaque:false,inst:false,desempaque:false,bodegaje:false,adicionales:false},trasteoSize:"mediano",trasteoQty:{pequeno:0,mediano:0,grande:0},trasteoOps:{pequeno:2,mediano:3,grande:4},empTab:"express",bodSize:"m10",cobertura:"urbano",modalidad:"expreso",nacVehiculos:[{modalidad:'expreso',tamano:'mediano',operarios:3}]};
 
 // ============ BUILD UI, only rebuilds non-input elements, preserves input values ============
 function buildStaticUI(){
   // Trasteo options (multi-camion: each type has quantity)
+  if(!state.trasteoOps)state.trasteoOps={pequeno:2,mediano:3,grande:4};
   document.getElementById("trasteo-opts").innerHTML=Object.entries(TRASTEO).map(([k,t])=>{
     const qty=state.trasteoQty[k]||0;
+    const ops=state.trasteoOps[k]||(k==='pequeno'?2:k==='grande'?4:3);
+    var opsHtml='';
+    if(qty>0){
+      opsHtml='<div class="urb-ops-row" onclick="event.stopPropagation()"><label>Op:</label><select onchange="setUrbOps(\''+k+'\',this.value)">';
+      for(var n=2;n<=5;n++)opsHtml+='<option value="'+n+'"'+(ops===n?' selected':'')+'>'+n+'</option>';
+      opsHtml+='</select></div>';
+    }
     return `<div class="ropt${qty>0?" sel":""}">
-      <strong>${t.l}</strong>
+      <strong>${t.l}</strong><small>${t.vehiculo||''}</small>
       ${state.showCosts?`<small>C: ${COP(t.c)}</small>`:""}
       <div class="rprice">${COP(t.v)}</div>
       <div class="qty-ctrl" onclick="event.stopPropagation()">
@@ -638,6 +653,7 @@ function buildStaticUI(){
         <span class="qty-val" id="qty-${k}">${qty}</span>
         <button type="button" class="qty-btn" onclick="trasteoQtyChg('${k}',1)">+</button>
       </div>
+      ${opsHtml}
     </div>`;
   }).join("");
   // Bodegaje options
@@ -722,10 +738,13 @@ function renderNacVehiculos(){
   var cont=document.getElementById('nac-vehiculos');
   if(!cont)return;
   var vehs=state.nacVehiculos;
-  if(!vehs||!vehs.length)vehs=state.nacVehiculos=[{modalidad:'expreso'}];
+  if(!vehs||!vehs.length)vehs=state.nacVehiculos=[{modalidad:'expreso',tamano:'mediano',operarios:3}];
+  var TAM=[{k:'pequeno',l:'Pequeño',sub:'NHR 16 m³'},{k:'mediano',l:'Mediano',sub:'Turbo 28 m³'},{k:'grande',l:'Grande',sub:'Sencillo 38+ m³'}];
   var h='';
   vehs.forEach(function(v,i){
     var isExp=(v.modalidad||'expreso')==='expreso';
+    var tam=v.tamano||'mediano';
+    var ops=v.operarios||(tam==='pequeno'?2:tam==='grande'?4:3);
     if(vehs.length>1){
       h+='<div class="nac-veh"><div class="nac-veh-head"><span>Vehículo '+(i+1)+'</span>';
       h+='<button type="button" class="nac-del-btn" onclick="removeNacVehiculo('+i+')">Eliminar</button></div>';
@@ -737,6 +756,15 @@ function renderNacVehiculos(){
     h+='<div class="ropt'+(isExp?' sel':'')+'" onclick="setNacModalidad('+i+',\'expreso\')"><strong>Expreso</strong><small>Directo al destino</small></div>';
     h+='<div class="ropt'+(!isExp?' sel':'')+'" onclick="setNacModalidad('+i+',\'compartido\')"><strong>Compartido</strong><small>Varios clientes</small></div>';
     h+='</div>';
+    h+='<div class="field-label" style="margin-bottom:8px">Tamaño del camión</div>';
+    h+='<div class="tam-grid">';
+    TAM.forEach(function(t){
+      h+='<div class="tam-opt'+(tam===t.k?' sel':'')+'" onclick="setNacTamano('+i+',\''+t.k+'\')"><strong>'+t.l+'</strong><small>'+t.sub+'</small></div>';
+    });
+    h+='</div>';
+    h+='<div class="ops-row"><label>Operarios:</label><select id="nac-ops-'+i+'" onchange="setNacOperarios('+i+',this.value)">';
+    for(var n=2;n<=5;n++)h+='<option value="'+n+'"'+(ops===n?' selected':'')+'>'+n+'</option>';
+    h+='</select></div>';
     h+='<div class="grid2"><div class="field"><label>Origen</label>';
     h+='<select id="nac-origen-'+i+'" onchange="handleCiudadSel(this,\'nac-origen-'+i+'\')">'+ciudadOpts(v.origen||'Bogotá')+'</select>';
     h+='<input id="nac-origen-'+i+'-otro" placeholder="Escribe la ciudad" style="display:none;margin-top:4px" oninput="recalc()"></div>';
@@ -765,17 +793,19 @@ function saveNacValues(){
     var sd=document.getElementById('nac-destino-'+i);
     var to=document.getElementById('nac-origen-'+i+'-otro');
     var td=document.getElementById('nac-destino-'+i+'-otro');
+    var sOps=document.getElementById('nac-ops-'+i);
     if(so)v.origen=so.value;
     if(sd)v.destino=sd.value;
     if(to&&so&&so.value==='Otro')v.origenTxt=to.value;
     if(td&&sd&&sd.value==='Otro')v.destinoTxt=td.value;
+    if(sOps)v.operarios=parseInt(sOps.value)||3;
     v.costo=numVal('nac-costo-'+i);
     v.venta=numVal('nac-venta-'+i);
   });
 }
 function addNacVehiculo(){
   saveNacValues();
-  state.nacVehiculos.push({modalidad:'expreso',origen:'Bogotá',destino:''});
+  state.nacVehiculos.push({modalidad:'expreso',tamano:'mediano',operarios:3,origen:'Bogotá',destino:''});
   renderNacVehiculos();
   recalc();
 }
@@ -791,6 +821,20 @@ function setNacModalidad(idx,m){
   saveNacValues();
   state.nacVehiculos[idx].modalidad=m;
   renderNacVehiculos();
+  recalc();
+}
+function setNacTamano(idx,t){
+  if(!state.nacVehiculos[idx])return;
+  saveNacValues();
+  state.nacVehiculos[idx].tamano=t;
+  var defOps=t==='pequeno'?2:t==='grande'?4:3;
+  state.nacVehiculos[idx].operarios=defOps;
+  renderNacVehiculos();
+  recalc();
+}
+function setNacOperarios(idx,val){
+  if(!state.nacVehiculos[idx])return;
+  state.nacVehiculos[idx].operarios=parseInt(val)||3;
   recalc();
 }
 
@@ -831,10 +875,17 @@ function sel(type,k){
 
 function trasteoQtyChg(k,delta){
   if(!state.trasteoQty)state.trasteoQty={pequeno:0,mediano:0,grande:0};
+  if(!state.trasteoOps)state.trasteoOps={pequeno:2,mediano:3,grande:4};
   var v=(state.trasteoQty[k]||0)+delta;
   if(v<0)v=0;if(v>9)v=9;
   state.trasteoQty[k]=v;
+  if(v>0&&!state.trasteoOps[k])state.trasteoOps[k]=(k==='pequeno'?2:k==='grande'?4:3);
   buildStaticUI();
+  recalc();
+}
+function setUrbOps(k,val){
+  if(!state.trasteoOps)state.trasteoOps={pequeno:2,mediano:3,grande:4};
+  state.trasteoOps[k]=parseInt(val)||3;
   recalc();
 }
 
@@ -853,24 +904,30 @@ function getLines(){
   if(state.mods.trasteo){
     if(state.cobertura==="urbano"){
       const qtys=state.trasteoQty||{};
+      const ops=state.trasteoOps||{pequeno:2,mediano:3,grande:4};
       Object.keys(TRASTEO).forEach(function(k){
         const q=qtys[k]||0;
         if(q>0){
           const t=TRASTEO[k];
-          lines.push({cat:"trasteo",l:`Trasteo Urbano ${t.l}${q>1?' × '+q:''}`,c:t.c*q,v:t.v*q,qty:q,cu:t.c,vu:t.v});
+          const nOps=ops[k]||(k==='pequeno'?2:k==='grande'?4:3);
+          lines.push({cat:"trasteo",l:`Trasteo Urbano ${t.l}${q>1?' × '+q:''} (${t.vehiculo||''}, ${nOps} op.)`,c:t.c*q,v:t.v*q,qty:q,cu:t.c,vu:t.v,operarios:nOps,vehiculo:t.vehiculo||''});
         }
       });
     } else {
-      var vehs=state.nacVehiculos||[{modalidad:'expreso'}];
+      var TAMNAMES={pequeno:'NHR 16 m³',mediano:'Turbo 28 m³',grande:'Sencillo 38+ m³'};
+      var vehs=state.nacVehiculos||[{modalidad:'expreso',tamano:'mediano',operarios:3}];
       vehs.forEach(function(vh,i){
         const venta=numVal("nac-venta-"+i);
         const costo=numVal("nac-costo-"+i);
         const origen=getCiudadVal("nac-origen-"+i)||"Bogotá";
         const destino=getCiudadVal("nac-destino-"+i)||"destino";
         const mod=(vh.modalidad||'expreso')==="expreso"?"Expreso":"Compartido";
+        const tam=vh.tamano||'mediano';
+        const camion=TAMNAMES[tam]||'Turbo 28 m³';
+        const nOps=vh.operarios||(tam==='pequeno'?2:tam==='grande'?4:3);
         if(venta>0||costo>0){
-          const lbl=vehs.length>1?`Servicio Nacional ${mod} (Veh ${i+1})`:`Servicio Nacional ${mod}`;
-          lines.push({cat:"trasteo",l:lbl,detail:`${origen} → ${destino}`,c:costo,v:venta,qty:1,cu:costo,vu:venta});
+          const lbl=vehs.length>1?`Nacional ${mod} (Veh ${i+1}) - ${camion}, ${nOps} op.`:`Nacional ${mod} - ${camion}, ${nOps} op.`;
+          lines.push({cat:"trasteo",l:lbl,detail:`${origen} → ${destino}`,c:costo,v:venta,qty:1,cu:costo,vu:venta,operarios:nOps,vehiculo:camion});
         }
       });
     }
@@ -2338,6 +2395,7 @@ function _saveSession(){
     inputs._mods=JSON.parse(JSON.stringify(state.mods));
     inputs._trasteoSize=state.trasteoSize;
     inputs._trasteoQty=JSON.parse(JSON.stringify(state.trasteoQty||{}));
+    inputs._trasteoOps=JSON.parse(JSON.stringify(state.trasteoOps||{pequeno:2,mediano:3,grande:4}));
     inputs._empTab=state.empTab;
     inputs._bodSize=state.bodSize;
     inputs._cobertura=state.cobertura;
@@ -2359,7 +2417,9 @@ function _restoreSession(){
     if(d._showCosts){state.showCosts=true;document.getElementById("costs-sw").className="sw on";const ei=document.getElementById("eye-icon");if(ei)ei.innerHTML='<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';}
     if(d._mods){Object.keys(d._mods).forEach(function(k){if(d._mods[k])toggleMod(k);});}
     if(d._trasteoSize)sel('trasteo',d._trasteoSize);
-    if(d._trasteoQty){state.trasteoQty=d._trasteoQty;buildStaticUI();}
+    if(d._trasteoQty){state.trasteoQty=d._trasteoQty;}
+    if(d._trasteoOps){state.trasteoOps=d._trasteoOps;}
+    buildStaticUI();
     if(d._empTab)setEmpTab(d._empTab);
     if(d._bodSize)sel('bod',d._bodSize);
     if(d._nacVehiculos)state.nacVehiculos=d._nacVehiculos;
