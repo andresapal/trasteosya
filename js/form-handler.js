@@ -68,7 +68,7 @@
     '  → Artículos grandes o delicados (nevecón, secadora, piano, vidrios)\n' +
     '  → Si necesitas empaque, cajas o bodegaje\n\n' +
     E.dart+' Nuestro compromiso es darte un servicio planeado, sin contratiempos y al mejor precio.\n\n' +
-    '¡Quedo atento a cualquier duda! '+E.hands+'\n\n' +
+    'Quedo atent@ a cualquier duda! '+E.hands+'\n\n' +
     'Equipo Trasteos Ya\n' +
     'trasteosya.online';
 
@@ -119,7 +119,7 @@
     if (data.tamano)   lines.push(E.pkg+' Tamaño: ' + data.tamano);
     if (data.fecha)    lines.push(E.cal+' Fecha: ' + data.fecha);
     if (data.detalles) lines.push(E.chat+' ' + data.detalles);
-    lines.push('', '¡Quedo atento, gracias! '+E.hands, '', 'Equipo Trasteos Ya · trasteosya.online');
+    lines.push('', 'Quedo atent@, gracias! '+E.hands, '', 'Equipo Trasteos Ya · trasteosya.online');
     return 'https://wa.me/' + getPhone() + '?text=' + encodeURIComponent(lines.join('\n'));
   }
 
