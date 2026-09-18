@@ -1168,7 +1168,8 @@ async function generarImagenYWA(){
     // Sync al sheet
     const fecha=document.getElementById("fecha").value;
     const subC=lines.reduce((a,l)=>a+l.c,0);
-    _saveCotSheet({tipo:'Mudanza',total,subtotal:subV,descuento:dcto,costo:subC,utilidad:total-subC,items:lines.map(l=>({cat:l.cat,l:l.l,v:l.v,c:l.c,qty:l.qty}))});
+    var imgDocNum=generarConsecutivo(fecha);
+    _saveCotSheet({tipo:'Mudanza',total,subtotal:subV,descuento:dcto,costo:subC,utilidad:total-subC,doc:imgDocNum,items:lines.map(l=>({cat:l.cat,l:l.l,v:l.v,c:l.c,qty:l.qty}))});
     _guardarCotParaOS(lines,cliente,tel,fecha,subV,dcto,total);
     _notificarCotizacion(lines,subV,dcto,total);
 
@@ -1216,7 +1217,8 @@ function sendWA(){
   _guardarCotParaOS(lines,cliente,tel,fecha,subV,dcto,total);
   // Sync al sheet
   const subC=lines.reduce((a,l)=>a+l.c,0);
-  _saveCotSheet({tipo:'Mudanza',total,subtotal:subV,descuento:dcto,costo:subC,utilidad:total-subC,items:lines.map(l=>({cat:l.cat,l:l.l,v:l.v,c:l.c,qty:l.qty}))});
+  var waDocNum=generarConsecutivo(fecha);
+  _saveCotSheet({tipo:'Mudanza',total,subtotal:subV,descuento:dcto,costo:subC,utilidad:total-subC,doc:waDocNum,items:lines.map(l=>({cat:l.cat,l:l.l,v:l.v,c:l.c,qty:l.qty}))});
 }
 
 // ============ COPIAR MENSAJE DE REFERIDOS ============
@@ -1370,7 +1372,7 @@ async function _saveCotSheet(financials){
     const fecha=document.getElementById("fecha").value;
     const hora=new Date().toTimeString().substring(0,5);
     var meta={cliente:cliente,telefono:telefono,fecha:fecha,hora:hora,tipo:financials.tipo||'',estado:'COTIZADO',
-      fuente:'Cotizador Admin',
+      fuente:'Cotizador Admin',doc:financials.doc||'',
       total:financials.total||0,subtotal:financials.subtotal||0,descuento:financials.descuento||0,
       costo:financials.costo||0,utilidad:financials.utilidad||0,items:financials.items||[]};
     await fetch(COT_SHEET_URL,{method:'POST',body:JSON.stringify({
@@ -1396,8 +1398,54 @@ async function _backupCotDrive(doc,filename,tipo,financials){
   }
 }
 
+// ============ CONSECUTIVO COTIZACIÓN ============
+var _cotDayCount=0;
+var _cotDayKey='';
+function generarConsecutivo(fechaStr){
+  var d=fechaStr?new Date(fechaStr+'T12:00:00'):new Date();
+  var dd=String(d.getDate()).padStart(2,'0');
+  var mm=String(d.getMonth()+1);
+  var yy=String(d.getFullYear()).slice(-2);
+  var key=dd+mm+yy;
+  var stored=null;
+  try{stored=JSON.parse(sessionStorage.getItem('ty_cot_consec')||'null');}catch(e){}
+  if(stored&&stored.key===key){_cotDayCount=stored.count+1;}
+  else{_cotDayCount=1;}
+  _cotDayKey=key;
+  try{sessionStorage.setItem('ty_cot_consec',JSON.stringify({key:key,count:_cotDayCount}));}catch(e){}
+  var suffix=_cotDayCount>1?String.fromCharCode(64+_cotDayCount):'';
+  return 'COTY'+key+suffix;
+}
+// ============ CONDICIONES PDF ============
+var PDF_CONDICIONES=[
+  'Cotización estimada: los valores presentados son un estimado generado automáticamente. No constituyen una oferta comercial vinculante ni un precio final.',
+  'Sujeta a validación: toda cotización debe ser verificada por un asesor mediante inspección visual de las condiciones reales del lugar de origen y destino.',
+  'Datos no definitivos: los datos indicados son declarados por el usuario y pueden ser ajustados por un experto tras la revisión en sitio.',
+  'Variación de precio: el valor final puede variar si las condiciones reales difieren de las informadas.',
+  'Objetos especiales y de valor: el cliente debe declarar previamente objetos frágiles, de alto valor o dimensiones especiales. No se responde por artículos no declarados.',
+  'Acceso y estacionamiento: el cliente debe garantizar condiciones de acceso adecuadas para el vehículo. Restricciones que generen demoras podrán ocasionar cargos adicionales.',
+  'Empaque y materiales: las cantidades son estimadas. El consumo real puede variar según el volumen y fragilidad de los enseres.',
+  'Disponibilidad: fechas y horarios sujetos a disponibilidad operativa.',
+  'Cancelación: sin costo antes de la confirmación. Una vez confirmado, aplican condiciones de cancelación vigentes.',
+  'Responsabilidad: Trasteos Ya responde por daños atribuibles a la operación. No se asume responsabilidad por daños preexistentes ni objetos no declarados.',
+  'Vigencia: esta cotización tiene vigencia de 15 días calendario.',
+  'Uso de datos: la información será utilizada exclusivamente para la cotización y prestación del servicio.'
+];
+function addCondicionesPDF(doc,y){
+  if(y>240){doc.addPage();y=20;}
+  doc.setDrawColor(220,225,235);doc.line(14,y,196,y);y+=6;
+  doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(10,24,69);
+  doc.text('Términos y condiciones',14,y);y+=5;
+  doc.setFont('helvetica','normal');doc.setFontSize(6.5);doc.setTextColor(100,110,130);
+  PDF_CONDICIONES.forEach(function(c,i){
+    if(y>282){doc.addPage();y=20;}
+    var txt=doc.splitTextToSize((i+1)+'. '+c,182);
+    doc.text(txt,14,y);y+=txt.length*3+1;
+  });
+  return y;
+}
 // ============ PDF HELPERS ============
-function safeName(s){return(s||"sin-cliente").replace(/[^a-z0-9\-_]+/gi,"_").slice(0,40);}
+function safeName(s){return(s||"sin-cliente").normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9 ]+/gi,' ').trim().toUpperCase().slice(0,40);}
 function fmtSigned(n){return n<0?`-${COP(Math.abs(n))}`:COP(n);}
 function fmtFecha(f){try{const[y,m,d]=f.split("-").map(Number);return new Date(y,(m||1)-1,d||1).toLocaleDateString("es-CO",{day:"2-digit",month:"long",year:"numeric"});}catch{return f;}}
 
@@ -1446,9 +1494,10 @@ function pdfCliente(){
   doc.setFillColor(200,208,224);
   for(var i=0;i<cols;i++){if((i*sz)/210>0.55)continue;for(var j=0;j<rows;j++){if((i+j)%2===0)doc.rect(i*sz,j*sz,sz,sz,'F');}}
   try{doc.setGState(new doc.GState({opacity:1}));}catch(e){}
+  var docNum=generarConsecutivo(fecha);
   try{doc.addImage(LOGO_SMALL,'JPEG',14,8,46,15);}catch(e){doc.setTextColor(10,24,69);doc.setFont('helvetica','bold');doc.setFontSize(20);doc.text('TRASTEOS YA',14,22);}
   doc.setTextColor(10,24,69);doc.setFont('helvetica','bold');doc.setFontSize(11);
-  doc.text('Cotización de mudanza',196,16,{align:'right'});
+  doc.text('Cotización: '+docNum,196,16,{align:'right'});
   doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(90,100,120);
   doc.text('trasteosya.online',196,22,{align:'right'});
   doc.setDrawColor(10,24,69);doc.setLineWidth(0.8);doc.line(0,36,210,36);
@@ -1478,21 +1527,21 @@ function pdfCliente(){
   // Total
   doc.setFillColor(10,24,69);doc.roundedRect(14,y-5,182,12,2,2,'F');
   doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(255,255,255);
-  doc.text('Total estimado',18,y+2);doc.text(COP(total),192,y+2,{align:'right'});y+=16;
+  doc.text('Total estimado',18,y+2);doc.text(COP(total),192,y+2,{align:'right'});y+=12;
+  // Condiciones
+  y=addCondicionesPDF(doc,y);y+=4;
   // Firma
   doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(70,80,100);
   doc.text('Cordialmente,',14,y);y+=5;
   doc.setFont('helvetica','bold');doc.setTextColor(10,24,69);doc.setFontSize(11);
   doc.text('Equipo Trasteos Ya',14,y);y+=5;
   doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(120,130,150);
-  doc.text('WhatsApp +57 314 309 5194  ·  trasteosya.online',14,y);y+=8;
-  doc.setFont('helvetica','italic');doc.setFontSize(7);
-  doc.text('Valores estimados, sujetos a validación en sitio (condiciones de origen y/o destino). Sin compromiso. Vigencia 15 días.',14,y);
-  doc.setProperties({title:'Cotización '+cliente+' - Trasteos Ya',subject:'Cotización de mudanza',creator:'Trasteos Ya',author:'trasteosya.online'});
-  const fn='cotizacion_'+safeName(cliente)+'.pdf';
+  doc.text('WhatsApp +57 314 309 5194  ·  trasteosya.online',14,y);
+  doc.setProperties({title:'Cotización '+docNum+' '+cliente+' - Trasteos Ya',subject:'Cotización de mudanza',creator:'Trasteos Ya',author:'trasteosya.online'});
+  const fn=docNum+' '+safeName(cliente)+'.pdf';
   try{var bl=doc.output('blob');var u=URL.createObjectURL(bl);var a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove();},2000);}catch(e){doc.save(fn);}
   _backupCotDrive(doc,fn,'cliente',{total:total,subtotal:subV,descuento:dcto,items:lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,qty:l.qty};})});
-  _saveCotSheet({tipo:'Mudanza',total:total,subtotal:subV,descuento:dcto,items:lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,c:l.c||0,qty:l.qty};})});
+  _saveCotSheet({tipo:'Mudanza',total:total,subtotal:subV,descuento:dcto,doc:docNum,items:lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,c:l.c||0,qty:l.qty};})});
   var tel=document.getElementById("telefono").value.replace(/\D/g,"");
   _guardarCotParaOS(lines,cliente,tel,fecha,subV,dcto,total);
 }
@@ -1599,11 +1648,12 @@ function pdfInterno(){
       columnStyles:{0:{fontStyle:"bold",cellWidth:80},1:{halign:"right",fontStyle:"bold",cellWidth:50}},
       margin:{left:150}
     });
-    const fn=`cotizacion_interna_${safeName(cliente)}.pdf`;
-    doc.setProperties({title:'Cotización interna '+cliente+' - Trasteos Ya',subject:'Cotización interna',creator:'Trasteos Ya',author:'trasteosya.online'});
+    var intDocNum=generarConsecutivo(fecha);
+    const fn=`${intDocNum} ${safeName(cliente)} interno.pdf`;
+    doc.setProperties({title:'Cotización interna '+intDocNum+' '+cliente+' - Trasteos Ya',subject:'Cotización interna',creator:'Trasteos Ya',author:'trasteosya.online'});
     downloadPDF(doc,fn);
     _backupCotDrive(doc,fn,'interno',{total:total,subtotal:subV,descuento:dcto,costo:subC,utilidad:utilNeta,items:lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,c:l.c,qty:l.qty};})});
-    _saveCotSheet({tipo:'Mudanza',total:total,subtotal:subV,descuento:dcto,costo:subC,utilidad:utilNeta,items:lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,c:l.c||0,qty:l.qty};})});
+    _saveCotSheet({tipo:'Mudanza',total:total,subtotal:subV,descuento:dcto,costo:subC,utilidad:utilNeta,doc:intDocNum,items:lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,c:l.c||0,qty:l.qty};})});
   });
 }
 
