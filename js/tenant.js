@@ -59,7 +59,7 @@
       apis: {
         CONTACTS_URL:  'https://script.google.com/macros/s/AKfycbz4gG8fs_mAq9z9dcIhhqB9GUOFehc4_jW0Wd77RxPMIEmmshcXHlAVb39cML6hdGKM/exec',
         BACKUP_URL:    'https://script.google.com/macros/s/AKfycbytFjQC4osp6QNdCyALI5DGLCMtomQ_DYGqa56MQkGJoykyZcJIPiA1JVyrJ2Smj3ST-w/exec',
-        COT_SHEET_URL: 'https://script.google.com/macros/s/AKfycbzk3szEtCvnMKaXqZw6gfAIMZFJEX-uI1Sm40OSV03xg47BvShY3ezttQIRmDuols_C/exec',
+        COT_SHEET_URL: 'https://script.google.com/macros/s/AKfycbyjGtM-cK7N2sPmKjGowZ2an5dabCTMU_Ah2vHb8YFSqTM0K9L-CRewXpF1ApNxRdxL/exec',
         BACKUP_APIKEY: 'TrasteosYa-2026-Backup'
       },
       footerMsg: 'Gracias por confiar en Trasteos Ya',
