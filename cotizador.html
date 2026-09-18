@@ -1406,15 +1406,16 @@ function generarConsecutivo(fechaStr){
   var dd=String(d.getDate()).padStart(2,'0');
   var mm=String(d.getMonth()+1);
   var yy=String(d.getFullYear()).slice(-2);
-  var key=dd+mm+yy;
+  var base=dd+mm+yy;
+  var cli=(document.getElementById('cliente')?document.getElementById('cliente').value:'').trim().toUpperCase();
+  var ckey=base+'_'+cli;
   var stored=null;
-  try{stored=JSON.parse(sessionStorage.getItem('ty_cot_consec')||'null');}catch(e){}
-  if(stored&&stored.key===key){_cotDayCount=stored.count+1;}
-  else{_cotDayCount=1;}
-  _cotDayKey=key;
-  try{sessionStorage.setItem('ty_cot_consec',JSON.stringify({key:key,count:_cotDayCount}));}catch(e){}
-  var suffix=_cotDayCount>1?String.fromCharCode(64+_cotDayCount):'';
-  return 'COTY'+key+suffix;
+  try{stored=JSON.parse(sessionStorage.getItem('ty_cot_consec')||'{}');}catch(e){stored={};}
+  var n=(stored[ckey]||0)+1;
+  stored[ckey]=n;
+  try{sessionStorage.setItem('ty_cot_consec',JSON.stringify(stored));}catch(e){}
+  var suffix=n>1?String.fromCharCode(64+n):'';
+  return 'COTY'+base+suffix;
 }
 // ============ CONDICIONES PDF ============
 var PDF_CONDICIONES=[
