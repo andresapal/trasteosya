@@ -1,1 +1,9 @@
+# No forman parte del sitio: no se publican en Vercel
 _check.js
+_serve.js
+import_data.py
+netlify.toml
+README.md
+apps-script/
+# Copia suelta con nombres y telefonos de clientes; ninguna pagina la usa (las paginas leen output/)
+/contactos.json
