@@ -21,8 +21,9 @@
   }
 
   function isOperator() {
-    try { return localStorage.getItem(STORAGE_KEY) === '1'; }
-    catch (e) { return false; }
+    try { if (localStorage.getItem(STORAGE_KEY) === '1') return true; } catch (e) {}
+    // Sesion de la puerta de acceso del servidor (middleware.js): ya inicio sesion, no pedir tambien el PIN
+    return /(?:^|;\s*)ty_ok=1(?:;|$)/.test(document.cookie);
   }
 
   function setOperator(state) {
@@ -184,6 +185,8 @@
   // Para que el menu pueda cerrar la sesion sin conocer como se guarda
   window.TYAccessGate = {
     logout: function () {
+      // Con la puerta de acceso activa, salir tambien cierra la sesion del servidor
+      if (/(?:^|;\s*)ty_ok=1(?:;|$)/.test(document.cookie)) { location.href = '/salir'; return; }
       setOperator(false);
       location.href = 'index.html';
     }
