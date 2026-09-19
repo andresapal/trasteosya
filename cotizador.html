@@ -1070,7 +1070,7 @@ function closeMobilePDF(){document.getElementById("pdf-modal").style.display="no
 // ============ IMAGEN + WHATSAPP ============
 const LINK_TY="trasteosya.online";
 const _e=function(c){return String.fromCodePoint(c);};
-const E={casa:_e(0x1F3E0),cam:_e(0x1F4F8),list:_e(0x1F4CB),dart:_e(0x1F3AF),hands:_e(0x1F91D),cal:_e(0x1F4C5),check:_e(0x2705),gift:_e(0x1F381),money:_e(0x1F4B0),clip:_e(0x1F4CE),truck:_e(0x1F69A),bell:_e(0x1F514),person:_e(0x1F464),phone:_e(0x1F4F1),clock:_e(0x23F0),globe:_e(0x1F310),warn:_e(0x26A0)};
+const E={casa:_e(0x1F3E0),cam:_e(0x1F4F8),list:_e(0x1F4CB),dart:_e(0x1F3AF),hands:_e(0x1F91D),cal:_e(0x1F4C5),check:_e(0x2705),gift:_e(0x1F381),money:_e(0x1F4B0),clip:_e(0x1F4CE),truck:_e(0x1F69A),bell:_e(0x1F514),person:_e(0x1F464),phone:_e(0x1F4F1),clock:_e(0x23F0),globe:_e(0x1F310),warn:_e(0x26A0),doc:_e(0x1F4C4)};
 const OBSERVACIONES=
 E.casa+` *¡Gracias por confiar en Trasteos Ya!*
 
@@ -1180,7 +1180,7 @@ async function generarImagenYWA(){
 }
 
 // ============ WHATSAPP ============
-function sendWA(){
+async function sendWA(){
   const lines=getLines();
   if(!lines.length){alert("Agrega al menos un servicio.");return;}
   const cliente=document.getElementById("cliente").value;
@@ -1189,6 +1189,21 @@ function sendWA(){
   const dcto=Math.min(numVal("descuento"),subV);
   const total=subV-dcto;
   const fecha=document.getElementById("fecha").value;
+  // Mismo consecutivo en el PDF, el Sheet y el mensaje de esta cotización
+  const waDocNum=_docNumCliente(lines,fecha);
+  // El PDF de cliente se sube a Drive y su enlace va en el mensaje. La pestaña se abre ya, con el clic
+  // (si no, el navegador la bloquea), y se completa cuando el enlace está listo
+  let w=null;
+  if(!_cliPdf.url){w=window.open('','_blank');if(w)w.opener=null;}
+  // Notificar / guardar: no dependen del PDF. Si algo falla aquí, WhatsApp igual debe abrir
+  try{
+    _notificarCotizacion(lines,subV,dcto,total);
+    _guardarCotParaOS(lines,cliente,tel,fecha,subV,dcto,total);
+    const subC=lines.reduce((a,l)=>a+l.c,0);
+    _saveCotSheet({tipo:'Mudanza',total,subtotal:subV,descuento:dcto,costo:subC,utilidad:total-subC,doc:waDocNum,items:lines.map(l=>({cat:l.cat,l:l.l,v:l.v,c:l.c,qty:l.qty}))});
+  }catch(e){console.warn('sendWA sync:',e);}
+  let pdfUrl=_cliPdf.url;
+  if(!pdfUrl){try{pdfUrl=await Promise.race([subirPdfClienteDrive(),new Promise(r=>setTimeout(()=>r(''),8000))]);}catch(e){pdfUrl='';}}
   let fechaFmt=fecha;
   try{const[y,m,d]=fecha.split("-").map(Number);fechaFmt=new Date(y,(m||1)-1,d||1).toLocaleDateString("es-CO",{day:"2-digit",month:"long",year:"numeric"});}catch{}
   let msg=E.casa+` *Cotización Trasteos Ya*\n`;
@@ -1208,17 +1223,10 @@ function sendWA(){
   } else {
     msg+=`\n`+E.check+` *Total: ${COP(subV)}*`;
   }
+  if(pdfUrl)msg+=`\n\n`+E.doc+` *Tu cotización en PDF (${waDocNum}):*\n${pdfUrl}`;
   msg+=`\n\n${OBSERVACIONES}`;
   var waUrl=tel?`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`:`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-  window.open(waUrl,"_blank","noopener,noreferrer");
-  // Notificar al operador
-  _notificarCotizacion(lines,subV,dcto,total);
-  // Guardar cotización para uso en OS
-  _guardarCotParaOS(lines,cliente,tel,fecha,subV,dcto,total);
-  // Sync al sheet
-  const subC=lines.reduce((a,l)=>a+l.c,0);
-  var waDocNum=generarConsecutivo(fecha);
-  _saveCotSheet({tipo:'Mudanza',total,subtotal:subV,descuento:dcto,costo:subC,utilidad:total-subC,doc:waDocNum,items:lines.map(l=>({cat:l.cat,l:l.l,v:l.v,c:l.c,qty:l.qty}))});
+  if(w)w.location.href=waUrl;else window.open(waUrl,"_blank","noopener,noreferrer");
 }
 
 // ============ COPIAR MENSAJE DE REFERIDOS ============
@@ -1374,6 +1382,36 @@ async function _saveCotSheet(financials){
     }),redirect:'follow'});
   }catch(e){console.warn('Save Sheet cot:',e.message);}
 }
+// ============ PDF DE CLIENTE → DRIVE (enlace en el WhatsApp) ============
+// Estado por cotización: misma cotización (mismos datos) = mismo consecutivo y un solo archivo en Drive
+var _cliPdf={sig:'',docNum:'',url:'',promise:null};
+function _docNumCliente(lines,fecha){
+  var sig=JSON.stringify([document.getElementById('cliente').value.trim(),document.getElementById('telefono')?document.getElementById('telefono').value.trim():'',fecha,numVal('descuento'),lines.map(function(l){return[l.l,l.v,l.qty];})]);
+  if(_cliPdf.sig!==sig)_cliPdf={sig:sig,docNum:generarConsecutivo(fecha),url:'',promise:null};
+  return _cliPdf.docNum;
+}
+function _postCotSheet(payload,ms){
+  var ctl=new AbortController();var t=setTimeout(function(){ctl.abort();},ms);
+  return fetch(COT_SHEET_URL,{method:'POST',body:JSON.stringify(Object.assign({apikey:BACKUP_APIKEY},payload)),redirect:'follow',signal:ctl.signal})
+    .then(function(r){return r.json();}).finally(function(){clearTimeout(t);});
+}
+function subirPdfClienteDrive(b){
+  var lines=getLines();
+  if(!lines.length)return Promise.resolve('');
+  var docNum=_docNumCliente(lines,document.getElementById('fecha').value);
+  var st=_cliPdf;
+  if(st.promise)return st.promise;
+  st.promise=(async function(){
+    try{
+      b=b||buildPdfCliente(docNum);
+      var r=await _postCotSheet({type:'cotizacion_pdf',filename:b.fn,pdf_base64:b.doc.output('datauristring').split(',')[1],meta:{doc:docNum,cliente:b.cliente}},20000);
+      if(r&&r.ok&&r.url){st.url=r.url;return r.url;}
+    }catch(e){console.warn('PDF cliente a Drive:',e.message);}
+    st.promise=null; // permite reintentar
+    return '';
+  })();
+  return st.promise;
+}
 async function _backupCotDrive(doc,filename,tipo,financials){
   try{
     const pdf_base64=doc.output('datauristring').split(',')[1];
@@ -1472,7 +1510,8 @@ async function addHeader(doc,title,cliente,fecha){
 }
 
 // ============ PDF CLIENTE ============
-function pdfCliente(){
+// Construye el PDF de cliente (no lo descarga ni lo envía): lo usan el botón PDF y el enlace del WhatsApp
+function buildPdfCliente(docNum){
   const{jsPDF}=window.jspdf;
   const doc=new jsPDF();
   const lines=getLines();
@@ -1489,7 +1528,6 @@ function pdfCliente(){
   doc.setFillColor(200,208,224);
   for(var i=0;i<cols;i++){if((i*sz)/210>0.55)continue;for(var j=0;j<rows;j++){if((i+j)%2===0)doc.rect(i*sz,j*sz,sz,sz,'F');}}
   try{doc.setGState(new doc.GState({opacity:1}));}catch(e){}
-  var docNum=generarConsecutivo(fecha);
   try{doc.addImage(LOGO_SMALL,'JPEG',14,8,46,15);}catch(e){doc.setTextColor(10,24,69);doc.setFont('helvetica','bold');doc.setFontSize(20);doc.text('TRASTEOS YA',14,22);}
   doc.setTextColor(10,24,69);doc.setFont('helvetica','bold');doc.setFontSize(11);
   doc.text('Cotización: '+docNum,196,16,{align:'right'});
@@ -1534,8 +1572,16 @@ function pdfCliente(){
   doc.text('WhatsApp +57 314 309 5194  ·  trasteosya.online',14,y);
   doc.setProperties({title:'Cotización '+docNum+' '+cliente+' - Trasteos Ya',subject:'Cotización de mudanza',creator:'Trasteos Ya',author:'trasteosya.online'});
   const fn=docNum+' '+safeName(cliente)+'.pdf';
+  return{doc,fn,docNum,cliente,subV,dcto,total};
+}
+function pdfCliente(){
+  const lines=getLines();
+  const fecha=document.getElementById("fecha").value;
+  const b=buildPdfCliente(_docNumCliente(lines,fecha));
+  const{doc,fn,docNum,cliente,subV,dcto,total}=b;
   try{var bl=doc.output('blob');var u=URL.createObjectURL(bl);var a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove();},2000);}catch(e){doc.save(fn);}
   _backupCotDrive(doc,fn,'cliente',{total:total,subtotal:subV,descuento:dcto,items:lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,qty:l.qty};})});
+  subirPdfClienteDrive(b); // solo el PDF de cliente va a Drive; el interno (costos y utilidad) nunca
   _saveCotSheet({tipo:'Mudanza',total:total,subtotal:subV,descuento:dcto,doc:docNum,items:lines.map(function(l){return{cat:l.cat,l:l.l,v:l.v,c:l.c||0,qty:l.qty};})});
   var tel=document.getElementById("telefono").value.replace(/\D/g,"");
   _guardarCotParaOS(lines,cliente,tel,fecha,subV,dcto,total);
