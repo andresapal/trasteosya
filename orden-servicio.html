@@ -114,8 +114,9 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" defer></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDi9_zgprc277akzYB895fHEWk90QSM5cg&libraries=places&loading=async" defer></script>
+<link rel="stylesheet" href="css/org-menu.css?v=1">
 </head>
-<body data-gate="admin-only">
+<body data-gate="admin-only" data-org="orden-servicio">
 
 <!-- SPLASH (una vez por sesion) -->
 <link rel="stylesheet" href="css/splash.css">
@@ -149,6 +150,7 @@ body.is-operator .os-bottom-bar{margin-bottom:0}
         <button onclick="handleDuplicar();document.getElementById('os-dropdown').classList.remove('open')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Duplicar</button>
       </div>
     </div>
+    <div id="org-menu-slot"></div>
   </div>
 </div>
 
@@ -1591,5 +1593,5 @@ document.addEventListener('click',function(e){
 });
 </script>
 <script src="js/swipe-nav.js"></script>
-<script src="js/access-gate.js?v=18"></script></body>
+<script src="js/org-menu.js?v=1"></script><script src="js/access-gate.js?v=20"></script></body>
 </html>

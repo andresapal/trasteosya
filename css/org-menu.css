@@ -1,0 +1,190 @@
+/* ============================================================
+   Menu de la Organizacion (hamburguesa) + encabezado unificado
+   Se aplica a los modulos internos: <body data-org="...">
+   ============================================================ */
+
+/* ---------- 1) Encabezado unificado: el de Tarifas ----------
+   Franja azul marino con patron de ajedrez. Se aplica al encabezado que es
+   hijo directo del <body> (cada modulo lo llama distinto). */
+body[data-org] > .header,
+body[data-org] > .main-header,
+body[data-org] > .top {
+  background:
+    linear-gradient(45deg, rgba(93,168,255,.12) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(93,168,255,.12) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(93,168,255,.12) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(93,168,255,.12) 75%),
+    linear-gradient(135deg, #001236 0%, #0A1845 50%, #001236 100%) !important;
+  background-size: 22px 22px, 22px 22px, 22px 22px, 22px 22px, 100% 100% !important;
+  background-position: 0 0, 0 11px, 11px -11px, -11px 0, 0 0 !important;
+  border-bottom: 1px solid rgba(93,168,255,.25) !important;
+  box-shadow: 0 4px 20px rgba(10,24,69,.35) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  color: #fff;
+}
+body[data-org] > .header h1,
+body[data-org] > .header .header-left h1,
+body[data-org] > .main-header h1,
+body[data-org] > .top .top-t {
+  color: #fff !important;
+}
+body[data-org] > .top .top-s { color: #9db2dd; }
+
+/* ---------- 2) Boton hamburguesa ---------- */
+#org-menu-slot {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: 8px;
+  padding: 0 !important; /* el cotizador aplica padding a los hijos de .hdr-actions */
+}
+.ty-org-burger {
+  width: 40px; height: 40px;
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  padding: 0; margin: 0;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.28);
+  background: rgba(255,255,255,.08);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .15s, border-color .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.ty-org-burger span {
+  display: block; width: 18px; height: 2px; border-radius: 2px; background: #fff;
+}
+.ty-org-burger:hover { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.45); }
+.ty-org-burger:focus-visible { outline: 2px solid #5DA8FF; outline-offset: 2px; }
+/* Sin slot en la pagina: boton flotante arriba a la derecha */
+.ty-org-burger--float {
+  position: fixed; top: 10px; right: 10px; z-index: 9990;
+  background: #0A1845;
+}
+
+/* ---------- 3) Panel lateral ---------- */
+.ty-org-overlay {
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(6,14,40,.55);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s;
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+}
+.ty-org-overlay.open { opacity: 1; pointer-events: auto; }
+
+.ty-org-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 9999;
+  width: min(88vw, 330px);
+  display: flex; flex-direction: column;
+  background: #fff; color: #0f172a;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  box-shadow: -12px 0 40px rgba(6,14,40,.35);
+  transform: translateX(105%);
+  transition: transform .25s ease;
+  visibility: hidden;
+}
+.ty-org-drawer.open { transform: none; visibility: visible; }
+
+.ty-org-head {
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 16px 16px 14px;
+  color: #fff;
+  background:
+    linear-gradient(45deg, rgba(93,168,255,.12) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(93,168,255,.12) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(93,168,255,.12) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(93,168,255,.12) 75%),
+    linear-gradient(135deg, #001236 0%, #0A1845 50%, #001236 100%);
+  background-size: 22px 22px, 22px 22px, 22px 22px, 22px 22px, 100% 100%;
+  background-position: 0 0, 0 11px, 11px -11px, -11px 0, 0 0;
+  border-bottom: 1px solid rgba(93,168,255,.25);
+}
+.ty-org-head b { display: block; font-size: 15px; letter-spacing: -.01em; }
+.ty-org-head small { display: block; margin-top: 2px; font-size: 11px; color: #9db2dd; }
+.ty-org-close {
+  width: 36px; height: 36px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 9px; border: 1px solid rgba(255,255,255,.28);
+  background: rgba(255,255,255,.08); color: #fff; cursor: pointer; padding: 0;
+}
+.ty-org-close:hover { background: rgba(255,255,255,.18); }
+.ty-org-close:focus-visible { outline: 2px solid #5DA8FF; outline-offset: 2px; }
+
+.ty-org-body { flex: 1; overflow-y: auto; padding: 8px 10px 14px; -webkit-overflow-scrolling: touch; }
+.ty-org-sec {
+  padding: 14px 10px 6px;
+  font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+  color: #64748b;
+}
+.ty-org-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 10px; margin: 1px 0;
+  border-radius: 10px;
+  font-size: 14px; font-weight: 600; text-decoration: none;
+  color: #0f172a;
+  transition: background .12s;
+}
+.ty-org-item svg { width: 18px; height: 18px; flex-shrink: 0; color: #003DA5; }
+.ty-org-item:hover { background: #f1f5f9; }
+.ty-org-item:focus-visible { outline: 2px solid #003DA5; outline-offset: -2px; }
+.ty-org-item.active { background: rgba(0,61,165,.09); color: #003DA5; }
+.ty-org-item .ty-org-ext { margin-left: auto; width: 14px; height: 14px; color: #94a3b8; }
+.ty-org-extra { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 4px 4px 6px; margin: 4px 0 2px; }
+.ty-org-extra .ty-org-sec { padding-top: 10px; }
+
+.ty-org-foot {
+  flex-shrink: 0;
+  display: flex; gap: 8px;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  border-top: 1px solid #e2e8f0;
+}
+.ty-org-foot button {
+  flex: 1;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 12px; border-radius: 10px;
+  border: 1px solid #e2e8f0; background: #fff; color: #334155;
+  font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.ty-org-foot button svg { width: 16px; height: 16px; flex-shrink: 0; }
+.ty-org-foot button:hover { background: #f1f5f9; }
+.ty-org-foot .ty-org-logout { color: #b91c1c; border-color: #fecaca; }
+.ty-org-foot .ty-org-logout:hover { background: #fef2f2; }
+
+/* ---------- 4) Modo oscuro ---------- */
+body.ty-dark .ty-org-drawer { background: #14162a; color: #e5e7eb; box-shadow: -12px 0 40px rgba(0,0,0,.6); }
+body.ty-dark .ty-org-sec { color: #94a3b8; }
+body.ty-dark .ty-org-item { color: #e5e7eb; }
+body.ty-dark .ty-org-item svg { color: #7b9cf5; }
+body.ty-dark .ty-org-item:hover { background: rgba(255,255,255,.06); }
+body.ty-dark .ty-org-item.active { background: rgba(123,156,245,.16); color: #a9c0ff; }
+body.ty-dark .ty-org-extra { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.08); }
+body.ty-dark .ty-org-foot { border-top-color: rgba(255,255,255,.08); }
+body.ty-dark .ty-org-foot button { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1); color: #e5e7eb; }
+body.ty-dark .ty-org-foot button:hover { background: rgba(255,255,255,.1); }
+body.ty-dark .ty-org-foot .ty-org-logout { color: #fca5a5; border-color: rgba(252,165,165,.3); }
+
+/* ---------- 5) Lo que ya no se muestra en los modulos con menu ---------- */
+/* Puntos de "deslizar entre modulos": ya los ocultaba la barra oscura anterior. */
+body[data-org] .swipe-nav-dots { display: none !important; }
+
+/* ---------- 6) Pantallas angostas ----------
+   El cotizador ya traia 3 controles en el encabezado; con el boton del menu se queda sin
+   espacio a 360 px o menos. Se compacta lo justo para que todo quepa sin scroll. */
+@media (max-width: 420px) {
+  body[data-org="cotizador"] > .header { padding-left: 12px !important; padding-right: 12px !important; }
+  body[data-org="cotizador"] > .header .header-left img { height: 32px !important; }
+  .ty-org-burger { width: 36px; height: 36px; }
+  #org-menu-slot { margin-left: 2px; }
+}
+@media (max-width: 340px) {
+  body[data-org="cotizador"] > .header .header-left img { height: 27px !important; }
+  body[data-org="cotizador"] .hdr-actions { gap: 2px !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ty-org-drawer, .ty-org-overlay { transition: none; }
+}
+@media print {
+  .ty-org-burger, .ty-org-drawer, .ty-org-overlay, #org-menu-slot { display: none !important; }
+}

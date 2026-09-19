@@ -280,8 +280,9 @@ body.ty-dark .cal-upcoming__item{background:rgba(30,32,44,.95);border-color:rgba
 
 @media print{.header,.controls,.camp-actions,.main-tabs,.swipe-nav-dots,.ty-op-toolbar,.ty-op-trigger,.ty-gate-modal,.ty-lock-btn{display:none!important}}
 </style>
+<link rel="stylesheet" href="css/org-menu.css?v=1">
 </head>
-<body data-gate="admin-only">
+<body data-gate="admin-only" data-org="campanas">
 
 <!-- SPLASH (una vez por sesion) -->
 <link rel="stylesheet" href="css/splash.css">
@@ -304,6 +305,7 @@ body.ty-dark .cal-upcoming__item{background:rgba(30,32,44,.95);border-color:rgba
       <a href="index.html"><img src="assets/img/logo.png" alt="Trasteos Ya"></a>
       <h1>Campa&#241;as</h1>
     </div>
+    <div id="org-menu-slot"></div>
   </div>
 </div>
 
@@ -1435,6 +1437,6 @@ setTimeout(checkAlertsOnLoad,1500);
 <script src="js/swipe-nav.js"></script>
 <script src="js/modulos-externos.js?v=1"></script>
 <link rel="stylesheet" href="css/access-gate.css?v=18"/>
-<script src="js/access-gate.js?v=18"></script>
+<script src="js/org-menu.js?v=1"></script><script src="js/access-gate.js?v=20"></script>
 </body>
 </html>
