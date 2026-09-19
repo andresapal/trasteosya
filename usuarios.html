@@ -12,19 +12,57 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--navy:#0A1845;--brand:#003DA5;--bg:#f4f6fb;--surface:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b}
-body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text)}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);padding-bottom:40px}
 .top{color:#fff;padding:16px 20px;position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#0A1845}
 .top img{height:30px}
 .top-t{font-size:15px;font-weight:700;letter-spacing:-.01em}
 .top-s{font-size:11px;color:#9db2dd;margin-top:2px}
 .wrap{max-width:900px;margin:0 auto;padding:18px 16px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 18px;margin-bottom:14px}
-.card h2{font-size:16px;color:var(--navy);margin-bottom:6px}
-.card p{font-size:13.5px;line-height:1.55;color:var(--muted)}
-.card ul{margin:12px 0 0 18px;font-size:13.5px;line-height:1.8;color:var(--text)}
-.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:999px;padding:3px 10px;margin-bottom:10px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden}
+.card-h{padding:14px 16px;border-bottom:1px solid var(--border)}
+.card-t{font-size:14px;font-weight:700;color:var(--navy)}
+.card-d{font-size:12px;color:var(--muted);margin-top:2px}
+.card-b{padding:16px}
+.aviso{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;padding:11px 13px;font-size:12.5px;line-height:1.5;margin-bottom:14px}
+/* Lista */
+.user{display:flex;align-items:center;gap:12px;padding:12px 0}
+.user+.user{border-top:1px solid var(--border)}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.user-n{font-size:14px;font-weight:700}
+.user-m{font-size:12px;color:var(--muted);word-break:break-all}
+.user-r{margin-left:auto;text-align:right;flex-shrink:0}
+.pill{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:3px 10px}
+.pill-admin{background:rgba(0,61,165,.1);color:var(--brand)}
+.pill-ok{background:#e0f2e9;color:#15803d;margin-left:4px}
+/* Formulario */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field.full{grid-column:1/-1}
+label,.lbl{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+input[type=text],input[type=email],input[type=tel],select{width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:9px;font:inherit;font-size:14px;background:#fff;color:var(--text)}
+input:focus,select:focus{outline:none;border-color:var(--brand)}
+.hint{font-size:12px;color:var(--muted);line-height:1.5}
+.mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.mod{display:flex;align-items:center;gap:8px;padding:9px 11px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--text);cursor:pointer;user-select:none}
+.mod input{width:16px;height:16px;accent-color:var(--brand);flex-shrink:0}
+.mod.on{border-color:var(--brand);background:rgba(0,61,165,.06);color:var(--brand)}
+.actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:6px}
+.btn{padding:11px 20px;border:none;border-radius:9px;background:var(--brand);color:#fff;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.btn:disabled{background:#cbd5e1;color:#64748b;cursor:not-allowed}
+/* Perfiles */
+.perfil{padding:11px 0}
+.perfil+.perfil{border-top:1px solid var(--border)}
+.perfil b{font-size:13.5px}
+.perfil p{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.5}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.user{flex-wrap:wrap}.user-r{margin-left:50px;text-align:left}}
+/* Oscuro */
 body.ty-dark{--bg:#0f0f1a;--surface:#161822;--border:rgba(255,255,255,.08);--text:#e5e7eb;--muted:#94a3b8}
-body.ty-dark .card h2{color:#a9c0ff}
+body.ty-dark .card-t{color:#a9c0ff}
+body.ty-dark input[type=text],body.ty-dark input[type=email],body.ty-dark input[type=tel],body.ty-dark select{background:#0f1120;color:var(--text)}
+body.ty-dark .mod.on{background:rgba(123,156,245,.14);color:#a9c0ff;border-color:#7b9cf5}
+body.ty-dark .pill-admin{background:rgba(123,156,245,.16);color:#a9c0ff}
+body.ty-dark .btn:disabled{background:#2a2d40;color:#7c8299}
+body.ty-dark .aviso{background:rgba(251,146,60,.1);border-color:rgba(251,146,60,.3);color:#fdba74}
 </style>
 </head>
 <body data-gate="admin-only" data-org="usuarios">
@@ -41,18 +79,92 @@ body.ty-dark .card h2{color:#a9c0ff}
 </header>
 
 <div class="wrap">
-  <div class="card">
-    <span class="tag">En construcción</span>
-    <h2>Módulo de usuarios</h2>
-    <p>Aquí vas a administrar a las personas que usan las herramientas internas de Trasteos Ya. Esta pantalla se activa junto con el inicio de sesión real, que reemplaza al PIN.</p>
-    <ul>
-      <li>Crear y desactivar usuarios</li>
-      <li>Definir qué módulos ve cada persona</li>
-      <li>Restablecer contraseñas</li>
-      <li>Cerrar sesiones abiertas</li>
-    </ul>
+
+  <div class="aviso">
+    Este módulo ya tiene su espacio, pero <b>todavía no guarda nada</b>: se activa junto con el inicio de sesión real, que reemplaza al PIN.
+    Hasta entonces las herramientas siguen entrando con el PIN de siempre.
   </div>
+
+  <div class="card">
+    <div class="card-h"><div class="card-t">Usuarios</div><div class="card-d">Personas con acceso a las herramientas internas</div></div>
+    <div class="card-b">
+      <div class="user">
+        <div class="avatar">A</div>
+        <div>
+          <div class="user-n">Andrés Aparicio</div>
+          <div class="user-m">andresapal@gmail.com</div>
+        </div>
+        <div class="user-r"><span class="pill pill-admin">Administrador</span><span class="pill pill-ok">Activo</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><div class="card-t">Nuevo usuario</div><div class="card-d">Solo el Administrador puede crear usuarios</div></div>
+    <div class="card-b">
+      <form id="form-usuario" onsubmit="return false" autocomplete="off">
+        <div class="grid">
+          <div class="field"><label for="u-nombre">Nombre completo</label><input id="u-nombre" type="text" placeholder="Ej: María Gómez"></div>
+          <div class="field"><label for="u-correo">Correo</label><input id="u-correo" type="email" inputmode="email" placeholder="correo@ejemplo.com"></div>
+          <div class="field"><label for="u-tel">Teléfono (opcional)</label><input id="u-tel" type="tel" inputmode="numeric" placeholder="573001234567"></div>
+          <div class="field"><label for="u-perfil">Perfil</label>
+            <select id="u-perfil">
+              <option value="ventas">Ventas</option>
+              <option value="contabilidad">Contabilidad</option>
+              <option value="operaciones">Operaciones</option>
+            </select>
+          </div>
+          <div class="field full">
+            <span class="lbl">Módulos que verá</span>
+            <div class="mods" id="u-mods"></div>
+            <div class="hint" id="u-hint"></div>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn" disabled title="Se activa con el inicio de sesión real">Crear usuario</button>
+          <span class="hint">Se activa con el inicio de sesión real.</span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><div class="card-t">Perfiles</div><div class="card-d">Qué puede hacer cada uno</div></div>
+    <div class="card-b">
+      <div class="perfil"><b>Administrador</b><p>Ve todos los módulos y administra los usuarios. Hoy: solo tú.</p></div>
+      <div class="perfil"><b>Ventas</b><p>Solo ve lo suyo: las cotizaciones y órdenes que crea con su usuario. No ve lo de otros vendedores.</p></div>
+      <div class="perfil"><b>Contabilidad</b><p>Reservado. Módulos financieros.</p></div>
+      <div class="perfil"><b>Operaciones</b><p>Reservado. Módulos de servicio en campo.</p></div>
+    </div>
+  </div>
+
 </div>
+
+<script>
+// Módulos que se marcan de entrada según el perfil. Son una sugerencia: se pueden cambiar uno por uno.
+var MODULOS=[
+  {id:'cotizador',l:'Cotizador'},{id:'orden-servicio',l:'Orden de servicio'},{id:'kpi',l:"KPI's"},
+  {id:'campanas',l:'Campañas'},{id:'finanzas',l:'Finanzas'},{id:'tarifas',l:'Tarifas'}
+];
+var POR_PERFIL={
+  ventas:{on:['cotizador','orden-servicio'],hint:'Ventas solo ve lo que crea con su propio usuario.'},
+  contabilidad:{on:['finanzas','kpi'],hint:'Sugerencia para Contabilidad. Puedes cambiarla.'},
+  operaciones:{on:['orden-servicio'],hint:'Sugerencia para Operaciones. Puedes cambiarla.'}
+};
+function pintar(){
+  var p=document.getElementById('u-perfil').value,def=POR_PERFIL[p];
+  document.getElementById('u-mods').innerHTML=MODULOS.map(function(m){
+    var on=def.on.indexOf(m.id)!==-1;
+    return '<label class="mod'+(on?' on':'')+'"><input type="checkbox" value="'+m.id+'"'+(on?' checked':'')+'><span>'+m.l+'</span></label>';
+  }).join('');
+  document.getElementById('u-hint').textContent=def.hint;
+}
+document.getElementById('u-perfil').addEventListener('change',pintar);
+document.getElementById('u-mods').addEventListener('change',function(e){
+  if(e.target&&e.target.type==='checkbox')e.target.parentNode.classList.toggle('on',e.target.checked);
+});
+pintar();
+</script>
 
 <link rel="stylesheet" href="css/access-gate.css?v=18"/>
 <link rel="stylesheet" href="css/org-menu.css?v=1">
