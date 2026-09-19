@@ -31,9 +31,7 @@ export const config = {
     '/servicios', '/servicios.html',
     '/usuarios', '/usuarios.html',
     '/output', '/output/:path*',
-    '/acceso', '/salir',
-    // Prueba de plataforma (se quitan cuando se confirme que Vercel ejecuta este archivo)
-    '/__mw_canary', '/__mw_next.txt'
+    '/acceso', '/salir'
   ]
 };
 
@@ -179,10 +177,6 @@ function cerrarSesion() {
 
 export default async function middleware(request) {
   var url = new URL(request.url), p = url.pathname;
-
-  // Prueba de plataforma
-  if (p === '/__mw_canary') return new Response('mw-ok', { status: 200, headers: { 'content-type': 'text/plain', 'x-ty-mw': 'respondio' } });
-  if (p === '/__mw_next.txt') return new Response(null, { headers: { 'x-middleware-next': '1', 'x-ty-mw': 'paso' } });
 
   var env = { AUTH_ENABLED: process.env.AUTH_ENABLED, ADMIN_EMAIL: process.env.ADMIN_EMAIL, ADMIN_PASSWORD: process.env.ADMIN_PASSWORD, SESSION_SECRET: process.env.SESSION_SECRET };
 
