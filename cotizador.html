@@ -1193,8 +1193,8 @@ async function sendWA(){
   const waDocNum=_docNumCliente(lines,fecha);
   // El PDF de cliente se sube a Drive y su enlace va en el mensaje. La pestaña se abre ya, con el clic
   // (si no, el navegador la bloquea), y se completa cuando el enlace está listo
-  let w=null;
-  if(!_cliPdf.url){w=window.open('','_blank');if(w)w.opener=null;}
+  let w=null,sinPestana=false;
+  if(!_cliPdf.url){w=window.open('','_blank');if(w)w.opener=null;else sinPestana=true;}
   // Notificar / guardar: no dependen del PDF. Si algo falla aquí, WhatsApp igual debe abrir
   try{
     _notificarCotizacion(lines,subV,dcto,total);
@@ -1203,7 +1203,11 @@ async function sendWA(){
     _saveCotSheet({tipo:'Mudanza',total,subtotal:subV,descuento:dcto,costo:subC,utilidad:total-subC,doc:waDocNum,items:lines.map(l=>({cat:l.cat,l:l.l,v:l.v,c:l.c,qty:l.qty}))});
   }catch(e){console.warn('sendWA sync:',e);}
   let pdfUrl=_cliPdf.url;
-  if(!pdfUrl){try{pdfUrl=await Promise.race([subirPdfClienteDrive(),new Promise(r=>setTimeout(()=>r(''),8000))]);}catch(e){pdfUrl='';}}
+  if(!pdfUrl){
+    // Si el navegador bloqueó la pestaña, no se espera: WhatsApp abre ya (sin perder el clic) y el enlace irá en el próximo envío
+    if(sinPestana){subirPdfClienteDrive();}
+    else{try{pdfUrl=await Promise.race([subirPdfClienteDrive(),new Promise(r=>setTimeout(()=>r(''),8000))]);}catch(e){pdfUrl='';}}
+  }
   let fechaFmt=fecha;
   try{const[y,m,d]=fecha.split("-").map(Number);fechaFmt=new Date(y,(m||1)-1,d||1).toLocaleDateString("es-CO",{day:"2-digit",month:"long",year:"numeric"});}catch{}
   let msg=E.casa+` *Cotización Trasteos Ya*\n`;
