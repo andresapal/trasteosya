@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><meta name="robots" content="noindex,nofollow"><meta name="description" content="Herramienta interna de cotización - Trasteos Ya"><link rel="icon" type="image/png" href="assets/img/logo.png"/>
 <title>Cotizador interno - Trasteos Ya</title>
-<script src="js/tenant.js"></script>
-<script src="js/tenant-apply.js"></script>
+<script src="js/tenant.js?v=20260919"></script>
+<script src="js/tenant-apply.js?v=20260919"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1282,24 +1282,21 @@ function _guardarCotParaOS(lines,cliente,tel,fecha,subV,dcto,total){
     // Alerta cuando se acerque al límite
     if(cache.length>=900){
       var aviso=E.warn+' *Alerta: Cache de cotizaciones al '+Math.round(cache.length/10)+'%*\n\nTienes '+cache.length+' de '+COT_MAX+' cotizaciones guardadas localmente.\n\nDescarga el backup desde el navegador antes de que se llene.\n\n'+E.clock+' '+new Date().toLocaleString('es-CO');
-      fetch('https://api.telegram.org/bot'+_NOTIFY.TG_TOKEN+'/sendMessage',{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({chat_id:_NOTIFY.TG_CHAT,text:aviso,parse_mode:'Markdown'})
-      }).catch(function(){});
-      fetch('https://api.callmebot.com/whatsapp.php?phone='+_NOTIFY.CMB_PHONE+'&text='+encodeURIComponent(aviso)+'&apikey='+_NOTIFY.CMB_KEY,{method:'GET',mode:'no-cors'}).catch(function(){});
+      _notif('tg',aviso);
+      _notif('wa',aviso);
     }
   }catch(e){console.warn('Cache cot:',e);}
 }
 
 // ============ NOTIFICACIONES AL OPERADOR ============
 const _NOTIFY={
-  TG_TOKEN:'8815751812:AAEGlCiQAZKSamRUfD5r0lmzjLTRAaFcdqw',
-  TG_CHAT:'1081707115',
-  CMB_PHONE:'573143095194',
-  CMB_KEY:'9452184',
   W3F_KEY:'4955ca45-48c4-4ef2-9c0b-da17741a1d2c',
   EMAIL_TO:'aaparicio.trasteosyabackup1@gmail.com'
 };
+// Telegram / WhatsApp: el token vive en el servidor (Code.gs, type 'notificar'), no en la página
+function _notif(canal,text){
+  fetch(COT_SHEET_URL,{method:'POST',body:JSON.stringify({type:'notificar',apikey:BACKUP_APIKEY,canal:canal,text:text}),redirect:'follow',keepalive:true}).catch(function(){});
+}
 function _notificarCotizacion(lines,subV,dcto,total){
   const cliente=document.getElementById("cliente").value.trim()||'-';
   const tel=document.getElementById("telefono").value.trim()||'-';
@@ -1319,15 +1316,12 @@ function _notificarCotizacion(lines,subV,dcto,total){
       E.clock+' '+new Date().toLocaleString('es-CO'),
       E.globe+' trasteosya.online'
     ];
-    fetch('https://api.telegram.org/bot'+_NOTIFY.TG_TOKEN+'/sendMessage',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chat_id:_NOTIFY.TG_CHAT,text:tg.join('\n'),parse_mode:'Markdown'})
-    }).catch(function(){});
+    _notif('tg',tg.join('\n'));
   }catch(e){}
   // WhatsApp CallMeBot
   try{
     const wa=E.bell+' Cotización enviada\n'+E.person+' '+cliente+'\n'+E.phone+' '+tel+'\n'+E.cal+' '+fecha+'\n'+E.money+' Total: '+totalFmt+'\n'+E.clock+' '+new Date().toLocaleString('es-CO');
-    fetch('https://api.callmebot.com/whatsapp.php?phone='+_NOTIFY.CMB_PHONE+'&text='+encodeURIComponent(wa)+'&apikey='+_NOTIFY.CMB_KEY,{method:'GET',mode:'no-cors'}).catch(function(){});
+    _notif('wa',wa);
   }catch(e){}
   // Email via Web3Forms
   try{

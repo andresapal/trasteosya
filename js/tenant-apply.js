@@ -92,10 +92,14 @@
     var _originalFetch = window.fetch;
     window.fetch = function () {
       var url = arguments[0] || '';
-      if (typeof url === 'string' &&
+      var body = arguments[1] && arguments[1].body;
+      // los avisos ahora pasan por Apps Script (type 'notificar'), no por api.telegram.org
+      var esAviso = typeof body === 'string' && body.indexOf('"type":"notificar"') !== -1;
+      if (esAviso || (typeof url === 'string' &&
           (url.indexOf('api.telegram.org') !== -1 ||
            url.indexOf('callmebot.com') !== -1 ||
-           url.indexOf('api.web3forms.com') !== -1)) {
+           url.indexOf('api.web3forms.com') !== -1))) {
+        url = String(url);
         console.log('[DEMO] Notificacion bloqueada:', url.substring(0, 60));
         return Promise.resolve(new Response('{}', { status: 200 }));
       }

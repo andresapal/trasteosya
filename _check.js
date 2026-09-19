@@ -591,10 +591,10 @@ function _guardarCotParaOS(lines,cliente,tel,fecha,subV,dcto,total){
 
 // ============ NOTIFICACIONES AL OPERADOR ============
 const _NOTIFY={
-  TG_TOKEN:'8815751812:AAEGlCiQAZKSamRUfD5r0lmzjLTRAaFcdqw',
+  TG_TOKEN:'REDACTED',
   TG_CHAT:'1081707115',
   CMB_PHONE:'573143095194',
-  CMB_KEY:'9452184',
+  CMB_KEY:'REDACTED',
   W3F_KEY:'4955ca45-48c4-4ef2-9c0b-da17741a1d2c',
   EMAIL_TO:'aaparicio.trasteosyabackup1@gmail.com'
 };
@@ -647,7 +647,7 @@ function _notificarCotizacion(lines,subV,dcto,total){
 
 // ============ BACKUP A GOOGLE DRIVE ============
 const BACKUP_URL='https://script.google.com/macros/s/AKfycbytFjQC4osp6QNdCyALI5DGLCMtomQ_DYGqa56MQkGJoykyZcJIPiA1JVyrJ2Smj3ST-w/exec';
-const COT_SHEET_URL='https://script.google.com/macros/s/AKfycbzk3szEtCvnMKaXqZw6gfAIMZFJEX-uI1Sm40OSV03xg47BvShY3ezttQIRmDuols_C/exec';
+const COT_SHEET_URL='https://script.google.com/macros/s/AKfycbyjGtM-cK7N2sPmKjGowZ2an5dabCTMU_Ah2vHb8YFSqTM0K9L-CRewXpF1ApNxRdxL/exec';
 const BACKUP_APIKEY='TrasteosYa-2026-Backup';
 async function _saveCotSheet(financials){
   try{

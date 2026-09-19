@@ -14,13 +14,9 @@
     // 1) Web3Forms · gratis 250 envios/mes · https://web3forms.com
     WEB3FORMS_KEY: '4955ca45-48c4-4ef2-9c0b-da17741a1d2c',
 
-    // 2) Telegram bot · gratis e instantaneo · ver README.md seccion "Telegram bot"
-    TELEGRAM_BOT_TOKEN: '8815751812:AAEGlCiQAZKSamRUfD5r0lmzjLTRAaFcdqw',
-    TELEGRAM_CHAT_ID:   '1081707115',
-
-    // 3) CallMeBot WhatsApp · gratis · push directo al WhatsApp del operador
-    CALLMEBOT_APIKEY: '9452184',
-    CALLMEBOT_PHONE:  '573143095194', // formato: 57 (Colombia) + 10 digitos sin +
+    // 2) y 3) Avisos por Telegram y WhatsApp (CallMeBot): los tokens viven en el servidor
+    //    (Apps Script, type 'notificar'). La página solo conoce esta URL.
+    NOTIFY_URL: 'https://script.google.com/macros/s/AKfycbyjGtM-cK7N2sPmKjGowZ2an5dabCTMU_Ah2vHb8YFSqTM0K9L-CRewXpF1ApNxRdxL/exec',
 
     // 4) Backup en Google Drive (Apps Script Web App)
     BACKUP_URL: 'https://script.google.com/macros/s/AKfycbytFjQC4osp6QNdCyALI5DGLCMtomQ_DYGqa56MQkGJoykyZcJIPiA1JVyrJ2Smj3ST-w/exec',
@@ -149,8 +145,17 @@
   }
 
   /* ---------- Telegram push al operador ---------- */
+  function notifyServer(canal, text) {
+    return fetch(CONFIG.NOTIFY_URL, {
+      method: 'POST',
+      body: JSON.stringify({ type: 'notificar', apikey: CONFIG.BACKUP_APIKEY, canal: canal, text: text }),
+      redirect: 'follow',
+      keepalive: true
+    });
+  }
+
   async function postTelegram(data, source) {
-    if (!CONFIG.TELEGRAM_BOT_TOKEN || !CONFIG.TELEGRAM_CHAT_ID) return;
+    if (!CONFIG.NOTIFY_URL) return;
     try {
       var cotizacion = buildCotizacionHogar(data);
       var lines = [
@@ -176,22 +181,13 @@
         lines.push(E.money+' *Tarifa:* ' + COP(t.precio));
         lines.push(E.ruler+' *Perfil:* ' + t.tamano);
       }
-      var url = 'https://api.telegram.org/bot' + CONFIG.TELEGRAM_BOT_TOKEN + '/sendMessage';
-      await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: CONFIG.TELEGRAM_CHAT_ID,
-          text: lines.join('\n'),
-          parse_mode: 'Markdown'
-        })
-      });
+      await notifyServer('tg', lines.join('\n'));
     } catch (e) { /* silent */ }
   }
 
   /* ---------- WhatsApp push al operador (via CallMeBot) ---------- */
   async function postWhatsApp(data, source) {
-    if (!CONFIG.CALLMEBOT_APIKEY || !CONFIG.CALLMEBOT_PHONE) return;
+    if (!CONFIG.NOTIFY_URL) return;
     try {
       var cotizacion = buildCotizacionHogar(data);
       var lines = [
@@ -216,12 +212,7 @@
         lines.push(E.truck+' ' + t.label + ': ' + COP(t.precio));
         lines.push(E.ruler+' ' + t.tamano);
       }
-      var text = encodeURIComponent(lines.join('\n'));
-      var url = 'https://api.callmebot.com/whatsapp.php' +
-                '?phone=' + CONFIG.CALLMEBOT_PHONE +
-                '&text=' + text +
-                '&apikey=' + CONFIG.CALLMEBOT_APIKEY;
-      await fetch(url, { method: 'GET', mode: 'no-cors' });
+      await notifyServer('wa', lines.join('\n'));
     } catch (e) { /* silent */ }
   }
 

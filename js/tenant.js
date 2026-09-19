@@ -49,10 +49,9 @@
       },
       pin: 'QEFuZHJlczI0MDUq',          // access-gate PIN (base64)
       notify: {
-        TG_TOKEN:  '8815751812:AAEGlCiQAZKSamRUfD5r0lmzjLTRAaFcdqw',
+        // TG_TOKEN y CMB_KEY viven en el servidor (Apps Script, Propiedades del script)
         TG_CHAT:   '1081707115',
         CMB_PHONE: '573143095194',
-        CMB_KEY:   '9452184',
         W3F_KEY:   '4955ca45-48c4-4ef2-9c0b-da17741a1d2c',
         EMAIL_TO:  'aaparicio.trasteosyabackup1@gmail.com'
       },

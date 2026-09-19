@@ -26,10 +26,11 @@
  */
 
 // ── Configuración ──
-var TG_TOKEN  = '8815751812:AAEGlCiQAZKSamRUfD5r0lmzjLTRAaFcdqw';
-var TG_CHAT   = '1081707115';
-var CMB_PHONE = '573143095194';
-var CMB_KEY   = '9452184';
+// Secretos en Propiedades del script (Configuración del proyecto): TG_TOKEN, TG_CHAT, CMB_PHONE, CMB_KEY
+var TG_TOKEN  = PropertiesService.getScriptProperties().getProperty('TG_TOKEN');
+var TG_CHAT   = PropertiesService.getScriptProperties().getProperty('TG_CHAT');
+var CMB_PHONE = PropertiesService.getScriptProperties().getProperty('CMB_PHONE');
+var CMB_KEY   = PropertiesService.getScriptProperties().getProperty('CMB_KEY');
 var FABIAN_PHONE = '573165206865';
 
 var COT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbyjGtM-cK7N2sPmKjGowZ2an5dabCTMU_Ah2vHb8YFSqTM0K9L-CRewXpF1ApNxRdxL/exec';
@@ -664,4 +665,18 @@ function sendWhatsAppTo(phone, text) {
     UrlFetchApp.fetch('https://api.callmebot.com/whatsapp.php?phone=' + phone +
       '&text=' + encodeURIComponent(text) + '&apikey=' + CMB_KEY, { muteHttpExceptions: true });
   } catch (e) {}
+}
+
+// Prueba desde el editor: debe llegar un mensaje a tu Telegram y otro a tu WhatsApp.
+// El resultado de Telegram queda en el Registro de ejecución (200 = enviado).
+function probarNotificacion() {
+  if (!TG_TOKEN || !TG_CHAT) {
+    Logger.log('Faltan las propiedades TG_TOKEN / TG_CHAT en Configuración del proyecto');
+    return;
+  }
+  var r = UrlFetchApp.fetch('https://api.telegram.org/bot' + TG_TOKEN + '/sendMessage', {
+    method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+    payload: JSON.stringify({ chat_id: TG_CHAT, text: 'Prueba de notificación · MarIAna (vapi-webhook)' }) });
+  Logger.log('Telegram: ' + r.getResponseCode() + ' ' + r.getContentText().substring(0, 120));
+  sendWhatsApp('Prueba de notificación · MarIAna (vapi-webhook)');
 }
