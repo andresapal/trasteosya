@@ -72,18 +72,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;background:#f0f2
 }
 </style>
 <link rel="stylesheet" href="css/access-gate.css?v=18"/>
+<link rel="stylesheet" href="css/org-menu.css?v=1">
 </head>
-<body data-gate="admin-only">
+<body data-gate="admin-only" data-org="kpi">
 
 <div class="header">
   <div class="header-left">
     <a href="index.html"><img src="/assets/img/logo.png" alt="Trasteos Ya"/></a>
     <h1>Informes de Servicios</h1>
   </div>
-  <div style="display:flex;gap:12px;align-items:center">
-    <a href="/kpis.html" style="font-size:12px;color:#1B3E8C;font-weight:600;text-decoration:none;padding:6px 12px;border-radius:6px;border:1.5px solid #e2e5ea">KPI's</a>
-    <a href="/orden-servicio.html" style="font-size:12px;color:#1B3E8C;font-weight:600;text-decoration:none">&larr; Orden de Servicio</a>
-  </div>
+  <div id="org-menu-slot"></div>
 </div>
 
 <div class="container">
@@ -293,6 +291,6 @@ function render(){
 render();
 </script>
 <script src="js/swipe-nav.js"></script>
-<script src="js/access-gate.js?v=18"></script>
+<script>window.TY_ORG_EXTRAS=(window.TY_ORG_EXTRAS||[]).concat([{title:"KPI",items:[{label:'KPI Empresa',href:'/kpi-empresa.html'},{label:'KPI General',href:'/kpis.html'}]}]);</script><script src="js/org-menu.js?v=1"></script><script src="js/access-gate.js?v=20"></script>
 </body>
 </html>

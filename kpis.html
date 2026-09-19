@@ -123,8 +123,9 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
 }
 </style>
 <link rel="stylesheet" href="css/access-gate.css?v=18"/>
+<link rel="stylesheet" href="css/org-menu.css?v=1">
 </head>
-<body data-gate="admin-only">
+<body data-gate="admin-only" data-org="kpi">
 
 <!-- SPLASH (una vez por sesion) -->
 <link rel="stylesheet" href="css/splash.css">
@@ -146,10 +147,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:13px;ba
     <a href="index.html"><img src="/assets/img/logo.png" alt="Trasteos Ya"/></a>
     <h1>KPI's</h1>
   </div>
-  <div class="header-nav">
-    <a href="/kpi-empresa.html">KPI Empresa</a>
-    <a href="/servicios.html">Servicios</a>
-  </div>
+  <div id="org-menu-slot"></div>
 </div>
 
 <div class="container" id="main-container">
@@ -903,6 +901,6 @@ async function actualizarDatos(){
 })();
 </script>
 <script src="js/swipe-nav.js"></script>
-<script src="js/access-gate.js?v=18"></script>
+<script>window.TY_ORG_EXTRAS=(window.TY_ORG_EXTRAS||[]).concat([{title:"KPI",items:[{label:'KPI Empresa',href:'/kpi-empresa.html'},{label:'Servicios',href:'/servicios.html'}]}]);</script><script src="js/org-menu.js?v=1"></script><script src="js/access-gate.js?v=20"></script>
 </body>
 </html>

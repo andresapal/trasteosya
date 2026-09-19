@@ -170,6 +170,25 @@
     }
   }
 
+  // ============ MENU DE LA ORGANIZACION ============
+  // Los modulos internos (<body data-org>) usan el menu hamburguesa (js/org-menu.js) en vez del
+  // candado flotante y la barra oscura de abajo. El resto de paginas con gate no cambia.
+  function injectChrome() {
+    if (isOperator() && document.body.hasAttribute('data-org') && window.TYOrgMenu) {
+      window.TYOrgMenu.init();
+      return;
+    }
+    injectLockButton();
+    injectOpToolbar();
+  }
+  // Para que el menu pueda cerrar la sesion sin conocer como se guarda
+  window.TYAccessGate = {
+    logout: function () {
+      setOperator(false);
+      location.href = 'index.html';
+    }
+  };
+
   // ============ INIT ============
   function boot() {
     applyBodyClass();
@@ -192,16 +211,14 @@
             document.body.classList.add('ty-dark');
           }
           document.body.style.visibility = '';
-          injectLockButton();
-          injectOpToolbar();
+          injectChrome();
         }
       });
       return;
     }
 
     if (hasGate) {
-      injectLockButton();
-      injectOpToolbar();
+      injectChrome();
     }
   }
 

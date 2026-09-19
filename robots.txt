@@ -6,6 +6,7 @@ Allow: /cotizadorparati
 Disallow: /cotizador
 Disallow: /orden-servicio
 Disallow: /tarifas
+Disallow: /usuarios
 Disallow: /gracias
 Disallow: /kpis
 Disallow: /kpi-empresa

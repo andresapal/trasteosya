@@ -108,8 +108,9 @@ button.act{padding:11px 20px;border:0;border-radius:9px;font-family:inherit;font
   .bar-in{flex-wrap:wrap}
 }
 </style>
+<link rel="stylesheet" href="css/org-menu.css?v=1">
 </head>
-<body data-gate="admin-only">
+<body data-gate="admin-only" data-org="tarifas">
 
 <header class="top">
   <div style="display:flex;align-items:center;gap:11px">
@@ -119,6 +120,7 @@ button.act{padding:11px 20px;border:0;border-radius:9px;font-family:inherit;font
       <div class="top-s" id="origen">Cargando...</div>
     </div>
   </div>
+  <div id="org-menu-slot"></div>
 </header>
 
 <div class="wrap">
@@ -143,6 +145,13 @@ button.act{padding:11px 20px;border:0;border-radius:9px;font-family:inherit;font
 var MARIANA_URL='https://script.google.com/macros/s/AKfycbwE0hcz8ZsI1nv3OlM0bwXymof_E0FjmvWO02ruOLR6C291alguj1vBlknPZNvzXQ-v/exec';
 var APIKEY='TrasteosYa-2026-Backup';
 var T=TYCotizador;
+
+// Solo la fecha (dd/mm/aaaa), sin hora ni la palabra "Actualizado". Sin dato, la de hoy.
+function soloFecha(s){
+  var m=String(s||'').match(/(\d{4})-(\d{2})-(\d{2})/);
+  if(m)return m[3]+'/'+m[2]+'/'+m[1];
+  var d=new Date();return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear();
+}
 
 var SECCIONES=[
   {k:'trasteo',t:'Trasteo urbano',d:'Por tamaño de vivienda',items:function(){
@@ -479,7 +488,7 @@ function guardar(){
       if(d&&d.ok){
         T.aplicar(tarifas);
         marcar('Guardado. MarIAna y los cotizadores ya usan estos valores.');
-        document.getElementById('origen').textContent='Actualizado '+(d.actualizado||'ahora');
+        document.getElementById('origen').textContent=soloFecha(d.actualizado);
       }else{
         marcar('No se pudo guardar: '+((d&&d.error)||'revisa la conexión'));
       }
@@ -503,7 +512,7 @@ var _aviso=setTimeout(function(){marcar('No se pudieron traer las tarifas guarda
 T.cargarTarifas(MARIANA_URL,APIKEY).then(function(){
   clearTimeout(_aviso);
   var m=T.meta();
-  document.getElementById('origen').textContent=m.actualizado?('Actualizado '+m.actualizado):'Valores base';
+  document.getElementById('origen').textContent=m.actualizado?soloFecha(m.actualizado):'Valores base';
   render();
   marcar('');
 }).catch(function(){
@@ -512,6 +521,6 @@ T.cargarTarifas(MARIANA_URL,APIKEY).then(function(){
 });
 </script>
 <link rel="stylesheet" href="css/access-gate.css?v=18"/>
-<script src="js/access-gate.js?v=18"></script>
+<script src="js/org-menu.js?v=1"></script><script src="js/access-gate.js?v=20"></script>
 </body>
 </html>

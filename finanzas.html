@@ -200,8 +200,9 @@ body.ty-dark .cot-show-more{color:#7b9cf5;border-color:rgba(80,80,120,.4)}
 }
 </style>
 <link rel="stylesheet" href="css/access-gate.css?v=19"/>
+<link rel="stylesheet" href="css/org-menu.css?v=1">
 </head>
-<body data-gate="admin-only">
+<body data-gate="admin-only" data-org="finanzas">
 
 <!-- SPLASH (una vez por sesion) -->
 <link rel="stylesheet" href="css/splash.css">
@@ -223,7 +224,7 @@ body.ty-dark .cot-show-more{color:#7b9cf5;border-color:rgba(80,80,120,.4)}
     <a href="index.html"><img src="/assets/img/logo.png" alt="Trasteos Ya"/></a>
     <h1>Finanzas</h1>
   </div>
-  <div class="header-nav"></div>
+  <div id="org-menu-slot"></div>
 </div>
 
 <div class="container">
@@ -802,6 +803,6 @@ fetchDriveCots().then(function(){renderCotizaciones();sincronizarCdcMariana();})
 });
 </script>
 <script src="js/swipe-nav.js"></script>
-<script src="js/access-gate.js?v=19"></script>
+<script src="js/org-menu.js?v=1"></script><script src="js/access-gate.js?v=20"></script>
 </body>
 </html>

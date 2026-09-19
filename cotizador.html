@@ -209,8 +209,9 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
 .ops-row select{flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit}
 .urb-ops-row{display:flex;align-items:center;gap:6px;margin-top:4px;justify-content:center}.urb-ops-row label{font-size:10px;color:var(--muted)}.urb-ops-row select{padding:2px 4px;font-size:11px;border:1px solid var(--border);border-radius:4px;width:40px;text-align:center}
 </style>
-<link rel="stylesheet" href="css/access-gate.css?v=18"></head>
-<body data-gate="enabled">
+<link rel="stylesheet" href="css/access-gate.css?v=18"><link rel="stylesheet" href="css/org-menu.css?v=1">
+</head>
+<body data-gate="enabled" data-org="cotizador">
 
 <!-- SPLASH (una vez por sesion, compartido entre paginas admin) -->
 <link rel="stylesheet" href="css/splash.css">
@@ -269,6 +270,7 @@ svg.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;str
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-2V6a4 4 0 0 0-4-4z"/><circle cx="12" cy="15" r="2"/></svg>
         <span class="hide-mobile">Motor IA</span>
       </div>
+      <div id="org-menu-slot"></div>
     </div>
   </div>
 </header>
@@ -2529,5 +2531,5 @@ recalc();
   </div>
 </div>
 <script src="js/motor-inteligente.js?v=1"></script>
-<script src="js/access-gate.js?v=18"></script></body>
+<script src="js/org-menu.js?v=1"></script><script src="js/access-gate.js?v=20"></script></body>
 </html>
